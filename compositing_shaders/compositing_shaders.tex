@@ -1,0 +1,323 @@
+% "Compositing shaders in X3D" by Michalis Kamburelis,
+% for Web3D 2011.
+%
+% If accepted, this will be © Copyright 2010 by ACM, Inc.
+% See http://www.acm.org/publications/policies/copyright_policy
+%
+
+%% Template stuff begins here ------------------------------------------------
+
+\documentclass{acmsiggraph}                     % final
+%\documentclass[annualconference]{acmsiggraph}  % final (annual conference)
+%\documentclass[review]{acmsiggraph}            % review
+%\documentclass[widereview]{acmsiggraph}        % wide-spaced review
+%\documentclass[preprint]{acmsiggraph}          % preprint
+
+\usepackage[scaled=.92]{helvet}
+\usepackage{times}
+\usepackage{graphicx}
+\usepackage{parskip}
+\usepackage[labelfont=bf,textfont=it]{caption}
+\onlineid{1010} %% I think this doesn't matter
+
+%% Template stuff ends here ------------------------------------------------
+
+% This is really the only sensible way to make breaking of monospace text
+% (everything inside \texttt, including (but not limited) to urls).
+% Otherwise, the monospace text flows outside of the column all over the place.
+\sloppy
+
+\usepackage{needspace}
+
+%% For href
+\usepackage{ifpdf}
+\ifpdf
+  \usepackage[pdftex]{hyperref}
+\else
+  \usepackage[hypertex]{hyperref}
+\fi
+
+%% Put float in a nice box,
+%% http://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
+\usepackage{float}
+\floatstyle{boxed}
+\newfloat{mycodecore}{H}{listofmycode}
+\floatname{mycodecore}{}
+
+% Fix mycodecore: it has additional vertical line at the bottom after the frame.
+% Possibly due to Verbatim inside?
+\newenvironment{mycode}
+{\begin{mycodecore}}
+{\end{mycodecore}
+\vspace{-0.1in}}
+
+%% Use verbatim that allows \latex commands inside,
+%% highly useful for my node spec figures.
+%% See http://scott.sherrillmix.com/blog/category/programmer/latex/,
+%% http://www.ctan.org/tex-archive/macros/latex/contrib/fancyvrb/
+\usepackage{fancyvrb}
+
+%% To allow tex_projected at the bottom.
+%% Without this, figure* can only go to the top (or separate page).
+%% http://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions#Wide_figures_in_two_column_documents
+\usepackage{stfloats}
+
+%% Bold inside our code/spec samples.
+%%
+%% For an older acm style (from
+%% http://www.acm.org/sigs/publications/proceedings-templates)
+%% this was a hack:
+%% we get some strange teletype font that cannot be bold (it just looks
+%% the same). It's a pity, since my verbatims really depend on bold parts
+%% for good look. Workaround was to just resign from teletype.
+%%
+%% For acm siggraph from http://www.siggraph.org/publications/instructions/index.html
+%% this simply makes text bold, no tricks.
+\newcommand*{\codeem}[1]{\textbf{#1}}
+
+% \nolinkurl is a trick to allow links to break across lines in pdf,
+% from http://www.miwie.org/tex-refs/html/latex-packages.html#hyperref
+\newcommand*{\myhref}[2]{\texttt{\href{#1}{\nolinkurl{#2}}}}
+
+% The above \myhref unfortunately (due to \nolinkurl trick)
+% makes it impossible to break links manually.
+% So below is the same as \myhref, but does not break link text automatically,
+% and allows to break it manually (by inserting \\ etc.)
+% \newcommand*{\myhrefm}[2]{\texttt{\href{#1}{#2}}}
+
+\newenvironment{myenumerate}
+{\begin{enumerate}
+  \setlength{\itemsep}{0pt}
+  \setlength{\parskip}{0pt}
+  \setlength{\parsep}{0pt}}
+{\end{enumerate}}
+
+\title{Compositing shaders in X3D}
+
+\author{Michalis Kamburelis\thanks{e-mail: michalis.kambi@gmail.com}\\Institute of Computer Science\\University of Wroc{\l}aw, Poland}
+%% no full addr here, I think?
+%% ul. Joliot-Curie 15
+%% 50-383 Wroc{\l}aw, Poland
+
+%% TODO: screenshots
+
+\keywords{X3D graphics, shaders, GLSL, shadows, shadow maps, bump mapping}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+TODO
+\end{abstract}
+
+\begin{CRcatlist}
+%% TODO: update it
+  \CRcat{I.3.7}{Computer Graphics}{Three-Dimensional Graphics and Realism}{Color, shading, shadowing, and texture};
+  \CRcat{I.3.6}{Computer Graphics}{Methodology and Techniques}{Languages, Standards}
+\end{CRcatlist}
+
+\keywordlist
+
+%% \terms{Languages, Standardization, Algorithms}
+%% not needed with acmsiggraph template?
+
+\section{Introduction}
+
+%% The ``\copyrightspace'' command must be the first command after the
+%% start of the first section of the body of your paper. It ensures the
+%% copyright space is left at the bottom of the first column on the first
+%% page of your paper.
+\copyrightspace
+
+We present a technique for composing many shader snippets into a
+single shader code. X3D browsers can use it to allow user and browser
+shaders to coexist. Thus, users benefit from all the effects
+implemented in the browser, even when they want to add some effect by
+explicit shader code. Users can also seamlessly connect various
+effects into a shape, without the need to adjust any shader source
+code. Even the browser's implementation can be simplified, by using
+the same mechanism to separate implementation of various effects
+within a browser.
+
+For an interesting example, condider three effects: shadows, bump
+mapping, and lighting equations. Shadows provide an information that
+either turns on or off a particular lighting contribution (or scales
+this contribution, in case of soft shadows). Lighting equation
+calculates light contribution, looking at material, light source and
+normal at given geometry point. Bump mapping (in the simplest case)
+modifies how the normal value is obtained: when bump mapping is used,
+the normal is taken from the texture. So we have
+
+$$  shadow(light) * light\_contribution(light, material, normal(point)) $$
+
+In case of no shadows, shadow(x) = 1. In case of no bump mapping,
+normal is determined by the geometry (per-face, or smoothed per-face),
+and usually is passed as an already calculated attribute to the
+shader.
+
+Now, we would like to allow modifying the three functions here to be
+orthogonal.
+
+\section{Motivation and previous work}
+
+Current shading description methods do not allow easy connecting
+many effects into a single shader.
+
+Shading source code files (GLSL, Cg) make no such way.
+
+Effects formats (HLSL .fx, CgFX) allows to choose one technique, and
+within it make passes. No way of automatically connecting one .fx file
+with another.
+
+One oldest solution: make a library of functions (like GLSL
+functions), and allow to user to use them. But this is very bad and
+limited. You cannot e.g. insert a shadow check right before adding the
+light contribution (and still use browser code outside (to iterate
+over lights) and inside (to calculate single light contribution)).
+
+Another common solution is to arrange shaders in a pipe, where one
+shader processes the result of another. This can be visualized as
+layers of materials, where each layer modifies the previous
+layer. However, this is again not flexible --- there's no way to plug
+in your code in the middle of another shader's work.
+
+An older solution, in the spirit of above, was also to perform
+multi-pass rendering. However, this (in addition to lack of
+flexibility of previous approach) makes also a loss of rendering
+speed. In our work, we want to allow a single rendering pass to be as
+powerful as it can.
+
+%% (see also http://groups.google.com/group/blendertorenderman/browse_thread/thread/aaf07831b91be9db?pli=1 , confirms my findings)
+
+Another approach is the Sh (ref:http://libsh.org/) language, which
+allows writing shaders code (that can run on GPU) directly inside a
+C++ program. For this, Sh extends the C++ language (through C++
+operator overloading and macros tricks). It allows an excellent
+integration between C++ code and shaders, hiding the ugly details of
+passing variables between normal code (that executes on CPU) and
+shader code (that usually executes on GPU). You can use
+object-oriented methods there to create a general shader that can
+later be extended through various means, like overriding virtual
+methods. However, this is a solution closely couples with C++. It's
+suitable if you have a 3D engine in C++, and you want to use in your
+own C++ program and extend it's shaders. In this paper, we want to
+create a solution that is absolutely separate from the programming
+language used to make a browser. Invoking a compiler to generate a
+final GPU shader, not to mention teaching user's C++, is out of the
+question.
+
+%% ("Metaprogramming GPUs with Sh", http://books.google.com/books?id=8RX4RmFRLmgC&pg=PA79&lpg=PA79&dq=ShAttrib2f&source=bl&ots=IOxd1-BQLL&sig=AIPgFRmbodNpCLWmwk-QV5JUjVo&hl=pl&ei=EylRTe7RB8qeOsiQ1aQI&sa=X&oi=book_result&ct=result&resnum=7&ved=0CEkQ6AEwBg#v=onepage&q=ShAttrib2f&f=false )
+
+\section{Plugging}
+
+The basic idea of our approach is that a shader source code defines
+a points when a user-defined code may be inserted. The mechanism
+allows very easily to define new plugging points, and to use
+them. Moreover, user shaders and browser internal shaders have the
+same means to define and use plug points. This allows to connect
+shaders (both user and browser) in a variety of ways.
+
+\begin{myenumerate}
+\itemsep 0pt
+\item Browser shaders can be connected with each other. For example, we
+have a basic shader code that defines lighting and texturing. Our bump
+mapping is implemented by simply plugging the code in the appropriate
+places in this base shader. This way, the base shader is completely
+independent from the bump mapping implementatation. We can switch bump
+mapping implementations (for example, use bump texture from image or
+some random noise) without trouble.
+
+So even inside the engine, this allows for much easier shader generator.
+
+\item User shaders may plug into browser shaders. This is the most usual
+case. Our shaders define various points when you can plug your code,
+and override or enhance our shading.
+
+\item User shaders may also plug into another user shaders. User shaders
+can trivially (by just adding a "magic" comment) define new plugging
+points, which are usable by other user shaders. User effects can
+define plugging points, which are available to the following effects
+on the Apperance.effects list.
+
+\end{myenumerate}
+
+We allow user shaders (defined in ComposedShader and such nodes) to
+define additional plugging points. User shaders can use our plug names
+(and thus work with the same effects), or they can invent their
+own. They can also always add new plug points.
+
+When you don't use an explicit shader (like ComposedShader node),
+browser user it's own internal basic shader. This shader is then
+extended by effects like bump mapping (coming from internal browser
+implementation), or by user effects. But you can also define your own
+ComposedShader node. Then your own shader is enhanced by the
+browser. TODO: ? If you define the same (or compatible) plugging
+points, then the browser effects will be even added to your own
+shader. And of course user effects are added to your shader.
+
+In summary, the system works regardless if you use or not an explicit
+shader on Appearance.shaders list.
+
+\subsection{ShaderEffect node}
+
+In the X3D file we add a field
+
+\begin{mycode}
+\underline{ProjectedTextureCoordinate : X3DTextureCoordinateNode}
+\begin{Verbatim}[commandchars=\\\{\}]
+MFNode [] \codeem{effects} [] # ShaderEffect
+\end{Verbatim}
+\end{mycode}
+
+that can hold any number of
+
+\begin{mycode}
+\underline{ShaderEffect : X3DChildNode}
+\begin{Verbatim}[commandchars=\\\{\}]
+SFString [] \codeem{name} ""
+  # plugging point name
+SFString [] \codeem{language} ""
+  # just like ComposedShader.language.
+  # Will be used only for matching language shaders.
+SFString [] \codeem{url} ""
+  # source code, in external file (url),
+  # or inline (following data:text/plain,)
+  ... any number of fields,
+      that will be passed
+      as uniform to the shader,
+      just like for ComposedShader node ...
+\end{Verbatim}
+\end{mycode}
+
+All the effects on this list (with suitable language, and with
+plugging points defined by the browser shader, or active shader on
+Appearance.shaders list) will be used. Note that this is contrary to
+the Appearance.shaders, which chooses only one shader. For effects, we
+choose all of them (that are suitable).
+
+The most basic idea of this paper is to allow one to define two
+independent shader effects, and then seamlessly connect them by simply
+placing them both on Appearance.effects list. This also allows to
+define a library of effects, that can be composited without any work
+needed by user.
+
+\subsubsection{Defining your own plug points}
+
+When you write shader code, you can define your own plug points by a
+magic comment:
+
+ /* PLUG: plug-name vec4 \%s(const in vec3 foo, inout vec4 bar) */
+
+This defines a point when multiple user plugs may be added. Each
+ShaderEffect with name matching given plug-name will cause a
+definition of a new function, with the declaration as given above
+(with \%s replaced by the automatic function name). This function will
+be called at given place.
+
+% TODO
+%% \bibliographystyle{acmsiggraph}
+%% \nocite{*}
+%% \bibliography{compositing_shaders}
+
+\end{document}
