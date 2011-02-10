@@ -273,20 +273,27 @@ MFNode [] \codeem{effects} [] # ShaderEffect
 that can hold any number of
 
 \begin{mycode}
-\underline{ShaderEffect : X3DChildNode}
+\underline{Effect : X3DNode}
 \begin{Verbatim}[commandchars=\\\{\}]
-SFString [] \codeem{name} ""
-  # plugging point name
 SFString [] \codeem{language} ""
   # just like ComposedShader.language.
   # Will be used only for matching language shaders.
-SFString [] \codeem{url} ""
-  # source code, in external file (url),
-  # or inline (following data:text/plain,)
+MFString [] \codeem{parts} [] # EffectPart
   ... any number of fields,
       that will be passed
       as uniform to the shader,
       just like for ComposedShader node ...
+\end{Verbatim}
+\end{mycode}
+
+\begin{mycode}
+\underline{EffectPart : X3DNode}
+\begin{Verbatim}[commandchars=\\\{\}]
+SFString [] \codeem{name} ""
+  # plugging point name
+MFString [] \codeem{url} ""
+  # source code, in external file (url),
+  # or inline (following data:text/plain,)
 \end{Verbatim}
 \end{mycode}
 
@@ -307,13 +314,24 @@ needed by user.
 When you write shader code, you can define your own plug points by a
 magic comment:
 
- /* PLUG: plug-name vec4 \%s(const in vec3 foo, inout vec4 bar) */
+/* PLUG: plug-name vec4 \%s(const in vec3 foo, inout vec4 bar) */
 
 This defines a point when multiple user plugs may be added. Each
-ShaderEffect with name matching given plug-name will cause a
+Effect with name matching given plug-name will cause a
 definition of a new function, with the declaration as given above
 (with \%s replaced by the automatic function name). This function will
 be called at given place.
+
+When a special value \texttt{declaration} is specified, like
+
+/* PLUG: plug-name declaration */
+
+then the code is inserted directly into the appropriate place.
+
+Multiple code pieces may be added to the given plug point.
+So multiple effects may use the same plug point. They are added
+in the order they are specified in the Appearance.effects list
+(although, preferably, for most effects this order will not matter).
 
 % TODO
 %% \bibliographystyle{acmsiggraph}
