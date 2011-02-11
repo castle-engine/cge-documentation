@@ -314,7 +314,7 @@ needed by user.
 When you write shader code, you can define your own plug points by a
 magic comment:
 
-/* PLUG: plug-name vec4 \%s(const in vec3 foo, inout vec4 bar) */
+/* PLUG: plug-name (param) (const in vec3 foo, inout vec4 bar) */
 
 This defines a point when multiple user plugs may be added. Each
 Effect with name matching given plug-name will cause a
@@ -337,6 +337,24 @@ So multiple effects may use the same plug point. They are added
 in the order they are specified in the Appearance.effects list
 (although, preferably, for most effects this order will not matter).
 
+When a special value \texttt{function} is specified, like
+
+/* PLUG: plug-name function type-name (params-called) (params-declared) */
+
+then the code will be replaced to a function call returning given type-name.
+Such plug can only be used once.
+Identifier (next token in GLSL language) immediately following
+this plug will be removed if this plug is defined.
+
+\subsubsection{Why plug as comments}
+
+The nice feature of our magic /* PLUG ... */ comments is that a shader source
+is still valid even if you completely ignore them. For example,
+you can write your custom ComposedShader node, defining some plugs,
+and for browsers that understand them --- the plugs can be used,
+for other browsers --- plugs will be gracefully ignored (but still
+the shader will run, although without any effects).
+
 \subsubsection{Plugging from other nodes}
 
 The real power of our system comes from the fact that some nodes,
@@ -352,6 +370,11 @@ MFNode [] \codeem{effects} [] # ShaderEffect
 \end{mycode}
 
 %% TODO check and fix above X3Dxxx class names.
+
+You can modify the light source contribution, or even replace the default
+calculation of light source contribution. In the second case,
+the default calculation will not even be used in the shader,
+so it will not slow down the calculation without a reason.
 
 % TODO
 %% \bibliographystyle{acmsiggraph}
