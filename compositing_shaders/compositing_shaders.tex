@@ -264,7 +264,7 @@ shader on Appearance.shaders list.
 In the X3D file we add a field
 
 \begin{mycode}
-\underline{ProjectedTextureCoordinate : X3DTextureCoordinateNode}
+\underline{Appearance}
 \begin{Verbatim}[commandchars=\\\{\}]
 MFNode [] \codeem{effects} [] # ShaderEffect
 \end{Verbatim}
@@ -322,6 +322,10 @@ definition of a new function, with the declaration as given above
 (with \%s replaced by the automatic function name). This function will
 be called at given place.
 
+This is often useful for processing some paremeter
+repeatedly (like adding or modulating the fragment color),
+so there's usually an inout parameter.
+
 When a special value \texttt{declaration} is specified, like
 
 /* PLUG: plug-name declaration */
@@ -332,6 +336,22 @@ Multiple code pieces may be added to the given plug point.
 So multiple effects may use the same plug point. They are added
 in the order they are specified in the Appearance.effects list
 (although, preferably, for most effects this order will not matter).
+
+\subsubsection{Plugging from other nodes}
+
+The real power of our system comes from the fact that some nodes,
+like light sources, textures, or even fog, can define their own effects
+now. So you can easily define a shader specific for a given light source,
+or texture. For this, we add the \texttt{effects} field to various nodes:
+
+\begin{mycode}
+\underline{X3DLightSource, X3DTextureNode, X3DFogObject}
+\begin{Verbatim}[commandchars=\\\{\}]
+MFNode [] \codeem{effects} [] # ShaderEffect
+\end{Verbatim}
+\end{mycode}
+
+%% TODO check and fix above X3Dxxx class names.
 
 % TODO
 %% \bibliographystyle{acmsiggraph}
