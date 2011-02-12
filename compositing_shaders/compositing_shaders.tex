@@ -108,7 +108,19 @@
 \maketitle
 
 \begin{abstract}
-TODO
+We demonstrate a flexible way to implement effects in X3D by shader programming.
+Our approach allows to define the effects at appropriate places
+(not only at Appearance, but also at particular light sources, texture and such).
+It allows to seamlessly combine many effects, defined by X3D author,
+with the shader defined internally by X3D browser.
+Thus, it makes designing new effects in the GPU shading language trivial,
+both for the browser implementors and for X3D authors. Various effects
+cooperate automatically, and may be trivially composed by the X3D author.
+And it still allows to design effects using the full power of GPU shading
+language. We deliberately do not invent a new language, thus allowing
+the authors the use all the shading language features for given GPU,
+and allowing for easy implementation --- there is no need for any complex
+language processing inside X3D browser.
 \end{abstract}
 
 \begin{CRcatlist}
@@ -375,6 +387,46 @@ You can modify the light source contribution, or even replace the default
 calculation of light source contribution. In the second case,
 the default calculation will not even be used in the shader,
 so it will not slow down the calculation without a reason.
+
+\subsubsection{More about defining plugs}
+
+You can define the same plug name many times. In this case,
+all occurences of this plug will be appropriately replaced.
+
+You can define plug points both inside your custom ComposedShader code,
+as in the ,,effects'' code. In the latter case, the plug points
+are only available for the following effects of the same node.
+
+\subsubsection{Invalid shader code}
+
+We guarantee the behavior only if the provided shading language code
+is a correct, self-contained code that can be inserted into a procedure body.
+X3D browser doesn't validate code in any way, so any error (like undeclared
+variable, like unterminated block (,,{'' without matching ,,}''),
+like unterminated comment) will be only detected after the complete shader
+is determined and compiled by the GPU.
+
+In all our practical cases, this didn't cause any problems.
+Since you code each effect separately, you also test them separately,
+and in practice it's usually obvious what problem causes the parsing error.
+This is also a direct consequence of our decision to \textbf{never require
+the browser to parse the shader code}.
+
+It should be noted however that in particularly nasty cases,
+a deliberately poorly coded effect may cause troubles for other effects.
+In particular, since you can use \#define and macros in your effect code,
+you can do nasty tricks to break other effects. You can make them compile,
+but function incorrectly. However, we don't consider
+it a real problem --- you really have to deliberately want to do something
+bad to achieve this, it doesn't happen by accident in our experience.
+And you may need to use the internal knowledge
+how the other effects are implemented (maybe how they are implemented
+inside the browser).
+
+Note that this isn't a security problem --- bad shader code only breaks
+rendering of a particular shape. And X3D ComposedShader node allows users
+to execute any shading language code anyway. So if there's anything bad,
+you could do it without using our effects framework anyway.
 
 % TODO
 %% \bibliographystyle{acmsiggraph}
