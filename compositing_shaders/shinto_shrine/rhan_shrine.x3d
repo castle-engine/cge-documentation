@@ -20,8 +20,6 @@
 <NavigationInfo headlight="false" visibilityLimit="0.0" type='"EXAMINE","ANY"' avatarSize="0.25, 1.75, 0.75" />
 <Background groundColor="0.051 0.051 0.051" skyColor="0.051 0.051 0.051" />
 
-<DirectionalLight DEF="Lamp_004" ambientIntensity="0.0" color="1.0 1.0 1.0" intensity="0.103" direction="0.2536 -0.7947 -0.5515"  />
-
 <SpotLight DEF="Lamp_003" radius="26.55" ambientIntensity="0.0" intensity="1.0" color="1.0 1.0 1.0" beamWidth="0.484" cutOffAngle="0.63" direction="-0.228 -0.305 0.925" location="8.262 7.12 -17.092" shadows="TRUE">
   <GeneratedShadowMap size="1024" update="ALWAYS" containerField="defaultShadowMap" />
 </SpotLight>
