@@ -271,14 +271,14 @@ shader. And of course user effects are added to your shader.
 In summary, the system works regardless if you use or not an explicit
 shader on Appearance.shaders list.
 
-\subsection{ShaderEffect node}
+\subsection{Effect node}
 
 In the X3D file we add a field
 
 \begin{mycode}
 \underline{Appearance}
 \begin{Verbatim}[commandchars=\\\{\}]
-MFNode [] \codeem{effects} [] # ShaderEffect
+MFNode [] \codeem{effects} [] # Effect
 \end{Verbatim}
 \end{mycode}
 
@@ -321,7 +321,28 @@ placing them both on Appearance.effects list. This also allows to
 define a library of effects, that can be composited without any work
 needed by user.
 
-\subsubsection{Defining your own plug points}
+\subsection{Plugging from other nodes}
+
+The real power of our system comes from the fact that some nodes,
+like light sources, textures, or even fog, can define their own effects
+now. So you can easily define a shader specific for a given light source,
+or texture. For this, we add the \texttt{effects} field to various nodes:
+
+\begin{mycode}
+\underline{X3DLightSource, X3DTextureNode, X3DFogObject}
+\begin{Verbatim}[commandchars=\\\{\}]
+MFNode [] \codeem{effects} [] # Effect
+\end{Verbatim}
+\end{mycode}
+
+%% TODO check and fix above X3Dxxx class names.
+
+You can modify the light source contribution, or even replace the default
+calculation of light source contribution. In the second case,
+the default calculation will not even be used in the shader,
+so it will not slow down the calculation without a reason.
+
+\section{Defining your own plug points}
 
 When you write shader code, you can define your own plug points by a
 magic comment:
@@ -358,7 +379,7 @@ Such plug can only be used once.
 Identifier (next token in GLSL language) immediately following
 this plug will be removed if this plug is defined.
 
-\subsubsection{Why plug as comments}
+\subsection{Why plug as comments}
 
 The nice feature of our magic /* PLUG ... */ comments is that a shader source
 is still valid even if you completely ignore them. For example,
@@ -367,28 +388,7 @@ and for browsers that understand them --- the plugs can be used,
 for other browsers --- plugs will be gracefully ignored (but still
 the shader will run, although without any effects).
 
-\subsubsection{Plugging from other nodes}
-
-The real power of our system comes from the fact that some nodes,
-like light sources, textures, or even fog, can define their own effects
-now. So you can easily define a shader specific for a given light source,
-or texture. For this, we add the \texttt{effects} field to various nodes:
-
-\begin{mycode}
-\underline{X3DLightSource, X3DTextureNode, X3DFogObject}
-\begin{Verbatim}[commandchars=\\\{\}]
-MFNode [] \codeem{effects} [] # ShaderEffect
-\end{Verbatim}
-\end{mycode}
-
-%% TODO check and fix above X3Dxxx class names.
-
-You can modify the light source contribution, or even replace the default
-calculation of light source contribution. In the second case,
-the default calculation will not even be used in the shader,
-so it will not slow down the calculation without a reason.
-
-\subsubsection{More about defining plugs}
+\subsection{More about defining plugs}
 
 You can define the same plug name many times. In this case,
 all occurences of this plug will be appropriately replaced.
@@ -397,7 +397,7 @@ You can define plug points both inside your custom ComposedShader code,
 as in the ,,effects'' code. In the latter case, the plug points
 are only available for the following effects of the same node.
 
-\subsubsection{Invalid shader code}
+\subsection{Invalid shader code}
 
 We guarantee the behavior only if the provided shading language code
 is a correct, self-contained code that can be inserted into a procedure body.
