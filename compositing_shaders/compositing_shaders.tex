@@ -99,11 +99,14 @@
 %% ul. Joliot-Curie 15
 %% 50-383 Wroc{\l}aw, Poland
 
-%% TODO: screenshots
-
 \keywords{X3D graphics, shaders, GLSL, shadows, shadow maps, bump mapping}
 
 \begin{document}
+
+\teaser{
+  \includegraphics[width=2.19in]{rhan_shrine_5_everything}
+  \caption{Bump mapping and 2 shadow maps on the same shape.}
+}
 
 \maketitle
 
@@ -220,6 +223,20 @@ final GPU shader, not to mention teaching user's C++, is out of the
 question.
 
 %% ("Metaprogramming GPUs with Sh", http://books.google.com/books?id=8RX4RmFRLmgC&pg=PA79&lpg=PA79&dq=ShAttrib2f&source=bl&ots=IOxd1-BQLL&sig=AIPgFRmbodNpCLWmwk-QV5JUjVo&hl=pl&ei=EylRTe7RB8qeOsiQ1aQI&sa=X&oi=book_result&ct=result&resnum=7&ved=0CEkQ6AEwBg#v=onepage&q=ShAttrib2f&f=false )
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=2.2in]{rhan_shrine_0}
+  \includegraphics[width=2.2in]{rhan_shrine_1_per_pixel_lighting}
+  \includegraphics[width=2.2in]{rhan_shrine_2_bump_mapping}
+  \includegraphics[width=2.2in]{rhan_shrine_3_shadow_1st}
+  \includegraphics[width=2.2in]{rhan_shrine_4_shadow_2nd}
+  \includegraphics[width=2.2in]{rhan_shrine_5_everything}
+  \caption{Japanese shrine model with more and more effects applied: Gouraud shading,
+Phong shading (per-pixel lighting), bump mapping, shadows from 1st light,
+shadows from 2nd light, shadows from both lights.}
+%%  \label{fig_xxx}
+\end{figure*}
 
 \section{Plugging}
 
