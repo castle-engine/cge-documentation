@@ -444,6 +444,27 @@ rendering of a particular shape. And X3D ComposedShader node allows users
 to execute any shading language code anyway. So if there's anything bad,
 you could do it without using our effects framework anyway.
 
+\section{Examples}
+
+Examples are available inside our engine example models on
+\myhref{http://vrmlengine.sourceforge.net/kambi\_vrml\_test\_suite.php}{http://vrmlengine.sourceforge.net/kambi_vrml_test_suite.php}.
+You can checkout them from SVN, or just browse through a web browser,
+using the URL
+\myhref{https://vrmlengine.svn.sourceforge.net/svnroot/vrmlengine/trunk/kambi\_vrml\_test\_suite/compositing\_shaders/}{https://vrmlengine.svn.sourceforge.net/svnroot/vrmlengine/trunk/kambi_vrml_test_suite/compositing_shaders/}.
+You can open them using any of our engine tools,
+like \texttt{view3dscene} from
+\myhref{http://vrmlengine.sourceforge.net/view3dscene.php}{http://vrmlengine.sourceforge.net/view3dscene.php}.
+
+You can run \texttt{view3dscene} with \texttt{--debug-log} command-line
+option. Output (stdout) will show you the final shader code generated.
+This is a useful way to learn about our shader rendering internals.
+
+Development notes: only the SVN kambi\_vrml\_test\_suite conatins
+compositing\_shaders subdirectory.
+You also have to use view3dscene from SVN or nightly builds,
+see \myhref{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
+And you have to activate ,,View -> Force Shader Rendering'' (Ctrl+S) manually.
+
 % TODO
 %% \bibliographystyle{acmsiggraph}
 %% \nocite{*}
