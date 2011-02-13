@@ -85,9 +85,6 @@
 \title{Compositing shaders in X3D}
 
 \author{Michalis Kamburelis\thanks{e-mail: michalis.kambi@gmail.com}\\Institute of Computer Science\\University of Wroc{\l}aw, Poland}
-%% no full addr here, I think?
-%% ul. Joliot-Curie 15
-%% 50-383 Wroc{\l}aw, Poland
 
 \keywords{X3D graphics, shaders, GLSL, shadows, shadow maps, bump mapping}
 
@@ -156,15 +153,14 @@ normal at given geometry point. Bump mapping
 modifies how the normal value is obtained: when bump mapping is used,
 the normal is taken from the texture. So we have
 
-$$  shadow(light) * light\_contribution(light, material, normal(point)) $$
+$$ shadow(light) * light\_contribution(light, material, normal(point)) $$
 
 In case of no shadows, shadow(x) = 1. In case of no bump mapping,
 normal is determined by the geometry (per-face, or smoothed per-face),
 and usually is passed as an already calculated attribute to the
 shader.
 
-Now, we would like to allow modifying the three functions here to be
-orthogonal.
+Now, we would like to allow modifying these three functions independently.
 
 \section{Motivation and previous work}
 
@@ -206,7 +202,7 @@ passing variables between normal code (that executes on CPU) and
 shader code (that usually executes on GPU). You can use
 object-oriented methods there to create a general shader that can
 later be extended through various means, like overriding virtual
-methods. However, this is a solution closely couples with C++. It's
+methods. However, this is a solution closely coupled with C++. It's
 suitable if you have a 3D engine in C++, and you want to use in your
 own C++ program and extend it's shaders. In this paper, we want to
 create a solution that is absolutely separate from the programming
@@ -245,7 +241,7 @@ shaders (both user and browser) in a variety of ways.
 have a basic shader code that defines lighting and texturing. Our bump
 mapping is implemented by simply plugging the code in the appropriate
 places in this base shader. This way, the base shader is completely
-independent from the bump mapping implementatation. We can switch bump
+independent from the bump mapping implementation. We can switch bump
 mapping implementations (for example, use bump texture from image or
 some random noise) without trouble.
 
@@ -259,26 +255,26 @@ and override or enhance our shading.
 can trivially (by just adding a "magic" comment) define new plugging
 points, which are usable by other user shaders. User effects can
 define plugging points, which are available to the following effects
-on the Apperance.effects list.
+on the Appearance.effects list.
 
 \end{myenumerate}
 
-We allow user shaders (defined in ComposedShader and such nodes) to
+We allow user shaders (defined in the \texttt{ComposedShader} and such nodes) to
 define additional plugging points. User shaders can use our plug names
 (and thus work with the same effects), or they can invent their
 own. They can also always add new plug points.
 
-When you don't use an explicit shader (like ComposedShader node),
-browser user it's own internal basic shader. This shader is then
+When you don't use an explicit shader (like \texttt{ComposedShader} node),
+browser uses it's own internal basic shader. This shader is then
 extended by effects like bump mapping (coming from internal browser
 implementation), or by user effects. But you can also define your own
-ComposedShader node. Then your own shader is enhanced by the
+\texttt{ComposedShader} node. Then your own shader is enhanced by the
 browser. TODO: ? If you define the same (or compatible) plugging
 points, then the browser effects will be even added to your own
 shader. And of course user effects are added to your shader.
 
 In summary, the system works regardless if you use or not an explicit
-shader on Appearance.shaders list.
+shader on \texttt{Appearance.shaders} list.
 
 \subsection{Effect node}
 
@@ -323,27 +319,27 @@ MFString [] \codeem{url} ""
 
 All the effects on this list (with suitable language, and with
 plugging points defined by the browser shader, or active shader on
-Appearance.shaders list) will be used. Note that this is contrary to
-the Appearance.shaders, which chooses only one shader. For effects, we
-choose all of them (that are suitable).
+\texttt{Appearance.shaders} list) will be used. Note that this is contrary to
+the \texttt{Appearance.shaders}, which chooses only one shader.
+For effects, we choose all of them (that are suitable).
 
 The most basic idea of this paper is to allow one to define two
 independent shader effects, and then seamlessly connect them by simply
-placing them both on Appearance.effects list. This also allows to
+placing them both on \texttt{Appearance.effects} list. This also allows to
 define a library of effects, that can be composited without any work
 needed by user.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=3in]{fresnel_and_toon}
-  \caption{Toon and fresnel effects combined.}
+  \caption{Toon and Fresnel effects combined.}
 \end{figure}
 
 \subsection{Plugging from other nodes}
 
 The real power of our system comes from the fact that some nodes,
-like light sources, textures, or even fog, can define their own effects
-now. So you can easily define a shader specific for a given light source,
+like light sources, textures, or even fog, can define their own effects.
+So you can easily define a shader specific for a given light source,
 or texture. For this, we add the \texttt{effects} field to various nodes:
 
 \begin{mycode}
@@ -366,7 +362,7 @@ Although you can define plugs at any texture node, sometimes you just
 want to define a texture contents completely by shaders. This means
 that the texture contents are not stored anywhere (not even on GPU),
 the X3D browser doesn't manage any texture resources and such.
-For a GPU point of view, there is no texture\footnote{But the spoon is real,
+From a GPU point of view, there is no texture\footnote{But the spoon is real,
 we swear.}. There is only a shader function that generates colors
 based on some vectors.
 
@@ -396,7 +392,9 @@ plug, otherwise texture contents are undefined.
 When you write shader code, you can define your own plug points by a
 magic comment:
 
+\begin{mycode}
 /* PLUG: plug-name (param) (const in vec3 foo, inout vec4 bar) */
+\end{mycode}
 
 This defines a point when multiple user plugs may be added. Each
 Effect with name matching given plug-name will cause a
@@ -404,13 +402,15 @@ definition of a new function, with the declaration as given above
 (with \%s replaced by the automatic function name). This function will
 be called at given place.
 
-This is often useful for processing some paremeter
+This is often useful for processing some parameter
 repeatedly (like adding or modulating the fragment color),
 so there's usually an inout parameter.
 
 When a special value \texttt{declaration} is specified, like
 
+\begin{mycode}
 /* PLUG: plug-name declaration */
+\end{mycode}
 
 then the code is inserted directly into the appropriate place.
 
@@ -421,17 +421,24 @@ in the order they are specified in the Appearance.effects list
 
 When a special value \texttt{function} is specified, like
 
+\begin{mycode}
 /* PLUG: plug-name function type-name (params-called) (params-declared) */
+\end{mycode}
 
 then the code will be replaced to a function call returning given type-name.
 Such plug can only be used once.
 Identifier (next token in GLSL language) immediately following
 this plug will be removed if this plug is defined.
+TODO: I'm unsure about the ,,function'' plugs.
+I don't like the fact that they can only be used once, but sometimes
+it really makes sense?
+I'm also unsure about definition --- this may force authors to use
+intermediate functions. Instead use closing /* PLUG-END: plug-name */?
 
-\subsection{Why plug as comments}
+\subsection{Why plugs are defined as comments}
 
 The nice feature of our magic /* PLUG ... */ comments is that a shader source
-is still valid even if you completely ignore them. For example,
+is still valid even if you completely ignore the plugs. For example,
 you can write your custom ComposedShader node, defining some plugs,
 and for browsers that understand them --- the plugs can be used,
 for other browsers --- plugs will be gracefully ignored (but still
@@ -440,7 +447,7 @@ the shader will run, although without any effects).
 \subsection{More about defining plugs}
 
 You can define the same plug name many times. In this case,
-all occurences of this plug will be appropriately replaced.
+all occurrences of this plug will be appropriately replaced.
 
 You can define plug points both inside your custom ComposedShader code,
 as in the ,,effects'' code. In the latter case, the plug points
@@ -466,15 +473,16 @@ a deliberately poorly coded effect may cause troubles for other effects.
 In particular, since you can use \#define and macros in your effect code,
 you can do nasty tricks to break other effects. You can make them compile,
 but function incorrectly. However, we don't consider
-it a real problem --- you really have to deliberately want to do something
-bad to achieve this, it doesn't happen by accident in our experience.
-And you may need to use the internal knowledge
-how the other effects are implemented (maybe how they are implemented
-inside the browser).
+it a real problem. You really have to deliberately want to do something bad,
+and often use an internal knowledge, to achieve something bad.
+It doesn't happen by accident in our experience.
+%% And you may need to use the internal knowledge
+%% how the other effects are implemented (maybe how they are implemented
+%% inside the browser).
 
 Note that this isn't a security problem --- bad shader code only breaks
 rendering of a particular shape. And X3D ComposedShader node allows users
-to execute any shading language code anyway. So if there's anything bad,
+to execute any shading language code anyway. So if there's anything dangerous,
 you could do it without using our effects framework anyway.
 
 \section{Usage examples}
@@ -503,7 +511,7 @@ You can run \texttt{view3dscene} with \texttt{--debug-log} command-line
 option. Output (stdout) will show you the final shader code generated.
 This is a useful way to learn about our shader rendering internals.
 
-Development notes: only the SVN kambi\_vrml\_test\_suite conatins
+Development notes: only the SVN kambi\_vrml\_test\_suite contains
 compositing\_shaders subdirectory.
 You also have to use view3dscene from SVN or nightly builds,
 see \myhref{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
