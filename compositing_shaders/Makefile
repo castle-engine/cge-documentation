@@ -7,8 +7,8 @@ rebuild: clean compositing_shaders.pdf
 	pdflatex -file-line-error -interaction=nonstopmode compositing_shaders.tex
 
 compositing_shaders.pdf: compositing_shaders.tex
-#	pdflatex -file-line-error -interaction=nonstopmode compositing_shaders.tex
-#	bibtex compositing_shaders
+	pdflatex -file-line-error -interaction=nonstopmode compositing_shaders.tex
+	bibtex compositing_shaders
 	pdflatex -file-line-error -interaction=nonstopmode compositing_shaders.tex
 	pdflatex -file-line-error -interaction=nonstopmode compositing_shaders.tex
 

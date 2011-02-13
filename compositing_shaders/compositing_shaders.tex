@@ -101,7 +101,8 @@
 \maketitle
 
 \begin{abstract}
-We demonstrate a flexible way to implement effects in X3D by shader programming.
+We demonstrate a flexible way to implement effects in X3D \cite{x3d:spec}
+by shader programming.
 Our approach allows to define the effects at appropriate places
 (not only at Appearance, but also at particular light sources, texture and such).
 It allows to seamlessly combine many effects, defined by X3D author,
@@ -150,7 +151,8 @@ mapping, and lighting equations. Shadows provide an information that
 either turns on or off a particular lighting contribution (or scales
 this contribution, in case of soft shadows). Lighting equation
 calculates light contribution, looking at material, light source and
-normal at given geometry point. Bump mapping (in the simplest case)
+normal at given geometry point. Bump mapping
+\cite{vrmleng:bumpmapping} (in the simplest case)
 modifies how the normal value is obtained: when bump mapping is used,
 the normal is taken from the texture. So we have
 
@@ -358,6 +360,37 @@ calculation of light source contribution. In the second case,
 the default calculation will not even be used in the shader,
 so it will not slow down the calculation without a reason.
 
+\subsection{Shader texture}
+
+Although you can define plugs at any texture node, sometimes you just
+want to define a texture contents completely by shaders. This means
+that the texture contents are not stored anywhere (not even on GPU),
+the X3D browser doesn't manage any texture resources and such.
+For a GPU point of view, there is no texture\footnote{But the spoon is real,
+we swear.}. There is only a shader function that generates colors
+based on some vectors.
+
+However it's still useful to let X3D ,,know'' that it is a texture.
+This way we can generate automatic texture coordinates for the given
+texture (using various methods supported by the
+\texttt{TextureCoordinateGenerator} and \texttt{ProjectedTextureCoordinate}
+nodes). For this reason, we introduce a new texture node:
+
+\begin{mycode}
+\underline{ShaderTexture : X3DTextureNode}
+\begin{Verbatim}[commandchars=\\\{\}]
+MFNode [] \codeem{effects} [] # Effect
+\end{Verbatim}
+\end{mycode}
+
+(Actually, \texttt{effects} field is already defined at \texttt{X3DTextureNode},
+see above. So in reality, \texttt{ShaderTexture} is just equal to
+\texttt{X3DTextureNode}. We simply allow actually using it in X3D files,
+while \texttt{X3DTextureNode} is left defined as an abstract class.)
+
+You have to include an effect overriding at least the \texttt{texture\_color}
+plug, otherwise texture contents are undefined.
+
 \section{Defining your own plug points}
 
 When you write shader code, you can define your own plug points by a
@@ -444,6 +477,17 @@ rendering of a particular shape. And X3D ComposedShader node allows users
 to execute any shading language code anyway. So if there's anything bad,
 you could do it without using our effects framework anyway.
 
+\section{Usage examples}
+
+- Short list of the most important plug names.
+
+- Example how our bump mapping and shadow maps use these plugs.
+
+- Example how to implement some non-trivial effects:
+  - water by plugs
+  - fog / smoke?
+  - grass moving under the wind
+
 \section{Examples}
 
 Examples are available inside our engine example models on
@@ -465,9 +509,8 @@ You also have to use view3dscene from SVN or nightly builds,
 see \myhref{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
 And you have to activate ,,View -> Force Shader Rendering'' (Ctrl+S) manually.
 
-% TODO
-%% \bibliographystyle{acmsiggraph}
-%% \nocite{*}
-%% \bibliography{compositing_shaders}
+\bibliographystyle{acmsiggraph}
+\nocite{*}
+\bibliography{compositing_shaders}
 
 \end{document}
