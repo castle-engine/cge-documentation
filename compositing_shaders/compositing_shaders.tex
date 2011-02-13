@@ -158,9 +158,7 @@ $$ shadow(light) * light\_contribution(light, material, normal(point)) $$
 In case of no shadows, shadow(x) = 1. In case of no bump mapping,
 normal is determined by the geometry (per-face, or smoothed per-face),
 and usually is passed as an already calculated attribute to the
-shader.
-
-Now, we would like to allow modifying these three functions independently.
+shader. We would like to be able to modify these three functions independently.
 
 \section{Motivation and previous work}
 
@@ -323,6 +321,7 @@ plugging points defined by the browser shader, or active shader on
 the \texttt{Appearance.shaders}, which chooses only one shader.
 For effects, we choose all of them (that are suitable).
 
+\needspace{1in}
 The most basic idea of this paper is to allow one to define two
 independent shader effects, and then seamlessly connect them by simply
 placing them both on \texttt{Appearance.effects} list. This also allows to
@@ -331,7 +330,7 @@ needed by user.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=3in]{fresnel_and_toon}
+  \includegraphics[width=2.5in]{fresnel_and_toon}
   \caption{Toon and Fresnel effects combined.}
 \end{figure}
 
@@ -515,7 +514,7 @@ Development notes: only the SVN kambi\_vrml\_test\_suite contains
 compositing\_shaders subdirectory.
 You also have to use view3dscene from SVN or nightly builds,
 see \myhref{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
-And you have to activate ,,View -> Force Shader Rendering'' (Ctrl+S) manually.
+And you have to activate ,,View $->$ Force Shader Rendering'' (Ctrl+S) manually.
 
 \bibliographystyle{acmsiggraph}
 \nocite{*}
