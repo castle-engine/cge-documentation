@@ -297,7 +297,7 @@ that can hold any number of
 SFString [] \codeem{language} ""
   # just like ComposedShader.language.
   # Will be used only for matching language shaders.
-MFString [] \codeem{parts} [] # EffectPart
+MFNode [] \codeem{parts} [] # EffectPart
   ... any number of fields,
       that will be passed
       as uniform to the shader,
@@ -306,13 +306,16 @@ MFString [] \codeem{parts} [] # EffectPart
 \end{mycode}
 
 \begin{mycode}
-\underline{EffectPart : X3DNode}
+\underline{EffectPart : X3DNode, X3DUrlObject}
 \begin{Verbatim}[commandchars=\\\{\}]
 SFString [] \codeem{name} ""
   # plugging point name
 MFString [] \codeem{url} ""
   # source code, in external file (url),
-  # or inline (following data:text/plain,)
+  # or inline (following data:text/plain,).
+  # Source code may also be inline in CDATA
+  # in XML encoding,
+  # exactly like standard ShaderPart.
 \end{Verbatim}
 \end{mycode}
 
