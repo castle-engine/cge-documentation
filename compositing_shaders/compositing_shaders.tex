@@ -233,6 +233,44 @@ them. Moreover, user shaders and browser internal shaders have the
 same means to define and use plug points. This allows to connect
 shaders (both user and browser) in a variety of ways.
 
+A trivial example of an effect that makes colors two times brighter
+follows. This is written in X3D classic encoding,
+you should add this inside any \texttt{Appearance} node:
+
+\begin{Verbatim}[commandchars=\\\{\},frame=single]
+effects Effect \{
+  language "GLSL"
+  parts EffectPart \{
+    type "FRAGMENT"
+    url "data:text/plain,
+
+\textbf{    void PLUG_texture_apply(}
+\textbf{      inout vec4 fragment_color)}
+\textbf{    \{}
+\textbf{      fragment_color.rgb *= 2.0;}
+\textbf{    \}}"
+  \}
+\}
+\end{Verbatim}
+
+It defines a GLSL function named \texttt{PLUG\_texture\_apply}
+within an \texttt{EffectPart} node. Function names starting with \texttt{PLUG\_}
+are special, they enhance some standard shader calculation. In particular
+the \texttt{PLUG\_texture\_apply} is used after the normal texture colors are applied,
+but before the alpha test, and is a usual place to ,,just modify the pixel color''.
+\texttt{fragment\_color} is an \texttt{inout} parameter, by modifying it
+you modify the color that will be displayed on screen (and the alpha that will
+be tested).
+
+We have a short reference (at the end of this document) of all
+the plugging points available in our shaders. For each plugging point,
+like this \texttt{PLUG\_texture\_apply}, we define a list of it's parameters
+(you have to declare them exactly the same in your code), and we define
+when it is called.
+
+Various ways of defining and using ,,pluggins points'' (which we'll just call
+,,plugs'' from now on) are possible:
+
 \begin{myenumerate}
 \itemsep 0pt
 \item Browser shaders can be connected with each other. For example, we
@@ -320,18 +358,28 @@ MFString [] \codeem{url} ""
 \end{mycode}
 
 The functions you want to override are automatically detected by names
-starting like PLUG\_. At one point we had a code that didn't look at any
-special function names, instead you defined plug name in the separate field,
-however this was unclean --- you had to split your algorithm into many parts,
-often 1/2-liners, especially the fact that you had to declare uniform variables
-in a separate effect part seemed bad. Detecting PLUG\_ function names it easy
-and works nicely.
+starting like \texttt{PLUG\_}.
+
+At one point we tried the approach
+to not look at any special function names in GLSL code,
+and instead define a plug name in the separate field of the \texttt{EffectPart}
+node. However this produced ugly code --- you had to split your algorithm
+into many \texttt{EffectPart} nodes, each often containing only 1 or 2 lines
+of code. Especially bad was the fact that you had to declare uniform variables
+in a separate effect part, which in turn means that we cannot place
+your effects parts in separate namespaces (like a compilation unit in GLSL),
+which in turn makes the usage less secure.
+Detecting \texttt{PLUG\_} function names in GLSL code is very easy,
+and turned out to be the cleaner solution.
 
 In case of shading languages that have separate compilation units
 (like OpenGL shading language) the implementation may choose to place
 each effect part in such separate unit. This allows for cleaner error detection
 (as the parsing errors in effect code will not cause errors elsewhere,
 and error messages will refer to line numbers in actual user code).
+This also allows some namespace separation. For example, uniforms defined in one
+effect part may not be visible in the other part, as they should be placed
+in a separate namespace (like a separate compilation unit for GLSL) if possible.
 
 All the effects on this list (with suitable language, and with
 plugging points defined by the browser shader, or active shader on
@@ -510,7 +558,7 @@ you could do it without using our effects framework anyway.
 
 \section{Usage examples}
 
-- Short list of the most important plug names.
+TODO: examples of non-trivial effects.
 
 - Example how our bump mapping and shadow maps use these plugs.
 
@@ -519,7 +567,12 @@ you could do it without using our effects framework anyway.
   - fog / smoke?
   - grass moving under the wind
 
-\section{Examples}
+\section{Short reference of available plugs}
+
+TODO: maybe make it a table? We can probably waste 0.5-1 page on this
+without a problem. Document this at the end, when everything is settled down.
+
+\section{Complete example models}
 
 Examples are available inside our engine example models on
 \myhref{http://vrmlengine.sourceforge.net/kambi\_vrml\_test\_suite.php}{http://vrmlengine.sourceforge.net/kambi_vrml_test_suite.php}.
