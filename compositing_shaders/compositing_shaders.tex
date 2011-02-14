@@ -227,7 +227,7 @@ shadows from 2nd light, shadows from both lights.}
 \section{Plugging}
 
 The basic idea of our approach is that a shader source code defines
-a points when a user-defined code may be inserted. The mechanism
+a points when a calls to user-defined functions may be inserted. The mechanism
 allows very easily to define new plugging points, and to use
 them. Moreover, user shaders and browser internal shaders have the
 same means to define and use plug points. This allows to connect
@@ -314,6 +314,25 @@ MFString [] \codeem{url} ""
   # exactly like standard ShaderPart.
 \end{Verbatim}
 \end{mycode}
+
+TODO:-----------
+
+1. I will probably remove name field, and replace it with SFString type =
+FRAGMENT | VERTEX. Plug names will be automatically found by magic
+function names PLUG\_xxx (followed by whitespace or "(") within source code,
+not by given plug names.
+This allows cleaner code, as user can write himself function declaration.
+
+2. Also, this cooperates nicely with idea to place each effect is a separate
+compilation unit for GLSL.
+
+In case of shading languages that have separate compilation units
+(like OpenGL shading language) the implementation may choose to place
+each effect in such separate unit. This allows for cleaner error detection
+(as the parsing errors in effect code will not cause errors elsewhere,
+and error messages will refer to line numbers in actual user code).
+
+--------------
 
 All the effects on this list (with suitable language, and with
 plugging points defined by the browser shader, or active shader on
@@ -405,13 +424,20 @@ This is often useful for processing some parameter
 repeatedly (like adding or modulating the fragment color),
 so there's usually an inout parameter.
 
-When a special value \texttt{declaration} is specified, like
+A special comment
 
 \begin{mycode}
-/* PLUG: plug-name declaration */
+/* PLUG-DECLARATION */
 \end{mycode}
 
-then the code is inserted directly into the appropriate place.
+may be specified within an effect part (or ShaderPart within
+your own ComposedShader node). It will be used to place
+declarations (external declarations of functions in other compilation
+units) at this point. Otherwise, they will be simply added to
+the beginning of given part.
+
+TODO: for now we have different implementation, with
+/* PLUG: plug-name declaration */
 
 Multiple code pieces may be added to the given plug point.
 So multiple effects may use the same plug point. They are added
@@ -455,11 +481,16 @@ are only available for the following effects of the same node.
 \subsection{Invalid shader code}
 
 We guarantee the behavior only if the provided shading language code
-is a correct, self-contained code that can be inserted into a procedure body.
+is a correct, self-contained code.
 X3D browser doesn't validate code in any way, so any error (like undeclared
 variable, like unterminated block (,,{'' without matching ,,}''),
-like unterminated comment) will be only detected after the complete shader
+like unterminated comment) may be only detected after the complete shader
 is determined and compiled by the GPU.
+
+Although in case of shading languages with separate compilation units,
+the separation is actually better, and parsing errors will cause
+problems in your own code only. Still, by writing incorrect code,
+you can cause the whole shader to malfunction.
 
 In all our practical cases, this didn't cause any problems.
 Since you code each effect separately, you also test them separately,
