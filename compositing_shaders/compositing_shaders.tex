@@ -304,8 +304,12 @@ MFNode [] \codeem{parts} [] # EffectPart
 \begin{mycode}
 \underline{EffectPart : X3DNode, X3DUrlObject}
 \begin{Verbatim}[commandchars=\\\{\}]
-SFString [] \codeem{name} ""
-  # plugging point name
+SFString [] \codeem{type} "VERTEX"
+  # type is used only to limit
+  # the search for plug point names,
+  # for shading languages where vertex/fragment
+  # have different source code.
+  # May be FRAGMENT | VERTEX.
 MFString [] \codeem{url} ""
   # source code, in external file (url),
   # or inline (following data:text/plain,).
@@ -315,24 +319,19 @@ MFString [] \codeem{url} ""
 \end{Verbatim}
 \end{mycode}
 
-TODO:-----------
-
-1. I will probably remove name field, and replace it with SFString type =
-FRAGMENT | VERTEX. Plug names will be automatically found by magic
-function names PLUG\_xxx (followed by whitespace or "(") within source code,
-not by given plug names.
-This allows cleaner code, as user can write himself function declaration.
-
-2. Also, this cooperates nicely with idea to place each effect is a separate
-compilation unit for GLSL.
+The functions you want to override are automatically detected by names
+starting like PLUG\_. At one point we had a code that didn't look at any
+special function names, instead you defined plug name in the separate field,
+however this was unclean --- you had to split your algorithm into many parts,
+often 1/2-liners, especially the fact that you had to declare uniform variables
+in a separate effect part seemed bad. Detecting PLUG\_ function names it easy
+and works nicely.
 
 In case of shading languages that have separate compilation units
 (like OpenGL shading language) the implementation may choose to place
-each effect in such separate unit. This allows for cleaner error detection
+each effect part in such separate unit. This allows for cleaner error detection
 (as the parsing errors in effect code will not cause errors elsewhere,
 and error messages will refer to line numbers in actual user code).
-
---------------
 
 All the effects on this list (with suitable language, and with
 plugging points defined by the browser shader, or active shader on
@@ -424,20 +423,14 @@ This is often useful for processing some parameter
 repeatedly (like adding or modulating the fragment color),
 so there's usually an inout parameter.
 
-A special comment
-
-\begin{mycode}
-/* PLUG-DECLARATION */
-\end{mycode}
-
-may be specified within an effect part (or ShaderPart within
-your own ComposedShader node). It will be used to place
+Special plug names \$declare-variables\$, \$declare-procedures\$
+are used to designate a place where functions are placed.
+May be specified within an effect part or ShaderPart within
+your own ComposedShader node. It will be used to place
 declarations (external declarations of functions in other compilation
 units) at this point. Otherwise, they will be simply added to
-the beginning of given part.
-
-TODO: for now we have different implementation, with
-/* PLUG: plug-name declaration */
+the beginning of given part. TODO: this ,,otherwise'' is not yet impl,
+and the treatment is hacky.
 
 Multiple code pieces may be added to the given plug point.
 So multiple effects may use the same plug point. They are added
