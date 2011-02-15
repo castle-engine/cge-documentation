@@ -587,7 +587,22 @@ you could do it without using our effects framework anyway.
 
 TODO: examples of non-trivial effects.
 
-- Example how our bump mapping and shadow maps use these plugs.
+Even inside the browse implementation, using plugs to implement internal
+effects allows for a great code simplication and separation.
+Our bump mapping effect (TODO: on slides, actually show
+the trivial TVRMLShader.EnableBumpMapping source code?)
+is done purely by using plugs.
+So it has a clean and short implementation. It also shows that
+X3D authors could implement perfect bump mapping themselves,
+without any traditional hassles. For example, bump mapping can be
+achieved using standard \texttt{ComposedShader} as well,
+but then you have to write all this ,,boilerplate'' code to also deal
+with all the possible lighting and textures configurations.
+Well, the browser is still useful to calculate nice tangent vectors,
+although an authoring program could generate GLSL attributes for them as well.
+
+Same thing with shadow maps, they only plug to the \texttt{light\_scale}
+calculation of appropriate light.
 
 - Example how to implement some non-trivial effects:
   - water by plugs
