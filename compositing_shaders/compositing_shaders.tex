@@ -210,6 +210,33 @@ question.
 
 %% ("Metaprogramming GPUs with Sh", http://books.google.com/books?id=8RX4RmFRLmgC&pg=PA79&lpg=PA79&dq=ShAttrib2f&source=bl&ots=IOxd1-BQLL&sig=AIPgFRmbodNpCLWmwk-QV5JUjVo&hl=pl&ei=EylRTe7RB8qeOsiQ1aQI&sa=X&oi=book_result&ct=result&resnum=7&ved=0CEkQ6AEwBg#v=onepage&q=ShAttrib2f&f=false )
 
+At the end, we would like to mention a solution from a completely
+different domain, that is surprisingly similar to ours in some ways.
+Drupal, an open-source CMS system written in PHP,
+has a very nice system of modules. Each module
+can extend the functionality of the base system (or other module)
+by implementing a \textit{hook}, which is just a normal PHP function
+with a special name and appropriate set of parameters. Modules can also define
+their own hooks (for use by other modules) and invoke them when appropriate.
+This creates a system where it's trivially easy to define a hook,
+and to use a hook.
+Many modules can implement the same hook and cooperate without any problems.
+The whole hook system is defined completely in PHP, as it's a scripting
+language, and you can query the list of loaded functions by name,
+and call function by name.
+
+This is actually quite similar to our base idea of combining effects
+inside Appearance.effects field. Our effects are similar to
+Drupal's modules, as our ,,plugging points'' are analgous to Drupal hooks.
+Our effects can define functions with special names to override
+standard shader behavior. They can also define new names of plugs, for other
+effects to use. Of course we also have some special problems
+(shading language is quite far from a scripting language,
+so defining hooks is done by smart textual replacements)
+and some special opportunities (we can define effects at
+the appropriate nodes of X3D, like textures and lights sources,
+as we don't want to throw all the effects in one bag).
+
 \begin{figure*}[t]
   \centering
   \includegraphics[width=2.2in]{rhan_shrine_0}
