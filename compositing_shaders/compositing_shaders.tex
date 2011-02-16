@@ -433,7 +433,7 @@ needed by user.
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=2.5in]{fresnel_and_toon}
+  \includegraphics[width=3in]{fresnel_and_toon}
   \caption{Toon and Fresnel effects combined.}
 \end{figure}
 
@@ -602,8 +602,20 @@ using any information available in the shader as a criteria for mixing.
 You can also pass any other values for an effect, for example you can
 pass the current time from a \texttt{TimeSensor} and make dynamic effects.
 
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=3in]{terrain}
+  \caption{ElevationGrid with 3 textures mixed based on height by GLSL effect.}
+\end{figure}
+
 An example effect for a light source is to use a fancy shape and equation
 for light's spot.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=3in]{fancy_light_spot_shape}
+  \caption{Textured spot light with shadow.}
+\end{figure}
 
 Even inside the browse implementation, using plugs to implement internal
 effects allows for a great code simplication and separation.
