@@ -356,12 +356,16 @@ that can hold any number of
 \underline{Effect : X3DNode}
 \begin{Verbatim}[commandchars=\\\{\}]
 SFString [] \codeem{language} ""
-  # just like ComposedShader.language.
-  # Will be used only for matching language shaders.
+  # Just like ComposedShader.language.
+  # This effect will be used only when
+  # the base shader (browser internal
+  # or selected from Appearance.shaders)
+  # has the same language.
 MFNode [] \codeem{parts} [] # EffectPart
-  ... any number of fields,
+  ... additionally you can
+      declare new fields and events,
       that will be passed
-      as uniform to the shader,
+      as uniform values to the shader,
       just like for ComposedShader node ...
 \end{Verbatim}
 \end{mycode}
@@ -370,14 +374,16 @@ MFNode [] \codeem{parts} [] # EffectPart
 \underline{EffectPart : X3DNode, X3DUrlObject}
 \begin{Verbatim}[commandchars=\\\{\}]
 SFString [] \codeem{type} "VERTEX"
-  # Allowed values like ShaderPart.type,
-  # FRAGMENT | VERTEX | (once supported) GEOMETRY.
-MFString [] \codeem{url} ""
-  # source code, in external file (url),
-  # or inline (following data:text/plain,).
-  # Source code may also be inline in CDATA
-  # in XML encoding,
-  # exactly like standard ShaderPart.
+  # Just like ShaderPart.type,
+  # allowed values are
+  # FRAGMENT | VERTEX |
+  # (once supported) GEOMETRY.
+MFString [] \codeem{url} []
+  # Source code, just like ShaderPart.url.
+  # May come from an external file (url),
+  # or inline (following "data:text/plain,").
+  # In XML encoding, may also be inline
+  # in CDATA.
 \end{Verbatim}
 \end{mycode}
 
