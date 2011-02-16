@@ -370,11 +370,8 @@ MFNode [] \codeem{parts} [] # EffectPart
 \underline{EffectPart : X3DNode, X3DUrlObject}
 \begin{Verbatim}[commandchars=\\\{\}]
 SFString [] \codeem{type} "VERTEX"
-  # type is used only to limit
-  # the search for plug point names,
-  # for shading languages where vertex/fragment
-  # have different source code.
-  # May be FRAGMENT | VERTEX.
+  # Allowed values like ShaderPart.type,
+  # FRAGMENT | VERTEX | (once supported) GEOMETRY.
 MFString [] \codeem{url} ""
   # source code, in external file (url),
   # or inline (following data:text/plain,).
@@ -386,6 +383,19 @@ MFString [] \codeem{url} ""
 
 The functions you want to override are automatically detected by names
 starting like \texttt{PLUG\_}.
+
+In a single \texttt{EffectPart} node, you can define many \texttt{PLUG\_}
+functions. However, you can only plug functions into the declared shader
+type. For example, you cannot plug into \texttt{texture\_apply} when
+your type is \texttt{VERTEX}.
+If your effect requires some processing per-vertex and some per-fragment,
+you will probably use two \texttt{EffectPart} nodes, with appropriate types.
+While this may seem like an arbitrary limitation,
+this reflects how shader parts are declared in shading languages with
+separate namespaces for vertex and fragment parts (like GLSL).
+A single part may declare variables (uniform, varying and such),
+and many functions that use them. But it must be completely within
+one shader type.
 
 At one point we tried the approach
 to not look at any special function names in GLSL code,
