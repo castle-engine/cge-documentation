@@ -585,7 +585,15 @@ you could do it without using our effects framework anyway.
 
 \section{Usage examples}
 
-TODO: examples of non-trivial effects.
+Remember that effects may define their own uniform variables,
+just like normal shader node. So you can pass your own textures
+to effects. For example you can write an effect that mixes a couple of textures,
+using any information available in the shader as a criteria for mixing.
+You can also pass any other values for an effect, for example you can
+pass the current time from a \texttt{TimeSensor} and make dynamic effects.
+
+An example effect for a light source is to use a fancy shape and equation
+for light's spot.
 
 Even inside the browse implementation, using plugs to implement internal
 effects allows for a great code simplication and separation.
