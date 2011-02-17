@@ -464,36 +464,132 @@ calculation of light source contribution. In the second case,
 the default calculation will not even be used in the shader,
 so it will not slow down the calculation without a reason.
 
-\subsection{Shader texture}
+\subsection{Texture effects}
 
-Although you can define plugs at any texture node, sometimes you just
-want to define a texture contents completely by shaders. This means
-that the texture contents are not stored anywhere (not even on GPU),
+\subsubsection{ShaderTexture effects}
+
+We introduce a new X3D node designed specifically for generating
+textures using the shading language. This is especially suitable
+if your texture is defined completely by the shaders.
+The texture contents are not stored anywhere (not even on GPU),
 the X3D browser doesn't manage any texture resources and such.
 From a GPU point of view, there is no texture\footnote{But the spoon is real,
 we swear.}. There is only a shader function that generates colors
 based on some vectors.
 
-However it's still useful to let X3D ,,know'' that it is a texture.
-This way we can generate automatic texture coordinates for the given
-texture (using various methods supported by the
-\texttt{TextureCoordinateGenerator} and \texttt{ProjectedTextureCoordinate}
-nodes). For this reason, we introduce a new texture node:
+While not strictly necessary, it's comfortable to wrap a texture generation
+function inside the \texttt{ShaderTexture} node, that is treated much
+like other X3D texture nodes. This allows the authors to provide texture
+coordinates (explicit or generated) for this texture, using all the standard
+tools available in X3D.
+
+The new texture node specification:
 
 \begin{mycode}
 \underline{ShaderTexture : X3DTextureNode}
 \begin{Verbatim}[commandchars=\\\{\}]
 MFNode [] \codeem{effects} [] # Effect
+SFString [] \codeem{defaultTexCoord} "BOUNDS2D"
+  # ["BOUNDS2D"|"BOUNDS3D"]
 \end{Verbatim}
 \end{mycode}
 
-(Actually, \texttt{effects} field is already defined at \texttt{X3DTextureNode},
-see above. So in reality, \texttt{ShaderTexture} is just equal to
-\texttt{X3DTextureNode}. We simply allow actually using it in X3D files,
-while \texttt{X3DTextureNode} is left defined as an abstract class.)
+Actually, the \texttt{effects} field is already defined at
+the \texttt{X3DTextureNode} class (see above).
 
-You have to include an effect overriding at least the \texttt{texture\_color}
-plug, otherwise texture contents are undefined.
+You should include an effect overriding at least the \texttt{texture\_color}
+plug, otherwise texture contents are undefined. Our implementation actually
+sets the default texture color to pink (RGB(1, 0, 1)), so it stands out,
+reminding you to override it.
+
+The \texttt{defaultTexCoord} says what texture coordinates to generate,
+if the geometry doesn't specify any texture generation method.
+
+\begin{myenumerate}
+
+\item
+  \texttt{"BOUNDS2D"} means that the algorithm described in the specification
+  for {IndexedFaceSet} should be used. This adapts 2D texture coordinates
+  to two largest bounding box sizes.
+  It's most suitable for 2D textures that use only 2D coordinates
+  (ignoring other coordinates, or assuming they are always 0, 1).
+
+\item
+  \texttt{"BOUNDS3D"} means that the algorithm described in the specification
+  of \textit{Texturing3D} component (section \textit{"Texture coordinate generation for primitive objects"}).
+  This adapts 3D texture coordinates to bounding box sizes.
+  Most suitable for 3D textures (you can ignore the 4th texture coordinate
+  component, or treat it as homegeneous, as \texttt{"BOUNDS3D"} will always
+  set it to 1).
+
+\end{myenumerate}
+
+Remember that the texture coordinates can be always explicitly specified
+at the geometry, by explicitly listing the coordinates (nodes
+\texttt{TextureCoordinate}, \texttt{TextureCoordinate3D},
+\texttt{TextureCoordinate4D}) or by explicitly giving the generation
+algorithm (nodes \texttt{TextureCoordinateGenerator},
+\texttt{ProjectedTextureCoordinate} \footnote{
+    Note that our implementation has some extensions
+    to \texttt{TextureCoordinateGenerator}. In particular
+    \texttt{"BOUNDS2D"} and \texttt{"BOUNDS3D"} are also valid names for
+    \texttt{TextureCoordinateGenerator.mode}. See
+    \myhref{http://vrmlengine.sourceforge.net/kambi\_vrml\_extensions.php\#section\_ext\_tex\_coord\_bounds}{http://vrmlengine.sourceforge.net/kambi_vrml_extensions.php\#section_ext_tex_coord_bounds}.
+    Projective texture mapping by \texttt{ProjectedTextureCoordinate}
+    is also our extension, see
+    \myhref{http://vrmlengine.sourceforge.net/kambi\_vrml\_extensions\_shadow\_maps.php\#section\_texture\_projective}{http://vrmlengine.sourceforge.net/kambi_vrml_extensions_shadow_maps.php\#section_texture_projective}.
+    TODO: move to bib. I really hate bibtex.
+}).
+The \texttt{defaultTexCoord} says only what is the default approach,
+when you don't use \texttt{texCoord} at the geometry node.
+The idea is that using a \texttt{ShaderTexture} should be as comfortable
+as any other normal texture.
+
+\subsubsection{General X3DTextureNode effects}
+
+You can use the \texttt{effects} field
+inside any \texttt{X3DTextureNode} to enhance and modify the look of any
+standard texture node, like \texttt{ImageTexture}.
+You can use a plug \texttt{texture\_color},
+that allows you to modify the texture color, knowing the current texture
+coordinates and such.
+
+Note that when the \texttt{texture\_color} plugs are called,
+the internal shaders already calculated the initial texture
+color by actually sampling the texture image. This is useful for you if you
+want to modify this color. If you simply want to ignore the normal
+texture color, and always override it with your own, consider using
+the special \texttt{ShaderTexture} node instead. Using
+a normal texture node (like \texttt{ImageTexture}) for this
+would be uncomfortable, as you would have to load a dummy texture image,
+and the shaders could (depending on optimization) waste some time
+on sampling a dummy texture color that will be actually overriden later.
+
+Remember that in all cases (effects at \texttt{ImageTexture},
+at \texttt{ShaderTexture}, etc.) you can always use additional
+textures inside the effect. Just like inside a standard \texttt{ComposedShader},
+you can declare an \texttt{SFNode} field inside an \texttt{Effect}
+to pass any texture node to the shader as uniform value.
+This allows you to base your effects calculation on any number of textures,
+and combine them in any way you like. The only difference
+between various \texttt{X3DTextureNode} descendants is what the browser
+does automatically for you, that is what color is passed
+to the first \texttt{texture\_color} plug.
+
+\subsubsection{No aliasing}
+
+The nice thing about the effects used on textures (both for \texttt{ShaderTexture}
+and for standard texture nodes) is that they are sampled at each
+screen fragment. So your effects are not concerned with texture filtering
+options. You just use the texture coordinate, passed for example to the
+\texttt{texture\_color} plug.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=3in]{shader_texture_no_filtering_problems}
+  \caption{Yellowish arc is done by a texture effect, as so is not
+    affected by the pixelated look of the base image texture.}
+\end{figure}
 
 \section{Defining your own plug points}
 
