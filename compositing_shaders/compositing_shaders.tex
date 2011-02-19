@@ -158,7 +158,27 @@ $$ shadow(light) * light\_contribution(light, material, normal(point)) $$
 In case of no shadows, shadow(x) = 1. In case of no bump mapping,
 normal is determined by the geometry (per-face, or smoothed per-face),
 and usually is passed as an already calculated attribute to the
-shader. We would like to be able to modify these three functions independently.
+shader.
+
+We would like to be able to modify these three functions independently.
+Independent effects may want to modify these functions, without knowing
+about each other. Our goals are to:
+
+\begin{enumerate}
+\item Make shader programs much easier to create. That's because we
+  can jump straight into the implementation of our imagined algorithm
+  in the shader.
+  We are only interested in modifying the relevant shader calculation
+  parameter, and we can completely ignore other parts of the shader.
+
+\item Make shader programs much more powerful. That's because our effect
+  immediately cooperates with absolutely every normal feature of X3D rendering.
+  This makes the implemented effect useful for a wide range of real uses,
+  not only for a particular situation or a particular model (as it often happens
+  with specialized shader code).
+  All X3D light sources, textures, even other shader effects,
+  are correctly applied.
+\end{enumerate}
 
 \section{Motivation and previous work}
 
