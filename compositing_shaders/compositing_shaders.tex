@@ -783,8 +783,18 @@ reflections and refractions (by a single environent cube map texture).
 4) All effects.}
 \end{figure*}
 
-TODO: making noise, 2d and 3d.
-Using it for water.
+We can also wrap 2D and 3D noise inside a \texttt{ShaderTexture}.
+A texture node like \texttt{NoiseTexture} from InstantReality
+\myhref{http://doc.instantreality.org/documentation/nodetype/NoiseTexture/}{http://doc.instantreality.org/documentation/nodetype/NoiseTexture/}
+may be implemented on GPU by a simple prototype using \texttt{ShaderTexture}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=3in]{noise}
+  \caption{3D and 2D smooth noise on GPU, wrapped in ShaderTexture.}
+\end{figure}
+
+TODO: use noise for water.
 
 - Example how to implement some non-trivial effects:
   - noise
