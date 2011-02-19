@@ -743,8 +743,29 @@ although an authoring program could generate GLSL attributes for them as well.
 Same thing with shadow maps, they only plug to the \texttt{light\_scale}
 calculation of appropriate light.
 
+Water is nice to implement by effects, as a proper water is a combination
+of a couple effects. You want to simulate waves, so you want to vary vertex
+heights or vary normals per-fragment (for best results, a mixture of both).
+You also want to simulate the fact that water has reflections, and
+is transparent.
+
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=2.2in]{water_shaders_0}
+  \includegraphics[width=2.2in]{water_shaders_1}
+  \includegraphics[width=2.2in]{water_shaders_2}
+  \includegraphics[width=2.2in]{water_shaders_3}
+  \caption{Water using our effects: 1) Only per-pixel lighting on transparect
+plane. 2) Per-pixel lighting and bump mapping. 3) Per-pixel lighting and
+reflections and refractions (by a single environent cube map texture).
+4) All effects.}
+\end{figure*}
+
+TODO: making noise, 2d and 3d.
+Using it for water.
+
 - Example how to implement some non-trivial effects:
-  - water by plugs
+  - noise
   - fog / smoke?
   - grass moving under the wind
 
