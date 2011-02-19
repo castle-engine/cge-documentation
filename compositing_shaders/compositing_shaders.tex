@@ -444,6 +444,14 @@ needed by user.
   \caption{Toon and Fresnel effects combined.}
 \end{figure}
 
+Note that all our nodes benefit from X3D mechanism to reuse the nodes
+by reference (the DEF / USE keywords). Reusing the \texttt{Effect} nodes
+is most natural, and allows to combine existing effects in any desired way.
+Reusing the \texttt{EffectPart} nodes is also useful, when some effects
+would like to share a particular piece of code. For example,
+you can create an \texttt{EffectPart} with a library of useful
+shading language functions, and reuse if for various effects.
+
 \subsection{Plugging from other nodes}
 
 The real power of our system comes from the fact that some nodes,
@@ -604,18 +612,18 @@ When you write shader code, you can define your own plug points by a
 magic comment:
 
 \begin{mycode}
-/* PLUG: plug-name (param) (const in vec3 foo, inout vec4 bar) */
+/* PLUG: plug-name (param1, param2, ...) */
 \end{mycode}
 
 This defines a point when multiple user plugs may be added. Each
 Effect with name matching given plug-name will cause a
-definition of a new function, with the declaration as given above
-(with \%s replaced by the automatic function name). This function will
-be called at given place.
+definition of a new function, that will be called with given parameters
+at this place.
 
 This is often useful for processing some parameter
 repeatedly (like adding or modulating the fragment color),
-so there's usually an inout parameter.
+so one or more of the parameters are usually allowed to be processed
+as \texttt{inout} parameters.
 
 Multiple code pieces may be added to the given plug point.
 So multiple effects may use the same plug point. They are added
@@ -649,7 +657,7 @@ TODO: such ComposedShader is not really impl yet.
 When a special value \texttt{function} is specified, like
 
 \begin{mycode}
-/* PLUG: plug-name function type-name (params-called) (params-declared) */
+/* PLUG: plug-name function (params-called) */
 \end{mycode}
 
 then the code will be replaced to a function call returning given type-name.
@@ -673,10 +681,7 @@ and for browsers that understand them --- the plugs can be used,
 for other browsers --- plugs will be gracefully ignored (but still
 the shader will run, although without any effects).
 
-\subsection{More about defining plugs}
-
-You can define the same plug name many times. In this case,
-all occurrences of this plug will be appropriately replaced.
+\subsection{Plugs from effects}
 
 You can define plug points both inside your custom ComposedShader code,
 as in the ,,effects'' code. In the latter case, the plug points
