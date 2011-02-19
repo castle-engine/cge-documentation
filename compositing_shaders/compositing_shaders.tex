@@ -832,6 +832,14 @@ For each plug:
 - type (fragment or vertex)
 - docs: called when?
 
+specials:
+texture\_color : has texture parameter only when not within ShaderTexture.
+Texture parameter type corresponds to VRML/X3D node type (samplerXxx).
+
+vertex\_object\_space: if you may change vertex\_object,
+be sure to add #define VERTEX\_OBJECT\_SPACE\_CHANGED.
+TODO: nicer? Maybe just do it always when vertex\_object\_space is plugged?
+
 \section{Complete example models}
 
 Examples are available inside our engine example models on
