@@ -617,19 +617,34 @@ This is often useful for processing some parameter
 repeatedly (like adding or modulating the fragment color),
 so there's usually an inout parameter.
 
-Special plug names \$declare-variables\$, \$declare-procedures\$
-are used to designate a place where functions are placed.
-May be specified within an effect part or ShaderPart within
-your own ComposedShader node. It will be used to place
-declarations (external declarations of functions in other compilation
-units) at this point. Otherwise, they will be simply added to
-the beginning of given part. TODO: this ,,otherwise'' is not yet impl,
-and the treatment is hacky.
-
 Multiple code pieces may be added to the given plug point.
 So multiple effects may use the same plug point. They are added
 in the order they are specified in the Appearance.effects list
 (although, preferably, for most effects this order will not matter).
+
+Moreover, the same plug may be declared many times in the source shader.
+This means that a single \texttt{PLUG\_xxx} function will be called
+many times. This is typically useful when your shader calculation is naturally
+expressed as a loop, but you had to unroll this loop for shader source
+(for example, to slightly tweak some loop iterations).
+The plug names that are available per-light source and per-texture
+are an example of this. If you use the \texttt{PLUG\_texture\_color}
+inside \texttt{Appearance.effects}, you can change the color of all
+the textures (even shader textures).
+Similarly, if you use the \texttt{PLUG\_light\_scale}
+inside \texttt{Appearance.effects}, you can change the intensity
+of all the light sources on the given shape.
+
+Special plug names \$declare-variables\$, \$declare-procedures\$
+are used to designate a place where functions are placed.
+These are only useful if you create your own ComposedShader node,
+and you would like to allow effects framework to cooperate with
+your ComposedShader. They will be used to place
+variable and procedure declarations (preferably, external declarations
+of procedures, actually defined in other compilation unit,
+for shading languages supporting this).
+TODO: otherwise place them at the beginning?
+TODO: such ComposedShader is not really impl yet.
 
 When a special value \texttt{function} is specified, like
 
@@ -646,6 +661,8 @@ I don't like the fact that they can only be used once, but sometimes
 it really makes sense?
 I'm also unsure about definition --- this may force authors to use
 intermediate functions. Instead use closing /* PLUG-END: plug-name */?
+So far I managed to achieve everything without ,,function plugs''.
+Maybe scrap this idea?
 
 \subsection{Why plugs are defined as comments}
 
