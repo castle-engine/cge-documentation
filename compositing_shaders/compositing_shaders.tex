@@ -247,7 +247,7 @@ and call function by name.
 
 This is actually quite similar to our base idea of combining effects
 inside Appearance.effects field. Our effects are similar to
-Drupal's modules, as our ,,plugging points'' are analgous to Drupal hooks.
+Drupal's modules, as our ,,plugging points'' are analogous to Drupal hooks.
 Our effects can define functions with special names to override
 standard shader behavior. They can also define new names of plugs, for other
 effects to use. Of course we also have some special problems
@@ -316,7 +316,7 @@ like this \texttt{PLUG\_texture\_apply}, we define a list of it's parameters
 (you have to declare them exactly the same in your code), and we define
 when it is called.
 
-Various ways of defining and using ,,pluggins points'' (which we'll just call
+Various ways of defining and using ,,plugging points'' (which we'll just call
 ,,plugs'' from now on) are possible:
 
 \begin{myenumerate}
@@ -548,7 +548,7 @@ if the geometry doesn't specify any texture generation method.
   of \textit{Texturing3D} component (section \textit{"Texture coordinate generation for primitive objects"}).
   This adapts 3D texture coordinates to bounding box sizes.
   Most suitable for 3D textures (you can ignore the 4th texture coordinate
-  component, or treat it as homegeneous, as \texttt{"BOUNDS3D"} will always
+  component, or treat it as homogeneous, as \texttt{"BOUNDS3D"} will always
   set it to 1).
 
 \end{myenumerate}
@@ -592,7 +592,7 @@ the special \texttt{ShaderTexture} node instead. Using
 a normal texture node (like \texttt{ImageTexture}) for this
 would be uncomfortable, as you would have to load a dummy texture image,
 and the shaders could (depending on optimization) waste some time
-on sampling a dummy texture color that will be actually overriden later.
+on sampling a dummy texture color that will be actually overridden later.
 
 Remember that in all cases (effects at \texttt{ImageTexture},
 at \texttt{ShaderTexture}, etc.) you can always use additional
@@ -769,7 +769,7 @@ for light's spot.
 \end{figure}
 
 Even inside the browse implementation, using plugs to implement internal
-effects allows for a great code simplication and separation.
+effects allows for a great code simplification and separation.
 Our bump mapping effect (TODO: on slides, actually show
 the trivial TVRMLShader.EnableBumpMapping source code?)
 is done purely by using plugs.
@@ -814,9 +814,9 @@ in real-time.)
   \includegraphics[width=2.2in]{water_shaders_1}
   \includegraphics[width=2.2in]{water_shaders_2}
   \includegraphics[width=2.2in]{water_shaders_3}
-  \caption{Water using our effects: 1) Only per-pixel lighting on transparect
+  \caption{Water using our effects: 1) Only per-pixel lighting on transparent
 plane. 2) Per-pixel lighting and bump mapping. 3) Per-pixel lighting and
-reflections and refractions (by a single environent cube map texture).
+reflections and refractions (by a single environment cube map texture).
 4) All effects.}
 \end{figure*}
 
