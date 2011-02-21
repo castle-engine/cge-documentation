@@ -1,0 +1,17 @@
+Shaders made usable
+
+  Existing shader nodes (ComposedShader and such):
+    - use the first matching shader
+      Good, allows to use various shading languages.
+    - can have uniform and attributes values from X3D fields
+      Very good (e.g. passing TimeSensor.time to shader is trivial)
+    - replace the normal shading
+      Good? This directly exposes the GPU (OpenGL, etc.)
+        functionality. So --- easy implementation, and following the idea
+        of having a specially crafted, optimized shaders for specific
+        situations.
+      Bad: Unless you are prepared to roll out your own shader generator
+        system, this isn't really usable. Before implementing the least
+        trivial GLSL effect, you usually want to replicate all the standard
+        X3D functionality. Huge task.
+

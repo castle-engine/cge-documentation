@@ -831,6 +831,25 @@ may be implemented on GPU by a simple prototype using \texttt{ShaderTexture}.
   \caption{3D and 2D smooth noise on GPU, wrapped in ShaderTexture.}
 \end{figure}
 
+We would like to emphasize that all the effects demonstrated here
+are theoretically already possible by using the X3D shaders component.
+%% TODO: proper name
+However, actually implementing them is extremely cumbersome: you would first
+have to prepare a shader code to calculate all the (multi-)texturing, lighting,
+shadows, and all the other effects that you use in your scene.
+This is a large work if you consider all the X3D options, and note that
+a shader should remain optimized for a particular setting.
+Moreover, you would have to calculate some global options,
+like which light sources and fog nodes affect the given shape.
+Effectively, this isn't really doable by a manual work --- instead
+you would have to write a shader generator program. Our you could use
+an existing shader generation system... which is exactly what our paper
+is about. The implementation of our effects simply constructs and links
+appropriate shader, gathering the information from all the nodes
+that affect the given shape. And all the information is nicely integrated
+with X3D nodes, effects are specified at suitable nodes, and their
+uniform values and attributes are integrated with X3D fields.
+
 \section{Short reference of available plugs}
 
 TODO: maybe make it a table? We can probably waste 0.5-1 page on this
