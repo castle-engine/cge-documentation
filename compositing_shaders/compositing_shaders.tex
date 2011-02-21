@@ -871,12 +871,16 @@ TODO: nicer? Maybe just do it always when vertex\_object\_space is plugged?
 
 \section{Complete example models}
 
-Examples are available inside our engine example models on
+Examples are available inside our engine demo models on
 \myhref{http://vrmlengine.sourceforge.net/kambi\_vrml\_test\_suite.php}{http://vrmlengine.sourceforge.net/kambi_vrml_test_suite.php}.
+The relevant demos are mainly inside \texttt{compositing\_shaders},
+also the \texttt{water} contains examples of the water implementation
+using our effects.
 You can checkout them from SVN, or just browse through a web browser,
 using the URL
 \myhref{https://vrmlengine.svn.sourceforge.net/svnroot/vrmlengine/trunk/kambi\_vrml\_test\_suite/compositing\_shaders/}{https://vrmlengine.svn.sourceforge.net/svnroot/vrmlengine/trunk/kambi_vrml_test_suite/compositing_shaders/}.
-You can open them using any of our engine tools,
+
+You can open the examples using any of our engine tools,
 like \texttt{view3dscene} from
 \myhref{http://vrmlengine.sourceforge.net/view3dscene.php}{http://vrmlengine.sourceforge.net/view3dscene.php}.
 
@@ -884,11 +888,21 @@ You can run \texttt{view3dscene} with \texttt{--debug-log} command-line
 option. Output (stdout) will show you the final shader code generated.
 This is a useful way to learn about our shader rendering internals.
 
+Another useful option to try in \texttt{view3dscene} is to switch to
+\textit{View $->$ Shaders $->$ Enable For Everything} mode.
+This will force shader rendering for all the shapes,
+while by default we use shader rendering only for the shapes that
+require particular effects (shaders by \texttt{ComposedShader}, effects
+described in this paper, shadow maps and such).
+Forcing shader rendering for everything allows to visually see
+how our shaders implement the whole X3D lighting and texturing model.
+It also makes the whole lighting calculation per-pixel, resulting
+in particular in beautiful light spot highlights.
+
 Development notes: only the SVN kambi\_vrml\_test\_suite contains
 compositing\_shaders subdirectory.
 You also have to use view3dscene from SVN or nightly builds,
 see \myhref{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
-And you have to activate ,,View $->$ Force Shader Rendering'' (Ctrl+S) manually.
 
 \bibliographystyle{acmsiggraph}
 \nocite{*}
