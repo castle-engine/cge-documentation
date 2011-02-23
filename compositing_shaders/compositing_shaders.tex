@@ -374,7 +374,7 @@ MFNode [] \codeem{effects} [] # Effect
 that can hold any number of
 
 \begin{mycode}
-\underline{Effect : X3DNode}
+\underline{Effect : X3DChildNode}
 \begin{Verbatim}[commandchars=\\\{\}]
 SFString [] \codeem{language} ""
   # Just like ComposedShader.language.
@@ -382,6 +382,11 @@ SFString [] \codeem{language} ""
   # the base shader (browser internal
   # or selected from Appearance.shaders)
   # has the same language.
+SFBool [in,out] \codeem{enabled} TRUE
+  # Allows to easily turn on/off the effect.
+  # You could also remove/add the node
+  # from the scene, but often toggling
+  # this field is easier for scripts.
 MFNode [] \codeem{parts} [] # EffectPart
   ... additionally you can
       declare new fields and events,
@@ -472,15 +477,43 @@ would like to share a particular piece of code. For example,
 you can create an \texttt{EffectPart} with a library of useful
 shading language functions, and reuse if for various effects.
 
-\subsection{Plugging from other nodes}
+\subsection{Effects for a group of nodes}
+
+Our \texttt{Effect} node is a descendant of \texttt{X3DChildNode},
+and can be placed directly within X3D grouping nodes like
+\texttt{Group} and \texttt{Transform}. This effect will apply
+to all the shapes within given grouping node. The way it works
+follows X3D conventions for pointing device sensor nodes and \texttt{LocalFog}.
+
+The \texttt{LocalFog} is especially worth mentioning. Browser can implement
+the \texttt{LocalFog} node as a prototype that expands to our
+\texttt{Effect} node. This gives you a 100\% correct implementation
+of the standard \texttt{LocalFog} node, as is trivially easy.
+
+TODO: implement it.
+
+As one of the demos, we have implemented a realistic
+animated volumetric fog, where the fog density is stored in
+a 3D smooth noise texture. In a fragment shader, the 3D texture is sampled
+along the line between the camera and pixel position. This makes a very
+convincing effect of a dense fog. Since it is implemented as an effect,
+it can be instantly used with various lighting and texturing conditions
+--- it simply works for all X3D shapes.
+
+TODO: screenshot of volumetic fog with / without headlight,
+with / without scene lights used.
+
+\subsection{Light sources effects}
 
 The real power of our system comes from the fact that some nodes,
-like light sources, textures, or even fog, can define their own effects.
+like light sources and textures, can define their own effects.
 So you can easily define a shader specific for a given light source,
-or texture. For this, we add the \texttt{effects} field to various nodes:
+or texture.
+
+We add the \texttt{effects} field for every light node:
 
 \begin{mycode}
-\underline{X3DLightSource, X3DTextureNode, X3DFogObject}
+\underline{X3DLightSource}
 \begin{Verbatim}[commandchars=\\\{\}]
 MFNode [] \codeem{effects} [] # Effect
 \end{Verbatim}
@@ -494,6 +527,24 @@ the default calculation will not even be used in the shader,
 so it will not slow down the calculation without a reason.
 
 \subsection{Texture effects}
+
+Just like the light sources, also each texture node may define it's own effects:
+
+\begin{mycode}
+\underline{X3DTextureNode}
+\begin{Verbatim}[commandchars=\\\{\}]
+MFNode [] \codeem{effects} [] # Effect
+\end{Verbatim}
+\end{mycode}
+
+%% TODO check and fix above X3Dxxx class names.
+
+You can use the \texttt{effects} field
+inside any \texttt{X3DTextureNode} to enhance and modify the look of any
+standard texture node, like \texttt{ImageTexture}.
+You can use a plug \texttt{texture\_color},
+that allows you to modify the texture color, knowing the current texture
+coordinates and such.
 
 \subsubsection{ShaderTexture effects}
 
@@ -574,16 +625,10 @@ when you don't use \texttt{texCoord} at the geometry node.
 The idea is that using a \texttt{ShaderTexture} should be as comfortable
 as any other normal texture.
 
-\subsubsection{General X3DTextureNode effects}
+\subsubsection{When to use ShaderTexture}
 
-You can use the \texttt{effects} field
-inside any \texttt{X3DTextureNode} to enhance and modify the look of any
-standard texture node, like \texttt{ImageTexture}.
-You can use a plug \texttt{texture\_color},
-that allows you to modify the texture color, knowing the current texture
-coordinates and such.
-
-Note that when the \texttt{texture\_color} plugs are called,
+For textures that are not \texttt{ShaderTexture},
+when the \texttt{texture\_color} plugs are called,
 the internal shaders already calculated the initial texture
 color by actually sampling the texture image. This is useful for you if you
 want to modify this color. If you simply want to ignore the normal
