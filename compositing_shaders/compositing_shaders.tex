@@ -491,8 +491,6 @@ a browser can implement the \texttt{LocalFog} node as a prototype
 that expands to our \texttt{Effect} node. This gives you a 100\% correct
 implementation of the standard \texttt{LocalFog} node, as is trivially easy.
 
-TODO: implement it.
-
 As one of the demos, we have implemented a realistic
 animated volumetric fog, where the fog density is stored in
 a 3D smooth noise texture. In a fragment shader, the 3D texture is sampled
@@ -501,8 +499,15 @@ convincing effect of a dense fog. Since it is implemented as an effect,
 it can be instantly used with various lighting and texturing conditions
 --- it simply works for all X3D shapes.
 
-TODO: screenshot of volumetic fog with / without headlight,
-with / without scene lights used.
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=2.2in]{volumetric_animated_fog_no_fog}
+  \includegraphics[width=2.2in]{volumetric_animated_fog_no_light}
+  \includegraphics[width=2.2in]{volumetric_animated_fog_all}
+  \caption{Volumetric fog scene: 1) No fog; 2) No lighting; 3) Lights and fog.
+Note that the fog is assumed to have it's own ambient lighting,
+so it colors the image even in the 2) case.}
+\end{figure*}
 
 \subsection{Light sources effects}
 
