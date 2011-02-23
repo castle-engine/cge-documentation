@@ -481,14 +481,15 @@ shading language functions, and reuse if for various effects.
 
 Our \texttt{Effect} node is a descendant of \texttt{X3DChildNode},
 and can be placed directly within X3D grouping nodes like
-\texttt{Group} and \texttt{Transform}. This effect will apply
-to all the shapes within given grouping node. The way it works
-follows X3D conventions for pointing device sensor nodes and \texttt{LocalFog}.
+\texttt{Group} and \texttt{Transform}, and at the top level of the X3D file.
+Such effect will apply to all the shapes within given grouping node.
+The scope rules follow the X3D conventions for other nodes,
+like pointing device sensor nodes and \texttt{LocalFog}.
 
-The \texttt{LocalFog} is especially worth mentioning. Browser can implement
-the \texttt{LocalFog} node as a prototype that expands to our
-\texttt{Effect} node. This gives you a 100\% correct implementation
-of the standard \texttt{LocalFog} node, as is trivially easy.
+The \texttt{LocalFog} is especially worth mentioning. Using this mechanism,
+a browser can implement the \texttt{LocalFog} node as a prototype
+that expands to our \texttt{Effect} node. This gives you a 100\% correct
+implementation of the standard \texttt{LocalFog} node, as is trivially easy.
 
 TODO: implement it.
 
