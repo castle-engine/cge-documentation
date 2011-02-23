@@ -1,5 +1,66 @@
 Shaders made usable
 
+  Motivation:
+
+  We would like to use GPU shading languages in X3D.
+  We would like it a lot.
+
+  However, current approach of X3D "programmable shaders" isn't really useful:
+  you can only create a shader tuned for a particular settings.
+  When you want to implement a particular effect, you immediately lose
+  all the browser X3D rendering capabilities: you have to reimplement them
+  yourself.
+
+  It's difficult to replicate the whole X3D rendering functionality
+  in shader yourself. In fact, it's not possible:
+  - There's a lot of information known to the browser that
+    isn't passed to shaders.
+  - At least not in standard way: GLSL has a lot of global vars.
+    But
+    1. it's still not specified whether browser should even load
+    them, and how, when you use ComposedShader
+    2. there's still stuff like which/how many light sources/textures
+    are enabled, which isn't available anywhere.
+    3. and even if it would be possible, this isn't the way to go:
+    GPU shaders should be optimized, not general.
+
+  We invented a way to overcome this. Instead of creating a complete
+  shader, you only create an "effect", which is just a small piece
+  of shader code that will be integrated with browser shaders.
+
+  So
+  - You still have the full power of shading language like GLSL
+    (we do not hide it from you, we do not invent any new language
+    for writing shaders, and implementation doesn't have to do any
+    difficult operations to process your shading language code).
+  - You can jump straight into the implementation of your
+    interesting effect in shading language.
+    Mark when it should be used... and you're done.
+  - Your effects are immediately reusable: they work under all
+    lighting / (multi-)texturing conditions, because the browser
+    takes care of it.
+
+  More:
+  - Browser implementation can also use this,
+    to apply some internal effects this way. So we can have a base
+    shader, then a really easy (and separate from the rest)
+    implementation of stuff like fog, bump mapping and shadow mapping.
+  - Various author effects also instantly cooperate with each other.
+
+  Show examples:
+    Shinto shrine: bump mapping, and 2 x shadow maps.
+      Each shadow map correctly scales appropriate light source.
+      Browser implementation is easy!
+      (Show EnableBumpMapping, or maybe EnableFog source)
+    Water: 2 separate effects, cooperating with standard browser per-pixel lighting
+    Volumetric fog. Turn on/off fog.
+    fresnel_and_toon: show the X3D source:
+      I can just say: "this is a list of effects you should use:
+      this one, and this one. Now make it happen."
+      And both effects are applied.
+
+  Into the spec:
+
   Existing shader nodes (ComposedShader and such):
     - use the first matching shader
       Good, allows to use various shading languages.
@@ -14,4 +75,28 @@ Shaders made usable
         system, this isn't really usable. Before implementing the least
         trivial GLSL effect, you usually want to replicate all the standard
         X3D functionality. Huge task.
+
+  Effects at Apperance.effects:
+  - Introducing Effect, EffectPart nodes.
+  - We steal ideas from ComposedShader and such: uniform values
+    can be trivially declared inside Effect (multiple Effects sum their
+    uniforms).
+  - Effect code is not complete: it will be plugged into full shader.
+    Magic PLUG_xxx function names are used for this.
+
+  Effects at light sources:
+
+  Effects at textures:
+
+  ShaderTexture:
+
+  Effects at grouping nodes:
+
+  Defining plugs:
+  - Effect code may define plugs for following effects to use.
+    Trivially easy, just a magic /* PLUG: ... */ comment.
+  - You can even still define your own basic shader (like ComposedShader),
+    and if you define standard plug names there --- it will work
+    with effects. And you can define more of your own plugs,
+    for your effects.
 
