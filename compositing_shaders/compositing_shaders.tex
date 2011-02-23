@@ -493,7 +493,8 @@ implementation of the standard \texttt{LocalFog} node, as is trivially easy.
 
 As one of the demos, we have implemented a realistic
 animated volumetric fog, where the fog density is stored in
-a 3D smooth noise texture. In a fragment shader, the 3D texture is sampled
+a 3D smooth noise texture (idea from \cite{humus:volumetricfog}).
+In a fragment shader, the 3D texture is sampled
 along the line between the camera and pixel position. This makes a very
 convincing effect of a dense fog. Since it is implemented as an effect,
 it can be instantly used with various lighting and texturing conditions
@@ -619,13 +620,10 @@ algorithm (nodes \texttt{TextureCoordinateGenerator},
     Note that our implementation has some extensions
     to \texttt{TextureCoordinateGenerator}. In particular
     \texttt{"BOUNDS2D"} and \texttt{"BOUNDS3D"} are also valid names for
-    \texttt{TextureCoordinateGenerator.mode}. See
-    \myhref{http://vrmlengine.sourceforge.net/kambi\_vrml\_extensions.php\#section\_ext\_tex\_coord\_bounds}{http://vrmlengine.sourceforge.net/kambi_vrml_extensions.php\#section_ext_tex_coord_bounds}.
+    \texttt{TextureCoordinateGenerator.mode}, see
+    \cite{vrmleng:texcoordbounds}.
     Projective texture mapping by \texttt{ProjectedTextureCoordinate}
-    is also our extension, see
-    \myhref{http://vrmlengine.sourceforge.net/kambi\_vrml\_extensions\_shadow\_maps.php\#section\_texture\_projective}{http://vrmlengine.sourceforge.net/kambi_vrml_extensions_shadow_maps.php\#section_texture_projective}.
-    TODO: move to bib. I really hate bibtex.
-}).
+    is also our extension, see \cite{vrmleng:projectivetexturing}.}).
 The \texttt{defaultTexCoord} says only what is the default approach,
 when you don't use \texttt{texCoord} at the geometry node.
 The idea is that using a \texttt{ShaderTexture} should be as comfortable
