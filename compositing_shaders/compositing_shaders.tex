@@ -712,8 +712,8 @@ Similarly, if you use the \texttt{PLUG\_light\_scale}
 inside \texttt{Appearance.effects}, you can change the intensity
 of all the light sources on the given shape.
 
-Special plug names \$declare-variables\$, \$declare-procedures\$
-are used to designate a place where functions are placed.
+Special plug names \$declare-variables\$, \$declare-forward-procedures\$,
+\$declare-procedures\$ are used to designate a place where functions are placed.
 These are only useful if you create your own ComposedShader node,
 and you would like to allow effects framework to cooperate with
 your ComposedShader. They will be used to place
@@ -721,7 +721,7 @@ variable and procedure declarations (preferably, external declarations
 of procedures, actually defined in other compilation unit,
 for shading languages supporting this).
 TODO: otherwise place them at the beginning?
-TODO: such ComposedShader is not really impl yet.
+TODO: test such ComposedShader, should work but not tested yet.
 
 When a special value \texttt{function} is specified, like
 
@@ -856,6 +856,16 @@ that using GPU noise is slower, requires a better GPU,
 but also improves the quality noticeably. With GPU noise, there is no problem
 with aliasing of the noise texture, and the noise parameters can be adjusted
 in real-time.)
+
+Our effects idea allowed us also to implement the two alternative versions
+of ,,water normal effect'' in a nice way. They are both actually provide
+alternative implementations for ,,getting the normal vector in object space''.
+Another common effect uses them, generating proper coordinates over
+the water surface, and transforming the normal vectors into eye space for
+the lighting equation. This makes the two alternatives nicely separated,
+from each other and from the common code for passing normals from object to eye space.
+This was possible thanks to the fact that an effect can actually define
+it's own plug names, that can be used by the following effects.
 
 \begin{figure*}[t]
   \centering
