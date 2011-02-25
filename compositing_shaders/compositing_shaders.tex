@@ -887,6 +887,19 @@ may be implemented on GPU by a simple prototype using \texttt{ShaderTexture}.
   \caption{3D and 2D smooth noise on GPU, wrapped in ShaderTexture.}
 \end{figure}
 
+We also provide plugs to easily change the geometry in object space.
+Again, since the effect is integrated with all the browser shaders,
+you only need to code a simple function to change the vertex positions
+as you want. The effect instantly works with all the lighting and texturing
+conditions. Since the transformation is done on GPU, there's practically
+no speed penalty for animating thousands of flowers in our test scene.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=3in]{flowers}
+  \caption{Flowers bending under the wind, by transforming then on GPU in object space.}
+\end{figure}
+
 We would like to emphasize that all the effects demonstrated here
 are theoretically already possible by using the X3D \textit{Programmable
 shaders component} component.
