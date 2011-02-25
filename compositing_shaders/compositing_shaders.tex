@@ -353,7 +353,7 @@ browser uses it's own internal basic shader. This shader is then
 extended by effects like bump mapping (coming from internal browser
 implementation), or by user effects. But you can also define your own
 \texttt{ComposedShader} node. Then your own shader is enhanced by the
-browser. TODO: ? If you define the same (or compatible) plugging
+browser. If you define the same (or compatible) plugging
 points, then the browser effects will be even added to your own
 shader. And of course user effects are added to your shader.
 
@@ -723,23 +723,17 @@ for shading languages supporting this).
 TODO: otherwise place them at the beginning?
 TODO: test such ComposedShader, should work but not tested yet.
 
-When a special value \texttt{function} is specified, like
-
-\begin{mycode}
-/* PLUG: plug-name function (params-called) */
-\end{mycode}
-
-then the code will be replaced to a function call returning given type-name.
-Such plug can only be used once.
-Identifier (next token in GLSL language) immediately following
-this plug will be removed if this plug is defined.
-TODO: I'm unsure about the ,,function'' plugs.
-I don't like the fact that they can only be used once, but sometimes
-it really makes sense?
-I'm also unsure about definition --- this may force authors to use
-intermediate functions. Instead use closing /* PLUG-END: plug-name */?
-So far I managed to achieve everything without ,,function plugs''.
-Maybe scrap this idea?
+Currently all the plugs must be procedures, that is their result type
+must be declared as \texttt{void}. We have been considering
+a possibility of functions, where part of the calculation may be replaced
+by a function call to a plug function. While not difficult to implement,
+this idea seems like a useless complication after many tests.
+Procedural plugs are easier to declare, as the call to the plug
+may be simply inserted, while in case of function it will have to replace
+some previous code. This also means that using a procedural plug
+\textit{never} replaces or removes some existing code, which is a very nice
+concept to keep. We want the effects to cooperate with each other,
+not to ,,hijack'' from each other some parts of functionality.
 
 \subsection{Why plugs are defined as comments}
 
@@ -819,9 +813,7 @@ for light's spot.
 
 Even inside the browse implementation, using plugs to implement internal
 effects allows for a great code simplification and separation.
-Our bump mapping effect (TODO: on slides, actually show
-the trivial TVRMLShader.EnableBumpMapping source code?)
-is done purely by using plugs.
+Our bump mapping effect is done purely by using plugs.
 So it has a clean and short implementation. It also shows that
 X3D authors could implement perfect bump mapping themselves,
 without any traditional hassles. For example, bump mapping can be
@@ -926,6 +918,7 @@ Texture parameter type corresponds to VRML/X3D node type (samplerXxx).
 vertex\_object\_space: if you may change vertex\_object,
 be sure to add \#define VERTEX\_OBJECT\_SPACE\_CHANGED.
 TODO: nicer? Maybe just do it always when vertex\_object\_space is plugged?
+Yes, invent special vertex\_object\_space\_change for this.
 
 \section{Complete example models}
 
