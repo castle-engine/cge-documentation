@@ -722,7 +722,7 @@ not to ,,hijack'' from each other some parts of functionality.
 
 \subsection{Where the forward declarations are placed}
 
-Special plug name \texttt{\$declare-forward-procedures\$} may be used
+Special comment \texttt{/* PLUG-DECLARATIONS */} may be used
 near the beginning of your shader source code. It is only useful
 if your shader code defines any new plugging points, that is if you
 have any magic \texttt{/* PLUG: ... */} comments inside.
@@ -732,19 +732,18 @@ Additionally, the browser has to declare the function,
 because it may be in a separate compilation unit (in case of GLSL),
 or just defined later in the code.
 These (forward or external) declarations are inserted at
-the point of special \texttt{/* PLUG: \$declare-forward-procedures\$ */}
+the point of special \texttt{/* PLUG-DECLARATIONS */}
 comment, or (when it is missing) simply at the beginning of your shader source.
 This applies in the same way to shader code inside an \texttt{EffectPart},
 or inside standard X3D node like \texttt{ShaderPart}.
 
-Using \texttt{\$declare-forward-procedures\$} may be necessary
+Using \texttt{/* PLUG-DECLARATIONS */} may be necessary
 as some shading language directives are required to be placed before
 all normal declarations. For example, in case of OpenGL shading language,
 the \texttt{\#version} as well as some \texttt{\#extension} directives
 must occur at the beginning of the shader code. You should place
-\texttt{/* PLUG: \$declare-forward-procedures\$ */} after such
-directives. Remember that they also must be placed outside of any
-function body, and before any normal \texttt{/* PLUG: ... */} declarations.
+\texttt{/* PLUG-DECLARATIONS */} after such directives,
+and before any \texttt{/* PLUG: ... */} declarations.
 
 \subsection{Why plugs are defined as comments}
 
