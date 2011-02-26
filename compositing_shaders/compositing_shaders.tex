@@ -790,7 +790,9 @@ It doesn't happen by accident in our experience.
 
 Note that this isn't a security problem --- bad shader code only breaks
 rendering of a particular shape. And X3D ComposedShader node allows users
-to execute any shading language code anyway. So if there's anything dangerous,
+to execute any shading language code anyway. So if there's anything dangerous
+(for example a buggy OpenGL may cause the browser process to exit with
+segmentation fault on some special shader code snippets),
 you could do it without using our effects framework anyway.
 
 \section{Usage examples}
