@@ -425,6 +425,11 @@ A single part may declare variables (uniform, varying and such),
 and many functions that use them. But it must be completely within
 one shader type.
 
+Note that it is completely reasonable to have an \texttt{EffectPart} node
+with source code that doesn't define any \texttt{PLUG\_xxx} functions.
+Such \texttt{EffectPart} node may be useful for defining shading language
+utility functions, used by your other effects.
+
 At one point we tried the approach
 to not look at any special function names in GLSL code,
 and instead define a plug name in the separate field of the \texttt{EffectPart}
