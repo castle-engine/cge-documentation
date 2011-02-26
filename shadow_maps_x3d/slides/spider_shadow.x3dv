@@ -22,7 +22,7 @@ KambiHeadLight {
 
 EXTERNPROTO PlaneNotTesselated [
   inputOutput SFBool solid
-] [ "../../../kambi_vrml_test_suite/x3d/useful_proto_plane_tess.x3dv#PlaneNotTesselated" ]
+] [ "../../../demo_models/x3d/useful_proto_plane_tess.x3dv#PlaneNotTesselated" ]
 
 DEF MySpot SpotLight {
   location 0 0 3
@@ -50,7 +50,7 @@ Transform {
     appearance Appearance {
       material Material { }
       texture ImageTexture {
-        url "../../../kambi_vrml_test_suite/textures/016marbre.jpg"
+        url "../../../demo_models/textures/016marbre.jpg"
         textureProperties TextureProperties {
           anisotropicDegree 32
           minificationFilter "NICEST"

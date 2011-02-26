@@ -22,14 +22,14 @@ KambiHeadLight {
 
 EXTERNPROTO TesselatedPlane [
   inputOutput SFNode texCoord
-] [ "../../../kambi_vrml_test_suite/x3d/tesselated_plane.wrl#TesselatedPlane" ]
+] [ "../../../demo_models/x3d/tesselated_plane.wrl#TesselatedPlane" ]
 
 EXTERNPROTO EditableTransform [
   inputOutput MFNode children
   inputOutput SFVec3f translation
   inputOutput SFVec3f scale
   inputOutput SFString description
-] [ "../../../kambi_vrml_test_suite/x3d/useful_prototypes.x3dv#EditableTransform" ]
+] [ "../../../demo_models/x3d/useful_prototypes.x3dv#EditableTransform" ]
 
 # spot test ------------------------------------------------------------------
 
