@@ -207,7 +207,7 @@ powerful as it can.
 
 %% (see also http://groups.google.com/group/blendertorenderman/browse_thread/thread/aaf07831b91be9db?pli=1 , confirms my findings)
 
-Another approach is the Sh (ref:http://libsh.org/) language, which
+Another approach is the Sh language (\cite{sh}, \cite{sh:book}) which
 allows writing shaders code (that can run on GPU) directly inside a
 C++ program. For this, Sh extends the C++ language (through C++
 operator overloading and macros tricks). It allows an excellent
@@ -224,7 +224,17 @@ language used to make a browser. Invoking a compiler to generate a
 final GPU shader, not to mention teaching user's C++, is out of the
 question.
 
-%% ("Metaprogramming GPUs with Sh", http://books.google.com/books?id=8RX4RmFRLmgC&pg=PA79&lpg=PA79&dq=ShAttrib2f&source=bl&ots=IOxd1-BQLL&sig=AIPgFRmbodNpCLWmwk-QV5JUjVo&hl=pl&ei=EylRTe7RB8qeOsiQ1aQI&sa=X&oi=book_result&ct=result&resnum=7&ved=0CEkQ6AEwBg#v=onepage&q=ShAttrib2f&f=false )
+OGRE \cite{ogre}, an open-source 3D engine written in C++, has a system
+for adding shader extensions \cite{ogre:shader}. It's idea is similar
+to our system (enhance the built-in shaders with your own effects),
+however the whole job of combining a shader is done by operating
+on particular shader by C++ code. The developer has to code
+the logic deciding which shaders are extended, and most of the specification
+about how the extension is called is done in the C++ code.
+This has the nice advantage of being able to encapsulate some fixed-function
+features as well, however the whole system must be carefully controlled by
+the C++ code. In our approach, we allow the authors to write direct shading
+language code quickly, and the integration is built inside appropriate X3D nodes.
 
 At the end, we would like to mention a solution from a completely
 different domain, that is surprisingly similar to ours in some ways.
@@ -252,6 +262,24 @@ so defining hooks is done by smart textual replacements)
 and some special opportunities (we can define effects at
 the appropriate nodes of X3D, like textures and lights sources,
 as we don't want to throw all the effects in one bag).
+
+% OpenSceneGraph:
+% http://www.openscenegraph.org/projects/osg/wiki/Support/Tutorials/ShadersParameters
+% http://www.openscenegraph.org/projects/osg/wiki/Support/Tutorials/ShadersIntroduction
+% http://mew.cx/osg_glsl_july2005.pdf
+% I see no way to connect shaders?
+%
+% Irrlight --- also no way to connect shaders?
+%
+% Blender Game Engine: no way to connect shaders, Python code can
+% set the final (complete) shader source only?
+% http://download.blender.org/documentation/GE/Blender.htm
+% http://www.blender.org/development/release-logs/blender-248/realtime-glsl-materials/
+% See also source, inside source/gameengine/:
+% ./Ketsji/BL_Shader.h
+% ./Ketsji/BL_Shader.cpp
+% ./Ketsji/BL_BlenderShader.h
+% ./Ketsji/BL_BlenderShader.cpp
 
 \begin{figure*}[t]
   \centering
