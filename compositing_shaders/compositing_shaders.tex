@@ -212,11 +212,10 @@ language processing inside X3D browser.
 
 \section{Motivation and previous work}
 
-The core shading languages don't provide a ready solution for connecting shaders
-from independent sources. The OpenGL GLSL \cite{glsl} and NVidia Cg \cite{cg}
-language files directly specify the shader source code.
-The Direct X HLSL \cite{hlsl} effects files and similar \texttt{CgFX}
-files define various techniques (for various graphic card capabilities),
+The popular real-time shading languages (OpenGL \texttt{GLSL}, NVidia \texttt{Cg}, Direct 3D \texttt{HLSL})
+don't provide a ready solution for connecting shaders from independent sources.
+The \texttt{CgFX} and HLSL \texttt{.fx} files encapsulate shading language code
+in \emph{techniques} (for various graphic card capabilities),
 and within a single technique specify operations for each rendering pass.
 In neither case can we simply connect multiple shader source code files
 and expect the result to be a valid program.
@@ -250,7 +249,7 @@ algorithm of this layer.
 
 %% (see also http://groups.google.com/group/blendertorenderman/browse_thread/thread/aaf07831b91be9db?pli=1 , confirms my findings)
 
-A different approach is presented by the Sh language (\cite{sh}, \cite{sh:book}).
+A different approach is presented by the Sh language (\myhref{http://libsh.org/}{http://libsh.org/}, \cite{sh:book}).
 It allows writing shaders code (that can run on GPU) directly inside a
 C++ program. For this, Sh extends the C++ language (through C++
 operator overloading and macros tricks). It allows an excellent
@@ -267,8 +266,8 @@ language used to make a browser. Invoking a compiler to generate a
 final GPU shader, not to mention teaching user's C++, is out of the
 question.
 
-OGRE \cite{ogre}, an open-source 3D engine written in C++, has a system
-for adding shader extensions \cite{ogre:shader}. Its idea is similar
+OGRE (\myhref{http://www.ogre3d.org/}{http://www.ogre3d.org/}), an open-source 3D engine written in C++, has a system
+for adding shader extensions (see \cite{ogre:shader}). Its idea is similar
 to our system (enhance the built-in shaders with your own effects),
 however the whole job of combining a shader is done by operating
 on particular shader by C++ code. The developer has to code
@@ -281,7 +280,8 @@ language code quickly, and the integration is built inside appropriate X3D nodes
 
 At the end, we would like to mention a solution from a completely
 different domain, that is surprisingly similar to ours in some ways.
-Drupal \cite{drupal}, an open-source CMS system written in PHP,
+Drupal (\myhref{http://drupal.org/}{http://drupal.org/}),
+an open-source CMS system written in PHP,
 has a very nice system of modules. Each module
 can extend the functionality of the base system (or other module)
 by implementing a \textit{hook}, which is just a normal PHP function
@@ -1038,9 +1038,10 @@ this). But they are not a necessary feature.
 The table below is a quick reference of plugs available in our
 implementation. We have found these plugs to be sufficient for a wide
 range of effects, although of course there's always a place for
-changes and improvements. See our engine website, and in
-particular the online reference of our plugs \cite{vrmleng:plugs}, for
-the most up-to-date list.
+changes and improvements. See our engine website,
+in particular the online reference of our plugs on
+\myhref{http://vrmlengine.sourceforge.net/compositing\_shaders.php}{http://vrmlengine.sourceforge.net/compositing_shaders.php},
+for the most up-to-date list.
 % Remember that you can always define your own plugs in your effects
 % and shader nodes.
 
