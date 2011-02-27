@@ -261,14 +261,14 @@ object-oriented methods there to create a general shader that can
 later be extended through various means, like overriding virtual
 methods. However, this is a solution closely coupled with C++. It's
 suitable if you have a 3D engine in C++, and you want to use in your
-own C++ program and extend it's shaders. In this paper, we want to
+own C++ program and extend its shaders. In this paper, we want to
 create a solution that is absolutely separate from the programming
 language used to make a browser. Invoking a compiler to generate a
 final GPU shader, not to mention teaching user's C++, is out of the
 question.
 
 OGRE \cite{ogre}, an open-source 3D engine written in C++, has a system
-for adding shader extensions \cite{ogre:shader}. It's idea is similar
+for adding shader extensions \cite{ogre:shader}. Its idea is similar
 to our system (enhance the built-in shaders with your own effects),
 however the whole job of combining a shader is done by operating
 on particular shader by C++ code. The developer has to code
@@ -292,7 +292,7 @@ and to use a hook.
 Many modules can implement the same hook and cooperate without any problems.
 The whole hook system is defined completely in PHP, as it's a scripting
 language, and you can query the list of loaded functions by name,
-and call function by it's name.
+and call function by its name.
 
 Drupal approach is actually quite similar to our
 core idea of combining effects. Our effects are similar to
@@ -367,7 +367,7 @@ you modify the color that will be displayed on screen.
 
 We have a short reference (at the end of this document) of all
 the plugging points available in our shaders. For each plugging point,
-like this \texttt{PLUG\_texture\_apply}, we define a list of it's parameters
+like this \texttt{PLUG\_texture\_apply}, we define a list of parameters
 (you have to declare them exactly the same in your code), and we define
 when it is called.
 
@@ -399,7 +399,7 @@ This way some of your effects may be further customized by the other effects.
 \end{myenumerate}
 
 When you don't use an explicit shader (like \texttt{ComposedShader} node),
-browser uses it's own internal basic shader. This shader is then
+browser uses its own internal basic shader. This shader is then
 extended by effects like bump mapping (coming from internal browser
 implementation), or by user effects. But you can also define your own
 \texttt{ComposedShader} node. Then your own shader is enhanced by the
@@ -570,7 +570,7 @@ it can be instantly used with various lighting and texturing conditions
   \includegraphics[width=2.3in]{volumetric_animated_fog_no_light}
   \includegraphics[width=2.3in]{volumetric_animated_fog_all}
   \caption{Volumetric fog scene: 1) No fog; 2) No lighting; 3) Lights and fog.
-Note that the fog is assumed to have it's own ambient lighting,
+Note that the fog is assumed to have its own ambient lighting,
 so it colors the image even in the 2) case.}
 \end{figure*}
 
@@ -597,7 +597,7 @@ so it will not slow down the calculation without a reason.
 
 \subsection{Texture effects}
 
-Just like the light sources, also each texture node may define it's own effects:
+Just like the light sources, also each texture node may define its own effects:
 
 \begin{mycode}
 \underline{X3DTextureNode}
@@ -932,8 +932,8 @@ Another common effect uses them, generating proper coordinates over
 the water surface, and transforming the normal vectors into eye space for
 the lighting equation. This makes the two alternatives nicely separated,
 from each other and from the common code for passing normals from object to eye space.
-This was possible thanks to the fact that an effect can actually define
-it's own plug names, that can be used by the following effects.
+This was possible thanks to the fact that an effect can define
+new plug names, that can be used by the following effects.
 
 \begin{figure*}[t]
   \centering
@@ -1112,9 +1112,9 @@ void PLUG_texture_color(
 
 Calculate or modify the texture color.
 This plug is available for texture effects. The second parameter of
-this plug is special: it's existence and type depends on the texture
+this plug is special: its existence and type depends on the texture
 node where it is used. For ShaderTexture, it's not available. For
-other X3DTextureNode, it's type corresponds to the GLSL sampler type
+other X3DTextureNode, its type corresponds to the GLSL sampler type
 of given texture node: \texttt{sampler2D} for 2D textures,
 \texttt{sampler3D} for 3D textures, \texttt{samplerCube} for cube
 maps, and \texttt{sampler2DShadow} for \texttt{GeneratedShadowMap}
