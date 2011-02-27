@@ -957,21 +957,158 @@ uniform values and attributes are integrated with X3D fields.
 
 \section{Short reference of available plugs}
 
-TODO: maybe make it a table? We can probably waste 0.5-1 page on this
-without a problem. Document this at the end, when everything is settled down.
+The table below is a quick reference of plugs available in our
+implementation. We have found these plugs to be sufficient for a wide
+range of effects, although of course there's always a place for
+changes and improvements. See the webpage of own engine, and in
+particular the online reference of our plugs \cite{vrmleng:plugs}, for
+the most up-to-date list.
+% Remember that you can always define your own plugs in your effects
+% and shader nodes.
 
-For each plug:
-- plug name
-- declaration (parameter order and types must match)
-- type (fragment or vertex)
-- docs: called when?
+Our implementation is concerned only with the OpenGL Shading Language
+(GLSL). We have designed our extensions to be useful with other
+shading languages (like Cg or HLSL), and we think that the same set of
+plugs will be useful for them --- but it's just a theory. An
+implementation of our effects for other shading languages may likely
+find other opportunities for plugs.
 
-specials:
-texture\_color : has texture parameter only when not within ShaderTexture.
-Texture parameter type corresponds to VRML/X3D node type (samplerXxx).
+What we know for a fact is that the GLSL ,,separate compilation
+units'' idea is \textit{not} necessary for a successfull
+implementation of our effects. That's because our initial
+implementation for GLSL didn't actually need the separate compilation
+of GLSL. ,,Separate compilation units'' of GLSL are useful to force
+cleaner shader code (you cannot use undeclared functions from other
+shader parts) and it gives you better line numbers in error messages
+(although a preprocessor directive like \#line could also be used for
+this). But they are not a necessary feature.
 
-vertex\_object\_space, vertex\_object\_space\_change: you can change
-only in the 1st one.
+Parameter names are shown merely to easily document the parameter
+meaning. Of course you can change the parameter names when declaring
+your own plug function.
+
+You can also change to some extent the parameter qualifiers (in, out,
+inout and const).
+
+\begin{itemize}
+  \item If a parameter below in "inout", you can change it to "in", or
+    "const in" if you don't want to modify the value of passing here
+    value.
+  \item You can also change the "inout" parameter to just "out", if
+    you want to unconditionally overwrite the passed value. Although
+    this is usually not adviced, as it means that you disable previous
+    effects working on this parameter. Most of the time, summing or
+    multiplying to the previous value is a better choice.
+  \item If a parameter below is shown as "in", you can add or remove
+    the "const" qualifier as you wish. Using "const" may allow the
+    shader compiler for additional optimizations.
+\end{itemize}
+
+\subsection{Vertex shaders plugs}
+
+\begin{Verbatim}[commandchars=\\\{\},frame=single]
+void PLUG_vertex_object_space_change(
+  inout vec4 vertex_object,
+  inout vec3 normal_object)
+\end{Verbatim}
+
+You can modify the vertex and normal vectors in object space.
+If you don't want to modify them, consider using \texttt{vertex\_object\_space}
+instead, that may result in more optimized shader.
+
+\begin{Verbatim}[commandchars=\\\{\},frame=single]
+void PLUG_vertex_object_space(
+  const in vec4 vertex_object,
+  const in vec3 normal_object)
+\end{Verbatim}
+
+Process the vertex and normal in object space.
+
+\begin{Verbatim}[commandchars=\\\{\},frame=single]
+void PLUG_vertex_eye_space(
+  const in vec4 vertex_eye,
+  const in vec3 normal_eye)
+\end{Verbatim}
+
+Process the vertex and normal in eye (camera) space.
+
+\subsection{Fragment shaders plugs}
+
+\begin{Verbatim}[commandchars=\\\{\},frame=single]
+void PLUG_fragment_normal_eye(
+  inout vec3 normal)
+\end{Verbatim}
+
+Modify the normal in eye space, at fragment shader.
+This is where the traditional bump mapping work is done.
+
+\begin{Verbatim}[commandchars=\\\{\},frame=single]
+void PLUG_light_scale(
+  inout float light_scale,
+  const in vec3 normal_eye,
+  const in vec3 light_dir,
+  const in gl_LightSourceParameters light_source,
+  const in gl_LightProducts light_products,
+  const in gl_MaterialParameters material)
+\end{Verbatim}
+
+Scale the given light source contribution.
+This plug is also available at light source nodes' effects.
+
+\begin{Verbatim}[commandchars=\\\{\},frame=single]
+void PLUG_add_light_contribution_front(
+  inout vec4 color,
+  const in vec4 vertex_eye,
+  const in vec3 normal_eye,
+  const in gl_MaterialParameters material)
+\end{Verbatim}
+
+Add to the color new light source.
+There is also the \texttt{add\_light\_contribution\_back},
+for light contribution on the back side of the faces.
+
+\begin{Verbatim}[commandchars=\\\{\},frame=single]
+void PLUG_texture_color(
+  inout vec4 texture_color,
+  [const in samplerXxx texture,]
+  const in vec4 tex_coord)
+\end{Verbatim}
+
+Calculate or modify the texture color.
+This plug is available for texture effects. The second parameter of
+this plug is special: it's existence and type depends on the texture
+node where it is used. For ShaderTexture, it's not available. For
+other X3DTextureNode, it's type corresponds to the GLSL sampler type
+of given texture node: \texttt{sampler2D} for 2D textures,
+\texttt{sampler3D} for 3D textures, \texttt{samplerCube} for cube
+maps, and \texttt{sampler2DShadow} for \texttt{GeneratedShadowMap}
+
+\begin{Verbatim}[commandchars=\\\{\},frame=single]
+void PLUG_texture_apply(
+  inout vec4 fragment_color,
+  const in vec3 normal_eye)
+\end{Verbatim}
+
+Apply a texture color.
+
+\begin{Verbatim}[commandchars=\\\{\},frame=single]
+void PLUG_fog_apply(
+  inout vec4 fragment_color,
+  const vec3 normal_eye_fragment)
+\end{Verbatim}
+
+Apply the fog effect. This plug is called after
+the \texttt{texture\_apply}, because you usually want to apply the fog
+to the final (textured) fragment color.
+
+\begin{Verbatim}[commandchars=\\\{\},frame=single]
+void PLUG_fragment_end(
+  const in vec4 fragment_color)
+\end{Verbatim}
+
+Do the final processing of the fragment. This is called after applying
+both textures and fog, and cannot modify the fragment color anymore.
+This is useful for operations like alpha-testing the fragment.
 
 \section{Complete example models}
 
@@ -991,6 +1128,8 @@ like \texttt{view3dscene} from
 You can run \texttt{view3dscene} with \texttt{--debug-log-shaders} command-line
 option. Output (stdout) will show you the final shader code generated,
 and also the OpenGL log after linking shaders.
+Be sure to redirect the output to a file, and you may want to test it first
+with a simple scene with one shape --- as the output may be quite large.
 This is a useful way to learn about our shader rendering internals.
 
 Another useful option to try in \texttt{view3dscene} is to switch to
