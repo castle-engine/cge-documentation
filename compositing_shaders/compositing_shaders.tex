@@ -1035,12 +1035,13 @@ Process the vertex and normal in eye (camera) space.
 \subsection{Fragment shaders plugs}
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
-void PLUG_fragment_normal_eye(
-  inout vec3 normal)
+void PLUG_fragment_eye_space(
+  const vec4 vertex_eye,
+  inout vec3 normal_eye)
 \end{Verbatim}
 
-Modify the normal in eye space, at fragment shader.
-This is where the traditional bump mapping work is done.
+Process the vertex and normal in eye space, at fragment shader.
+You can modify the normal vector here, this is useful for bump mapping.
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
 void PLUG_light_scale(
