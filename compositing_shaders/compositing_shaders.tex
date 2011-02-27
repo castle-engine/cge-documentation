@@ -98,20 +98,17 @@
 \maketitle
 
 \begin{abstract}
-We demonstrate a flexible way to implement effects in X3D \cite{x3d:spec}
-by shader programming.
-Our approach allows to define the effects at appropriate places
-(not only at Appearance, but also at particular light sources, texture and such).
-It allows to seamlessly combine many effects, defined by X3D author,
-with the shader defined internally by X3D browser.
-Thus, it makes designing new effects in the GPU shading language trivial,
-both for the browser implementors and for X3D authors. Various effects
-cooperate automatically, and may be trivially composed by the X3D author.
-And it still allows to design effects using the full power of GPU shading
-language. We deliberately do not invent a new language, thus allowing
-the authors the use all the shading language features for given GPU,
-and allowing for easy implementation --- there is no need for any complex
-language processing inside X3D browser.
+We present a flexible system for implementing effects in X3D
+using the GPU shading languages.
+Our approach makes the effects naturally integrated with appropriate
+X3D nodes, like shape's appearance, light sources and textures.
+Our effects seamlessly cooperate with each other and with
+the shaders used internally by the X3D browser.
+Thus the effects are more reusable, and work in various combinations
+and under various lighting and texturing conditions.
+This makes the GPU shaders more useful to the authors.
+The browser implementation may also gain from using the same approach
+for composing internal shaders.
 \end{abstract}
 
 \begin{CRcatlist}
@@ -129,45 +126,63 @@ language processing inside X3D browser.
 %% page of your paper.
 \copyrightspace
 
-We present a technique for composing many shader snippets into a
-single shader code. X3D browsers can use it to allow user and browser
-shaders to coexist. Thus, users benefit from all the effects
-implemented in the browser, even when they want to add some effect by
-explicit shader code. Users can also seamlessly connect various
-effects into a shape, without the need to adjust any shader source
-code. Even the browser's implementation can be simplified, by using
-the same mechanism to separate implementation of various effects
-within a browser.
+X3D \cite{x3d:spec} is an open standard for representing rich 3D data.
+Many advanced graphic features are available for the authors.
+In particular, we can use \emph{shaders} to change the look of the rendered
+geometry.
+\emph{Shaders} are programs executed typically on the graphic processor unit
+(GPU). They control the per-vertex and per-pixel processing done
+during the rendering, for example summing the lights contribution,
+and mixing the texture colors.
+%% There are three popular shading languages:
+%% OpenGL GLSL \cite{glsl}, NVidia Cg \cite{cg} and Direct X HLSL \cite{hlsl}.
+The X3D standard \textit{Programmable shaders component} already allows to use
+the shaders by the authors. However, the shaders designed using
+the standard nodes
+\textit{replace} the normal rendering functionality, not \textit{enhance} it.
+This approach reflects the underlying API (like OpenGL or Direct X),
+where a shader code should be a complete and optimized program designed for
+a particular shape.
 
-For an interesting example, consider three effects: shadows, bump
-mapping, and lighting equations. Shadows provide an information that
-either turns on or off a particular lighting contribution (or scales
-this contribution, in case of soft shadows). Lighting equation
-calculates light contribution, looking at material, light source and
-normal at given geometry point. Bump mapping
-\cite{vrmleng:bumpmapping} (in the simplest case)
-modifies how the normal value is obtained: when bump mapping is used,
-the normal is taken from the texture. So we have
+We argue that a better approach is needed in most situations.
+Authors usually would like to keep the normal rendering features working,
+and only add their own effects on top of it. The browser
+implementations already have an extensive internal shaders system,
+and the authors should be able to depend on these internal shaders
+to do the common job.
 
-$$ shadow(light) * light\_contribution(light, material, normal(point)) $$
+For a simple example, consider the simplified lighting equation with shadows
+and bump mapping. We have
 
-In case of no shadows, shadow(x) = 1. In case of no bump mapping,
-normal is determined by the geometry (per-face, or smoothed per-face),
-and usually is passed as an already calculated attribute to the
-shader.
+$$ \sum_{l\in Lights} shadow(l) * light\_color(l, material, normal(point)) $$
 
-We would like to be able to modify these three functions independently.
-Independent effects may want to modify these functions, without knowing
-about each other. Our goals are to:
+The \textit{shadow} function returns values in the [0..1] range
+scaling the light color. If the object is not in the shadow, it returns 1.
+The \textit{normal} function returns a normal vector at given point.
+Now realize that we would like to configure various parts of this equation,
+without touching the others.
+For example, the \textit{shadow} may check a shadow map pixel,
+or (when shadow map is not available) always return 1.
+The \textit{normal} function may take the vector straight from
+the geometry description, or calculate it using a texture value.
+The \textit{light\_color} function may be replaced to use different
+light models (Phong, Ward, Cook-Torrance etc). Sometimes it makes sense
+to change these functions only for some chosen light sources, and sometimes
+we want to modify all the light sources.
+
+We present a system for creating effects by essentially compositing together
+a pieces of a shader code. All the defined effects effortlessly
+cooperate and can be combined with each other and with browser internal
+shaders. This allows to:
 
 \begin{enumerate}
-\item Make shader programs much easier to create. That's because we
+\item Make the shader programs much easier to create. That's because we
   can jump straight into the implementation of our imagined algorithm
   in the shader.
   We are only interested in modifying the relevant shader calculation
   parameter, and we can completely ignore other parts of the shader.
 
-\item Make shader programs much more powerful. That's because our effect
+\item Make the shader programs much more powerful. That's because our effect
   immediately cooperates with absolutely every normal feature of X3D rendering.
   This makes the implemented effect useful for a wide range of real uses,
   not only for a particular situation or a particular model (as it often happens
@@ -175,6 +190,13 @@ about each other. Our goals are to:
   All X3D light sources, textures, even other shader effects,
   are correctly applied.
 \end{enumerate}
+
+The important property is that authors still design the effects using
+the full power of a GPU shading language.
+We deliberately do not invent a new language, thus allowing
+the authors the use all the shading language features for given GPU.
+It also allows for easy implementation --- there is no need for any complex
+language processing inside X3D browser.
 
 \section{Motivation and previous work}
 
@@ -937,7 +959,7 @@ no speed penalty for animating thousands of flowers in our test scene.
 
 We would like to emphasize that all the effects demonstrated here
 are theoretically already possible by using the X3D \textit{Programmable
-shaders component} component.
+shaders component}.
 However, actually implementing them is extremely cumbersome using this
 standard component. You would first
 have to prepare a shader code to calculate all the (multi-)texturing, lighting,
@@ -960,7 +982,7 @@ uniform values and attributes are integrated with X3D fields.
 The table below is a quick reference of plugs available in our
 implementation. We have found these plugs to be sufficient for a wide
 range of effects, although of course there's always a place for
-changes and improvements. See the webpage of own engine, and in
+changes and improvements. See our engine website, and in
 particular the online reference of our plugs \cite{vrmleng:plugs}, for
 the most up-to-date list.
 % Remember that you can always define your own plugs in your effects
@@ -974,13 +996,13 @@ implementation of our effects for other shading languages may likely
 find other opportunities for plugs.
 
 What we know for a fact is that the GLSL ,,separate compilation
-units'' idea is \textit{not} necessary for a successfull
+units'' idea is \textit{not} necessary for a successful
 implementation of our effects. That's because our initial
 implementation for GLSL didn't actually need the separate compilation
 of GLSL. ,,Separate compilation units'' of GLSL are useful to force
 cleaner shader code (you cannot use undeclared functions from other
 shader parts) and it gives you better line numbers in error messages
-(although a preprocessor directive like \#line could also be used for
+(although a pre-processor directive like \#line could also be used for
 this). But they are not a necessary feature.
 
 Parameter names are shown merely to easily document the parameter
@@ -996,7 +1018,7 @@ inout and const).
     value.
   \item You can also change the "inout" parameter to just "out", if
     you want to unconditionally overwrite the passed value. Although
-    this is usually not adviced, as it means that you disable previous
+    this is usually not advised, as it means that you disable previous
     effects working on this parameter. Most of the time, summing or
     multiplying to the previous value is a better choice.
   \item If a parameter below is shown as "in", you can add or remove
