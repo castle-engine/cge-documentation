@@ -757,48 +757,59 @@ In your shader code, you can define your own plug points by a
 magic comment:
 
 \begin{mycode}
-/* PLUG: plug-name (param1, param2, ...) */
+\begin{Verbatim}[commandchars=\\\{\}]
+/* PLUG: name (param1, param2, ...) */
+\end{Verbatim}
 \end{mycode}
 
-This defines a point when multiple user plugs may be added. Each
-Effect with name matching given plug-name will cause a
-definition of a new function, that will be called with given parameters
-at this place.
+This defines a point when calls to user functions declared as
+\texttt{PLUG\_name} will be added. They will be called with given
+parameters.
 
-This is often useful for processing some parameter
+Many effects may use the same \texttt{PLUG\_name},
+you can even use the same \texttt{PLUG\_name} many times within a single
+effect. All the \texttt{PLUG\_name} functions
+will be uniquely renamed to not collide with each other.
+
+The calls will be added in the order they are specified on the
+\texttt{effects} list. More precisely, the most local effects
+(at light sources and textures) are called first, then the effects
+at appearance, and finally the effects inside the grouping nodes.
+Although, preferably, for most effects this order will not matter.
+
+A plug is often defined to allow modifying some parameter
 repeatedly (like adding or modulating the fragment color),
-so one or more of the parameters are usually allowed to be processed
+so one or more of the parameters are often allowed to be processed
 as \texttt{inout} parameters.
 
-Multiple code pieces may be added to the given plug point.
-So multiple effects may use the same plug point. They are added
-in the order they are specified in the Appearance.effects list
-(although, preferably, for most effects this order will not matter).
-
-Moreover, the same plug may be declared many times in the source shader.
+The same plug name may be declared many times in the source shader.
 This means that a single \texttt{PLUG\_xxx} function will be called
 many times. This is typically useful when your shader calculation is naturally
 expressed as a loop, but you had to unroll this loop for shader source
 (for example, to slightly tweak some loop iterations).
 The plug names that are available per-light source and per-texture
-are an example of this. If you use the \texttt{PLUG\_texture\_color}
-inside \texttt{Appearance.effects}, you can change the color of all
-the textures (even shader textures).
-Similarly, if you use the \texttt{PLUG\_light\_scale}
-inside \texttt{Appearance.effects}, you can change the intensity
-of all the light sources on the given shape.
+are an example of this.
+%% If you use the \texttt{PLUG\_texture\_color}
+%% inside \texttt{Appearance.effects}, you change the color of all
+%% the textures (even shader textures).
+%% Not really available, as params to texture\_color differ.
+If you use the \texttt{PLUG\_light\_scale}
+inside \texttt{Appearance.effects}, you change the intensity
+of all the light sources on the given shape. Contrast this with using
+the same \texttt{PLUG\_light\_scale} inside a \texttt{X3DLightNode.effects},
+where you only change the given light node contribution.
 
 Currently all the plugs must be procedures, that is their result type
 must be declared as \texttt{void}. We have been considering
 a possibility of functions, where part of the calculation may be replaced
-by a function call to a plug function. While not difficult to implement,
-this idea seems like a useless complication after many tests.
+by a call to a plugged function. While not difficult to implement,
+this idea seems unnecessary after many tests.
 Procedural plugs are easier to declare, as the call to the plug
 may be simply inserted, while in case of function it will have to replace
 some previous code. This also means that using a procedural plug
 \textit{never} replaces or removes some existing code, which is a very nice
 concept to keep. We want the effects to cooperate with each other,
-not to ,,hijack'' from each other some parts of functionality.
+not to ,,hijack'' from each other some parts of the functionality.
 
 \subsection{Where the forward declarations are placed}
 
@@ -827,9 +838,9 @@ and before any \texttt{/* PLUG: ... */} declarations.
 
 \subsection{Why plugs are defined as comments}
 
-The nice feature of our magic /* PLUG ... */ comments is that a shader source
+The nice feature of our magic \texttt{/* PLUG ... */} comments is that a shader source
 is still valid even if you completely ignore the plugs. For example,
-you can write your custom ComposedShader node, defining some plugs,
+you can write a custom \texttt{ComposedShader} node, defining some plugs,
 and for browsers that understand them --- the plugs can be used,
 for other browsers --- plugs will be gracefully ignored (but still
 the shader will run, although without any effects).
@@ -866,23 +877,24 @@ In particular, since you can use \#define and macros in your effect code,
 you can do nasty tricks to break other effects. You can make them compile,
 but function incorrectly. However, we don't consider
 it a real problem. You really have to deliberately want to do something bad,
-and often use an internal knowledge, to achieve something bad.
+and be familiar with internals about how the shader is generated,
+to achieve some particular weird behavior.
 It doesn't happen by accident in our experience.
 %% And you may need to use the internal knowledge
 %% how the other effects are implemented (maybe how they are implemented
 %% inside the browser).
 
 Note that this isn't a security problem --- bad shader code only breaks
-rendering of a particular shape. And X3D ComposedShader node allows users
+rendering of a particular shape. And X3D \texttt{ComposedShader} node allows users
 to execute any shading language code anyway. So if there's anything dangerous
 (for example a buggy OpenGL may cause the browser process to exit with
 segmentation fault on some special shader code snippets),
 you could do it without using our effects framework anyway.
 
-\section{Usage examples}
+\section{Various examples}
 
 Remember that effects may define their own uniform variables,
-just like normal shader node. So you can pass your own textures
+just like the standard shader nodes. So you can pass your own textures
 to effects. For example you can write an effect that mixes a couple of textures,
 using any information available in the shader as a criteria for mixing.
 You can also pass any other values for an effect, for example you can
@@ -891,28 +903,34 @@ pass the current time from a \texttt{TimeSensor} and make dynamic effects.
 \begin{figure}[H]
   \centering
   \includegraphics[width=3in]{terrain}
-  \caption{ElevationGrid with 3 textures mixed based on height by GLSL effect.}
+  \caption{ElevationGrid with 3 textures mixed inside the shader,
+based on the point height.}
 \end{figure}
 
 Even inside the browse implementation, using plugs to implement internal
 effects allows for a great code simplification and separation.
-Our bump mapping effect is done purely by using plugs.
-So it has a clean and short implementation. It also shows that
-X3D authors could implement perfect bump mapping themselves,
-without any traditional hassles. For example, bump mapping can be
-achieved using standard \texttt{ComposedShader} as well,
-but then you have to write all this ,,boilerplate'' code to also deal
-with all the possible lighting and textures configurations.
-Well, the browser is still useful to calculate nice tangent vectors,
-although an authoring program could generate GLSL attributes for them as well.
+Many internal effects of our engine, like fog, shadow maps
+and the bump mapping have been reimplemented using our plugs approach.
+This made their implementation very clean and short,
+and nicely separated from each other. It also shows that
+X3D authors have the power to implement such effects easily by themselves.
 
-Same thing with shadow maps, they only plug to the \texttt{light\_scale}
-calculation of appropriate light.
+%% without any traditional hassles. For example, bump mapping can be
+%% achieved using standard \texttt{ComposedShader} as well,
+%% but then you have to write all this ,,boilerplate'' code to also deal
+%% with all the possible lighting and textures configurations.
+%% Well, the browser is still useful to calculate nice tangent vectors,
+%% although an authoring program could generate GLSL attributes for them as well.
 
-Water is very nice to implement by our effects, as a proper water simulation
+%% Same thing with shadow maps, they only plug to the \texttt{light\_scale}
+%% calculation of appropriate light.
+
+Another example is \emph{water}. Water is very nice to implement by our effects,
+as a proper water simulation
 is naturally a combination of a couple effects.
 You want to simulate waves, so you want to vary vertex
-heights or vary normals per-fragment (for best results, a mixture of both).
+heights, or vary per-fragment normal vectors (for best results,
+you want to do both things).
 You also want to simulate the fact that water has reflections, and
 is transparent. We have implemented a nice water using this approach,
 with two independent effects.
@@ -921,26 +939,25 @@ Our approach also allowed us to easily implement and test
 two alternative versions for generating water normals.
 One approach was to take normals from the pre-recorded sequence of images
 (encoded inside \texttt{MovieTexture},
-with noise images generated by Blender renderer).
-The second approach was to calculate them on the fly from
-a generated smooth 3D noise. We could immediately test our alternative versions
-of the ,,water normal effect'' with the same, unmodified,
-,,water reflection / refraction effect''.
-(As for the results about which one is better: predictably, we showed
-that using GPU noise is slower, requires a better GPU,
-but also improves the quality noticeably. With GPU noise, there is no problem
-with aliasing of the noise texture, and the noise parameters can be adjusted
-in real-time.)
+with noise images generated by \emph{Blender} renderer).
+The second approach was to calculate them on the GPU from
+a generated smooth 3D noise. Thanks to our effects system,
+we could immediately test our alternative normal vector approaches,
+without touching the water reflection / refraction effect.
+We have actually implemented the two alternative effects by overriding
+the plug ,,getting the normal vector in object space''.
+This plug is defined in another effect, that calls it and transforms
+the normal vector into the eye space. This way we have extracted
+as much as possible common logic into one effect, making it clear
+where the alternative versions differ and what they have in common.
+This was possible because one effect can define
+new plug names, that can be used by the other effects.
 
-Our effects idea allowed us also to implement the two alternative versions
-of ,,water normal effect'' in a nice way. They are both actually provide
-alternative implementations for ,,getting the normal vector in object space''.
-Another common effect uses them, generating proper coordinates over
-the water surface, and transforming the normal vectors into eye space for
-the lighting equation. This makes the two alternatives nicely separated,
-from each other and from the common code for passing normals from object to eye space.
-This was possible thanks to the fact that an effect can define
-new plug names, that can be used by the following effects.
+%% (As for the results about which one is better: predictably, we showed
+%% that using GPU noise is slower, requires a better GPU,
+%% but also improves the quality noticeably. With GPU noise, there is no problem
+%% with aliasing of the noise texture, and the noise parameters can be adjusted
+%% in real-time.)
 
 \begin{figure*}[t]
   \centering
@@ -978,35 +995,26 @@ no speed penalty for animating thousands of flowers in our test scene.
 \end{figure}
 
 We would like to emphasize that all the effects demonstrated here
-are theoretically already possible by using the X3D \textit{Programmable
-shaders component}.
-However, actually implementing them is extremely cumbersome using this
-standard component. You would first
-have to prepare a shader code to calculate all the (multi-)texturing, lighting,
+are theoretically already possible to implement by the standard
+X3D \textit{Programmable shaders component}. However, such implementation
+would be extremely cumbersome.
+You would first have to prepare a shader code to calculate all
+the (multi-)texturing, lighting,
 shadows, and all the other effects that you use in your scene.
 This is a large work if you consider all the X3D options, and note that
 a shader should remain optimized for a particular setting.
-Moreover, you would have to calculate some global options,
+Actually, it isn't even possible, unless you can calculate some global options,
 like which light sources and fog nodes affect the given shape.
-Effectively, this isn't really doable by a manual work --- instead
-you would have to write a shader generator program. Our you could use
-an existing shader generation system... which is exactly what our paper
-is about. The implementation of our effects simply constructs and links
-appropriate shader, gathering the information from all the nodes
+The only manageable way to do this, that would work for all the lighting
+and texturing conditions, is to write a shader generator program.
+Which is actually exactly what our effects already do for you ---
+the implementation of our effects constructs and links
+the appropriate shader code, gathering the information from all the nodes
 that affect the given shape. And all the information is nicely integrated
 with X3D nodes, effects are specified at suitable nodes, and their
 uniform values and attributes are integrated with X3D fields.
 
-\section{Short reference of available plugs}
-
-The table below is a quick reference of plugs available in our
-implementation. We have found these plugs to be sufficient for a wide
-range of effects, although of course there's always a place for
-changes and improvements. See our engine website, and in
-particular the online reference of our plugs \cite{vrmleng:plugs}, for
-the most up-to-date list.
-% Remember that you can always define your own plugs in your effects
-% and shader nodes.
+\section{Implementation notes: GLSL}
 
 Our implementation is concerned only with the OpenGL Shading Language
 (GLSL). We have designed our extensions to be useful with other
@@ -1025,19 +1033,28 @@ shader parts) and it gives you better line numbers in error messages
 (although a pre-processor directive like \#line could also be used for
 this). But they are not a necessary feature.
 
+\section{Short reference of available plugs}
+
+The table below is a quick reference of plugs available in our
+implementation. We have found these plugs to be sufficient for a wide
+range of effects, although of course there's always a place for
+changes and improvements. See our engine website, and in
+particular the online reference of our plugs \cite{vrmleng:plugs}, for
+the most up-to-date list.
+% Remember that you can always define your own plugs in your effects
+% and shader nodes.
+
 Parameter names are shown merely to easily document the parameter
 meaning. Of course you can change the parameter names when declaring
 your own plug function.
 
-You can also change to some extent the parameter qualifiers (in, out,
-inout and const).
+You can also change to some extent the parameter qualifiers:
 
 \begin{itemize}
-  \item If a parameter below in "inout", you can change it to "in", or
-    "const in" if you don't want to modify the value of passing here
-    value.
+  \item If a parameter below is "inout", you can change it to "in", or
+    "const in" if you don't want to modify the given value.
   \item You can also change the "inout" parameter to just "out", if
-    you want to unconditionally overwrite the passed value. Although
+    you want to unconditionally overwrite the given value. Although
     this is usually not advised, as it means that you disable previous
     effects working on this parameter. Most of the time, summing or
     multiplying to the previous value is a better choice.
@@ -1054,7 +1071,7 @@ void PLUG_vertex_object_space_change(
   inout vec3 normal_object)
 \end{Verbatim}
 
-You can modify the vertex and normal vectors in object space.
+You can modify the vertex and normal vectors in object space here.
 If you don't want to modify them, consider using \texttt{vertex\_object\_space}
 instead, that may result in more optimized shader.
 
@@ -1106,7 +1123,7 @@ void PLUG_add_light_contribution_front(
   const in gl_MaterialParameters material)
 \end{Verbatim}
 
-Add to the color new light source.
+Add pixel color for a lit material. This is typically used for each light source.
 There is also the \texttt{add\_light\_contribution\_back},
 for light contribution on the back side of the faces.
 
