@@ -134,8 +134,6 @@ geometry.
 (GPU). They control the per-vertex and per-pixel processing done
 during the rendering, for example summing the lights contribution,
 and mixing the texture colors.
-%% There are three popular shading languages:
-%% OpenGL GLSL \cite{glsl}, NVidia Cg \cite{cg} and Direct X HLSL \cite{hlsl}.
 The X3D standard \textit{Programmable shaders component} already allows to use
 the shaders by the authors. However, the shaders designed using
 the standard nodes
@@ -170,6 +168,20 @@ light models (Phong, Ward, Cook-Torrance etc). Sometimes it makes sense
 to change these functions only for some chosen light sources, and sometimes
 we want to modify all the light sources.
 
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=2.3in]{rhan_shrine_0}
+  \includegraphics[width=2.3in]{rhan_shrine_1_per_pixel_lighting}
+  \includegraphics[width=2.3in]{rhan_shrine_2_bump_mapping}
+  \includegraphics[width=2.3in]{rhan_shrine_3_shadow_1st}
+  \includegraphics[width=2.3in]{rhan_shrine_4_shadow_2nd}
+  \includegraphics[width=2.3in]{rhan_shrine_5_everything}
+  \caption{Japanese shrine model with more and more effects applied: Gouraud shading,
+Phong shading (per-pixel lighting), bump mapping, shadows from 1st light,
+shadows from 2nd light, shadows from both lights.}
+%%  \label{fig_xxx}
+\end{figure*}
+
 We present a system for creating effects by essentially compositing together
 a pieces of a shader code. All the defined effects effortlessly
 cooperate and can be combined with each other and with browser internal
@@ -200,37 +212,46 @@ language processing inside X3D browser.
 
 \section{Motivation and previous work}
 
-Current shading description methods do not allow easy connecting
-many effects into a single shader.
+The core shading languages don't provide a ready solution for connecting shaders
+from independent sources. The OpenGL GLSL \cite{glsl} and NVidia Cg \cite{cg}
+language files directly specify the shader source code.
+The Direct X HLSL \cite{hlsl} effects files and similar \texttt{CgFX}
+files define various techniques (for various graphic card capabilities),
+and within a single technique specify operations for each rendering pass.
+In neither case can we simply connect multiple shader source code files
+and expect the result to be a valid program.
 
-Shading source code files (GLSL, Cg) make no such way.
+An oldest solution to combining effects, used even before the shading languages,
+was to perform a multi-pass rendering. Each rendering pass adds or multiplies
+the current buffer contents, adding a layer with desired effect.
+However, this is expensive --- in each pass we usually have to repeat
+some work, like least transforming and clipping the geometry.
+It is also not flexible --- you can only modify
+the complete result of the previous pass.
+%% In our work, we want to allow a single rendering pass to be as
+%% powerful as it can.
 
-Effects formats (HLSL .fx, CgFX) allows to choose one technique, and
-within it make passes. No way of automatically connecting one .fx file
-with another.
-
-One oldest solution: make a library of functions (like GLSL
-functions), and allow to user to use them. But this is very bad and
-limited. You cannot e.g. insert a shadow check right before adding the
-light contribution (and still use browser code outside (to iterate
-over lights) and inside (to calculate single light contribution)).
+One approach to writing flexible shader code is to create
+a library of functions, and allow the author to choose and compose them
+in any order to achieve the desired look. But this approach is very limited,
+as it doesn't allow to modify a particular calculation part without
+replicating the algorithm outside of this calculation.
+For example, if you want to scale the light contribution by a shadow function,
+you will have to also replicate the code iterating over the light sources.
 
 Another common solution is to arrange shaders in a pipe, where one
 shader processes the result of another. This can be visualized as
 layers of materials, where each layer modifies the previous
-layer. However, this is again not flexible --- there's no way to plug
-in your code in the middle of another shader's work.
-
-An older solution, in the spirit of above, was also to perform
-multi-pass rendering. However, this (in addition to lack of
-flexibility of previous approach) makes also a loss of rendering
-speed. In our work, we want to allow a single rendering pass to be as
-powerful as it can.
+layer. It is actually similar to a multi-pass rendering approach,
+except you don't lose speed on repeating the geometry transformation work.
+Still it suffers from the same limitations, as you cannot change
+the calculation within an existing layer, without replicating the whole
+algorithm of this layer.
 
 %% (see also http://groups.google.com/group/blendertorenderman/browse_thread/thread/aaf07831b91be9db?pli=1 , confirms my findings)
 
-Another approach is the Sh language (\cite{sh}, \cite{sh:book}) which
-allows writing shaders code (that can run on GPU) directly inside a
+A different approach is presented by the Sh language (\cite{sh}, \cite{sh:book}).
+It allows writing shaders code (that can run on GPU) directly inside a
 C++ program. For this, Sh extends the C++ language (through C++
 operator overloading and macros tricks). It allows an excellent
 integration between C++ code and shaders, hiding the ugly details of
@@ -271,16 +292,18 @@ and to use a hook.
 Many modules can implement the same hook and cooperate without any problems.
 The whole hook system is defined completely in PHP, as it's a scripting
 language, and you can query the list of loaded functions by name,
-and call function by name.
+and call function by it's name.
 
-This is actually quite similar to our base idea of combining effects
-inside Appearance.effects field. Our effects are similar to
-Drupal's modules, as our ,,plugging points'' are analogous to Drupal hooks.
-Our effects can define functions with special names to override
-standard shader behavior. They can also define new names of plugs, for other
-effects to use. Of course we also have some special problems
+Drupal approach is actually quite similar to our
+core idea of combining effects. Our effects are similar to
+Drupal's modules, and our ,,plugging points'' are analogous to Drupal hooks.
+Our effects can define functions with special names to enhance
+the standard shader behavior, just like Drupal modules can define functions
+to act on an event from another module.
+We can also define new plugs, for other effects to use.
+Of course we also have some special problems
 (shading language is quite far from a scripting language,
-so defining hooks is done by smart textual replacements)
+so calling the plugs must be implemented by text replacements inside the browser)
 and some special opportunities (we can define effects at
 the appropriate nodes of X3D, like textures and lights sources,
 as we don't want to throw all the effects in one bag).
@@ -303,28 +326,15 @@ as we don't want to throw all the effects in one bag).
 % ./Ketsji/BL_BlenderShader.h
 % ./Ketsji/BL_BlenderShader.cpp
 
-\begin{figure*}[t]
-  \centering
-  \includegraphics[width=2.3in]{rhan_shrine_0}
-  \includegraphics[width=2.3in]{rhan_shrine_1_per_pixel_lighting}
-  \includegraphics[width=2.3in]{rhan_shrine_2_bump_mapping}
-  \includegraphics[width=2.3in]{rhan_shrine_3_shadow_1st}
-  \includegraphics[width=2.3in]{rhan_shrine_4_shadow_2nd}
-  \includegraphics[width=2.3in]{rhan_shrine_5_everything}
-  \caption{Japanese shrine model with more and more effects applied: Gouraud shading,
-Phong shading (per-pixel lighting), bump mapping, shadows from 1st light,
-shadows from 2nd light, shadows from both lights.}
-%%  \label{fig_xxx}
-\end{figure*}
+\section{Plugs: extending the base shader}
 
-\section{Plugging}
-
-The basic idea of our approach is that a shader source code defines
-a points when a calls to user-defined functions may be inserted. The mechanism
-allows very easily to define new plugging points, and to use
-them. Moreover, user shaders and browser internal shaders have the
-same means to define and use plug points. This allows to connect
-shaders (both user and browser) in a variety of ways.
+The basic idea of our approach is that the base shader code defines
+points when a calls to user-defined functions may be inserted. We call
+these places \textit{plugs}, as they act like sockets where a logic
+may be added. Each plug has a name, and a given set of parameters.
+The effects can now use special function names, starting with \texttt{PLUG\_}
+and followed by the plug name. These declarations will be found,
+and the browser will insert appropriate calls to them from the base shader.
 
 A trivial example of an effect that makes colors two times brighter
 follows. This is written in X3D classic encoding,
@@ -336,7 +346,6 @@ effects Effect \{
   parts EffectPart \{
     type "FRAGMENT"
     url "data:text/plain,
-
 \textbf{    void PLUG_texture_apply(}
 \textbf{      inout vec4 fragment_color,}
 \textbf{      const in vec3 normal)}
@@ -348,13 +357,13 @@ effects Effect \{
 \end{Verbatim}
 
 It defines a GLSL function named \texttt{PLUG\_texture\_apply}
-within an \texttt{EffectPart} node. Function names starting with \texttt{PLUG\_}
-are special, they enhance some standard shader calculation. In particular
-the \texttt{PLUG\_texture\_apply} is used after the normal texture colors are applied,
-but before the alpha test, and is a usual place to ,,just modify the pixel color''.
+within an \texttt{EffectPart} node. The call to this function will
+be automatically inserted at the \texttt{texture\_apply} plug point in
+the browser internal shader. This particular plug,
+the \texttt{PLUG\_texture\_apply}, is called after the normal texture colors
+are applied, but before the alpha test, and is a usual place to ,,just modify the pixel color''.
 \texttt{fragment\_color} is an \texttt{inout} parameter, by modifying it
-you modify the color that will be displayed on screen (and the alpha that will
-be tested).
+you modify the color that will be displayed on screen.
 
 We have a short reference (at the end of this document) of all
 the plugging points available in our shaders. For each plugging point,
@@ -362,37 +371,32 @@ like this \texttt{PLUG\_texture\_apply}, we define a list of it's parameters
 (you have to declare them exactly the same in your code), and we define
 when it is called.
 
-Various ways of defining and using ,,plugging points'' (which we'll just call
-,,plugs'' from now on) are possible:
+Many usage scenarios are available:
 
 \begin{myenumerate}
 \itemsep 0pt
-\item Browser shaders can be connected with each other. For example, we
-have a basic shader code that defines lighting and texturing. Our bump
-mapping is implemented by simply plugging the code in the appropriate
-places in this base shader. This way, the base shader is completely
-independent from the bump mapping implementation. We can switch bump
+\item Browser internal shaders can be connected with each other. For example,
+we have a basic shader code that defines lighting and texturing. Our bump
+mapping is implemented by simply plugging the code to modify the normals
+into the base shader. This way, the base shader is completely
+independent from the bump mapping implementation. We can change the bump
 mapping implementations (for example, use bump texture from image or
-some random noise) without trouble.
+from a generated random noise) without trouble.
 
-So even inside the engine, this allows for much easier shader generator.
+So even inside the browser, this allows for much easier shader handling.
 
 \item User shaders may plug into browser shaders. This is the most usual
 case. Our shaders define various points when you can plug your code,
 and override or enhance our shading.
 
-\item User shaders may also plug into another user shaders. User shaders
-can trivially (by just adding a "magic" comment) define new plugging
-points, which are usable by other user shaders. User effects can
-define plugging points, which are available to the following effects
-on the Appearance.effects list.
+\item User shaders can trivially (by just adding a "magic" comment)
+define new plugging points, which are available for the following
+user shaders on the same shape. This is available for user shaders
+defined inside our \texttt{Effect} nodes, and also for the complete user shaders
+in standard \texttt{ComposedShader} and similar nodes.
 
+This way some of your effects may be further customized by the other effects.
 \end{myenumerate}
-
-We allow user shaders (defined in the \texttt{ComposedShader} and such nodes) to
-define additional plugging points. User shaders can use our plug names
-(and thus work with the same effects), or they can invent their
-own. They can also always add new plug points.
 
 When you don't use an explicit shader (like \texttt{ComposedShader} node),
 browser uses it's own internal basic shader. This shader is then
@@ -402,22 +406,13 @@ implementation), or by user effects. But you can also define your own
 browser. If you define the same (or compatible) plugging
 points, then the browser effects will be even added to your own
 shader. And of course user effects are added to your shader.
-
-In summary, the system works regardless if you use or not an explicit
-shader on \texttt{Appearance.shaders} list.
+So the system is useful regardless if you use or not an explicit
+shader on the \texttt{Appearance.shaders} list.
 
 \subsection{Effect node}
 
-In the X3D file we add a field
-
-\begin{mycode}
-\underline{Appearance}
-\begin{Verbatim}[commandchars=\\\{\}]
-MFNode [] \codeem{effects} [] # Effect
-\end{Verbatim}
-\end{mycode}
-
-that can hold any number of
+We define new \texttt{Effect} node that holds information about
+the source code and uniform values specific to given effect.
 
 \begin{mycode}
 \underline{Effect : X3DChildNode}
@@ -434,51 +429,58 @@ SFBool [in,out] \codeem{enabled} TRUE
   # from the scene, but often toggling
   # this field is easier for scripts.
 MFNode [] \codeem{parts} [] # EffectPart
-  ... additionally you can
-      declare new fields and events,
-      that will be passed
-      as uniform values to the shader,
-      just like for ComposedShader node ...
+
+... you can declare additional
+  new fields and events, that will be passed
+  as uniform values to the shader,
+  just like for ComposedShader node ...
 \end{Verbatim}
 \end{mycode}
+
+\needspace{1in}
+The effect source code is split into a number of parts:
 
 \begin{mycode}
 \underline{EffectPart : X3DNode, X3DUrlObject}
 \begin{Verbatim}[commandchars=\\\{\}]
 SFString [] \codeem{type} "VERTEX"
-  # Just like ShaderPart.type,
+  # Like ShaderPart.type:
   # allowed values are
-  # FRAGMENT | VERTEX |
-  # (once supported) GEOMETRY.
+  # FRAGMENT | VERTEX | GEOMETRY.
 MFString [] \codeem{url} []
-  # Source code, just like ShaderPart.url.
-  # May come from an external file (url),
-  # or inline (following "data:text/plain,").
-  # In XML encoding, may also be inline
-  # in CDATA.
+  # The source code, like ShaderPart.url.
 \end{Verbatim}
 \end{mycode}
 
-The functions you want to override are automatically detected by names
-starting like \texttt{PLUG\_}.
+  %% # May come from an external file (url),
+  %% # or inline (following "data:text/plain,").
+  %% # In XML encoding, may also be inlined in CDATA.
+
+The functions that enhance standard shaders behavior are recognized
+by names starting with \texttt{PLUG\_} in the source code.
+You can also freely define your own utility functions.
+You can pass uniform variables to the shader,
+and you can pass varying variables between the vertex and fragment
+shaders, just like with standard shader nodes.
 
 In a single \texttt{EffectPart} node, you can define many \texttt{PLUG\_}
 functions. However, you can only plug functions into the declared shader
-type. For example, you cannot plug into \texttt{texture\_apply} when
-your type is \texttt{VERTEX}.
+type. For example, you cannot use the \texttt{texture\_apply} plug within
+a \texttt{VERTEX} shader.
 If your effect requires some processing per-vertex and some per-fragment,
 you will probably use two \texttt{EffectPart} nodes, with appropriate types.
 While this may seem like an arbitrary limitation,
 this reflects how shader parts are declared in shading languages with
-separate namespaces for vertex and fragment parts (like GLSL).
-A single part may declare variables (uniform, varying and such),
-and many functions that use them. But it must be completely within
-one shader type.
+separate namespaces for vertex and fragment parts.
+A single part may declare many variables and functions,
+but it must be completely contained within a given shader type.
 
 Note that it is completely reasonable to have an \texttt{EffectPart} node
 with source code that doesn't define any \texttt{PLUG\_xxx} functions.
 Such \texttt{EffectPart} node may be useful for defining shading language
 utility functions, used by your other effects.
+
+%% TODO: reread from here ----------------------------------------------------
 
 At one point we tried the approach
 to not look at any special function names in GLSL code,
@@ -501,13 +503,24 @@ This also allows some namespace separation. For example, uniforms defined in one
 effect part may not be visible in the other part, as they should be placed
 in a separate namespace (like a separate compilation unit for GLSL) if possible.
 
+\subsection{Effects for particular shapes}
+
+The simplest way to use an \texttt{Effect} node is to place it
+on the \texttt{Appearance.effects} list:
+
+\begin{mycode}
+\underline{Appearance}
+\begin{Verbatim}[commandchars=\\\{\}]
+MFNode [] \codeem{effects} [] # Effect
+\end{Verbatim}
+\end{mycode}
+
 All the effects on this list (with suitable language, and with
 plugging points defined by the browser shader, or active shader on
-\texttt{Appearance.shaders} list) will be used. Note that this is contrary to
-the \texttt{Appearance.shaders}, which chooses only one shader.
+\texttt{Appearance.shaders} list) will be used. Note that this is different
+than the \texttt{Appearance.shaders}, which chooses only one shader.
 For effects, we choose all of them (that are suitable).
 
-\needspace{1in}
 The most basic idea of this paper is to allow one to define two
 independent shader effects, and then seamlessly connect them by simply
 placing them both on \texttt{Appearance.effects} list. This also allows to
@@ -663,20 +676,20 @@ at the geometry, by explicitly listing the coordinates (nodes
 \texttt{TextureCoordinate}, \texttt{TextureCoordinate3D},
 \texttt{TextureCoordinate4D}) or by explicitly giving the generation
 algorithm (nodes \texttt{TextureCoordinateGenerator},
-\texttt{ProjectedTextureCoordinate} \footnote{
-    Note that our implementation has some extensions
-    to \texttt{TextureCoordinateGenerator}. In particular
-    \texttt{"BOUNDS2D"} and \texttt{"BOUNDS3D"} are also valid names for
-    \texttt{TextureCoordinateGenerator.mode}, see
-    \cite{vrmleng:texcoordbounds}.
-    Projective texture mapping by \texttt{ProjectedTextureCoordinate}
-    is also our extension, see \cite{vrmleng:projectivetexturing}.}).
+\texttt{ProjectedTextureCoordinate}.
 The \texttt{defaultTexCoord} says only what is the default approach,
 when you don't use \texttt{texCoord} at the geometry node.
 The idea is that using a \texttt{ShaderTexture} should be as comfortable
 as any other normal texture.
 
-\subsubsection{When to use ShaderTexture}
+Note that our engine has some extensions to \texttt{TextureCoordinateGenerator}.
+In particular \texttt{"BOUNDS2D"} and \texttt{"BOUNDS3D"} are also valid names
+for the \texttt{TextureCoordinateGenerator.mode}, see
+\cite{vrmleng:texcoordbounds}.
+Projective texture mapping by \texttt{ProjectedTextureCoordinate}
+is also our extension, see \cite{vrmleng:projectivetexturing}.
+
+\subsubsection{When to use the ShaderTexture}
 
 For textures that are not \texttt{ShaderTexture},
 when the \texttt{texture\_color} plugs are called,
