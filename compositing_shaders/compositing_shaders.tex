@@ -164,7 +164,7 @@ or (when shadow map is not available) always return 1.
 The \textit{normal} function may take the vector straight from
 the geometry description, or calculate it using a texture value.
 The \textit{light\_color} function may be replaced to use different
-light models (Phong, Ward, Cook-Torrance etc). Sometimes it makes sense
+light models (Phong, Ward, Cook-Torrance and so on). Sometimes it makes sense
 to change these functions only for some chosen light sources, and sometimes
 we want to modify all the light sources.
 
@@ -480,32 +480,33 @@ with source code that doesn't define any \texttt{PLUG\_xxx} functions.
 Such \texttt{EffectPart} node may be useful for defining shading language
 utility functions, used by your other effects.
 
-%% TODO: reread from here ----------------------------------------------------
+For shading languages that have separate compilation units
+(like the \emph{OpenGL Shading Language}) the implementation may choose to place
+each effect part in such separate unit. This forces the shader code to be
+cleaner, as you cannot use undeclared functions and uniform variables.
+It also allows for cleaner error detection (parsing errors will be detected
+inside the given unit).
 
 At one point we tried the approach
-to not look at any special function names in GLSL code,
+to not look at any special function names in shader code,
 and instead define a plug name in the separate field of the \texttt{EffectPart}
-node. However this produced ugly code --- you had to split your algorithm
-into many \texttt{EffectPart} nodes, each often containing only 1 or 2 lines
-of code. Especially bad was the fact that you had to declare uniform variables
-in a separate effect part, which in turn means that we cannot place
-your effects parts in separate namespaces (like a compilation unit in GLSL),
-which in turn makes the usage less secure.
-Detecting \texttt{PLUG\_} function names in GLSL code is very easy,
-and turned out to be the cleaner solution.
+node. However, the browser may need to know the full declaration
+of a function, to make a forward or external declaration of it.
+One way to overcome this problem was to force repeating this declaration
+in another field. Another way was to split shader code into much more
+parts (for example, one part declares the uniform variables, one part declares
+the plug function, one part declared the function body and so on).
+Both approaches seemed not natural and uncomfortable for authors,
+and they didn't really offer much simpler implementation, so we dropped this idea.
+The current approach, to find the declarations of \texttt{PLUG\_xxx} functions
+inside a complete shader code, is easy to implement, and results in clean
+shader code of the effects. It also allows us to naturally use
+the separate compilation units in case of GLSL.
 
-In case of shading languages that have separate compilation units
-(like OpenGL shading language) the implementation may choose to place
-each effect part in such separate unit. This allows for cleaner error detection
-(as the parsing errors in effect code will not cause errors elsewhere,
-and error messages will refer to line numbers in actual user code).
-This also allows some namespace separation. For example, uniforms defined in one
-effect part may not be visible in the other part, as they should be placed
-in a separate namespace (like a separate compilation unit for GLSL) if possible.
+\subsection{Effects for particular shapes appearance}
 
-\subsection{Effects for particular shapes}
-
-The simplest way to use an \texttt{Effect} node is to place it
+There are various places where an \texttt{Effect} node may be used.
+If it's specific to a given shape appearance, you can place it
 on the \texttt{Appearance.effects} list:
 
 \begin{mycode}
@@ -515,13 +516,12 @@ MFNode [] \codeem{effects} [] # Effect
 \end{Verbatim}
 \end{mycode}
 
-All the effects on this list (with suitable language, and with
-plugging points defined by the browser shader, or active shader on
-\texttt{Appearance.shaders} list) will be used. Note that this is different
+All the effects on this list (with suitable language) will be used.
+Note that this is different
 than the \texttt{Appearance.shaders}, which chooses only one shader.
-For effects, we choose all of them (that are suitable).
+For effects, we choose all of them.
 
-The most basic idea of this paper is to allow one to define two
+The most basic idea of this paper is to allow you to define two
 independent shader effects, and then seamlessly connect them by simply
 placing them both on \texttt{Appearance.effects} list. This also allows to
 define a library of effects, that can be composited without any work
@@ -534,7 +534,8 @@ needed by user.
 \end{figure}
 
 Note that all our nodes benefit from X3D mechanism to reuse the nodes
-by reference (the DEF / USE keywords). Reusing the \texttt{Effect} nodes
+by reference (the \texttt{DEF} / \texttt{USE} keywords). Reusing the
+\texttt{Effect} nodes
 is most natural, and allows to combine existing effects in any desired way.
 Reusing the \texttt{EffectPart} nodes is also useful, when some effects
 would like to share a particular piece of code. For example,
@@ -543,14 +544,14 @@ shading language functions, and reuse if for various effects.
 
 \subsection{Effects for a group of nodes}
 
-Our \texttt{Effect} node is a descendant of \texttt{X3DChildNode},
-and can be placed directly within X3D grouping nodes like
-\texttt{Group} and \texttt{Transform}, and at the top level of the X3D file.
+Our \texttt{Effect} node is a descendant of the abstract \texttt{X3DChildNode}.
+As such it can be placed directly within X3D grouping nodes like
+\texttt{Group}, \texttt{Transform} and at the top level of the X3D file.
 Such effect will apply to all the shapes within given grouping node.
 The scope rules follow the X3D conventions for other nodes,
 like pointing device sensor nodes and \texttt{LocalFog}.
 
-The \texttt{LocalFog} is especially worth mentioning. Using this mechanism,
+The \texttt{LocalFog} example is worth emphasizing. Using our system,
 a browser can implement the \texttt{LocalFog} node as a prototype
 that expands to our \texttt{Effect} node. This gives you a 100\% correct
 implementation of the standard \texttt{LocalFog} node, as is trivially easy.
@@ -581,6 +582,7 @@ like light sources and textures, can define their own effects.
 So you can easily define a shader specific for a given light source,
 or texture.
 
+\needspace{1in}
 We add the \texttt{effects} field for every light node:
 
 \begin{mycode}
@@ -590,10 +592,22 @@ MFNode [] \codeem{effects} [] # Effect
 \end{Verbatim}
 \end{mycode}
 
-You can modify the light source contribution, or even replace the default
-calculation of light source contribution. In the second case,
-the default calculation will not even be used in the shader,
-so it will not slow down the calculation without a reason.
+This allows you to modify the light source contribution of this particular
+light node. For example you can modify the spot light shape, possibly
+based on some texture information.
+Or you can implement a different lighting model, like anisotropic Ward
+or Cook-Torrance.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=3in]{fancy_light_spot_shape}
+  \caption{Textured spot light with shadow.}
+\end{figure}
+
+%% , or even replace the default
+%% calculation of the light source contribution. In the second case,
+%% the default calculation will not even be used in the shader,
+%% so it will not slow down the calculation without a reason.
 
 \subsection{Texture effects}
 
@@ -609,9 +623,8 @@ MFNode [] \codeem{effects} [] # Effect
 You can use the \texttt{effects} field
 inside any \texttt{X3DTextureNode} to enhance and modify the look of any
 standard texture node, like \texttt{ImageTexture}.
-You can use a plug \texttt{texture\_color},
-that allows you to modify the texture color, knowing the current texture
-coordinates and such.
+You can use a plug \texttt{texture\_color} to change the texture color,
+knowing the current texture coordinates and other information.
 
 \subsubsection{ShaderTexture effects}
 
@@ -619,16 +632,17 @@ We introduce a new X3D node designed specifically for generating
 textures using the shading language. This is especially suitable
 if your texture is defined completely by the shaders.
 The texture contents are not stored anywhere (not even on GPU),
-the X3D browser doesn't manage any texture resources and such.
+and the X3D browser doesn't manage any texture resources.
 From a GPU point of view, there is no texture\footnote{But the spoon is real,
 we swear.}. There is only a shader function that generates colors
 based on some vectors.
 
-While not strictly necessary, it's comfortable to wrap a texture generation
-function inside the \texttt{ShaderTexture} node, that is treated much
-like other X3D texture nodes. This allows the authors to provide texture
-coordinates (explicit or generated) for this texture, using all the standard
-tools available in X3D.
+While not necessary, it's often comfortable to wrap a texture generation
+function inside the \texttt{ShaderTexture} node. Since \texttt{ShaderTexture}
+is treated much like other X3D texture nodes by the browser,
+you can provide texture coordinates (explicit or generated) for this texture.
+Effectively, it behaves like a normal texture node, with all the related
+X3D features.
 
 The new texture node specification:
 
@@ -642,30 +656,32 @@ SFString [] \codeem{defaultTexCoord} "BOUNDS2D"
 \end{mycode}
 
 Actually, the \texttt{effects} field is already defined at
-the \texttt{X3DTextureNode} class (see above).
+the \texttt{X3DTextureNode} class (see above). We just mention it here
+for completeness.
 
 You should include an effect overriding at least the \texttt{texture\_color}
 plug, otherwise texture contents are undefined. Our implementation actually
-sets the default texture color to pink (RGB(1, 0, 1)), so it stands out,
+sets the default texture color to pink (RGB(1,~0,~1)), so it stands out,
 reminding you to override it.
 
-The \texttt{defaultTexCoord} says what texture coordinates to generate,
-if the geometry doesn't specify any texture generation method.
+The \texttt{defaultTexCoord} field is used only when a particular geometry
+doesn't specify the texture coordinates to use for this texture:
 
 \begin{myenumerate}
 
 \item
   \texttt{"BOUNDS2D"} means that the algorithm described in the specification
   for {IndexedFaceSet} should be used. This adapts 2D texture coordinates
-  to two largest bounding box sizes.
+  to the two largest bounding box sizes.
   It's most suitable for 2D textures that use only 2D coordinates
-  (ignoring other coordinates, or assuming they are always 0, 1).
+  (ignoring other coordinates, or assuming they are always 0,~1).
 
 \item
   \texttt{"BOUNDS3D"} means that the algorithm described in the specification
-  of \textit{Texturing3D} component (section \textit{"Texture coordinate generation for primitive objects"}).
-  This adapts 3D texture coordinates to bounding box sizes.
-  Most suitable for 3D textures (you can ignore the 4th texture coordinate
+  of \textit{Texturing3D} component (section \textit{"Texture coordinate generation for primitive objects"})
+  is used.
+  This adapts 3D texture coordinates to the bounding box sizes.
+  It's most suitable for 3D textures (you can ignore the 4th texture coordinate
   component, or treat it as homogeneous, as \texttt{"BOUNDS3D"} will always
   set it to 1).
 
@@ -676,32 +692,33 @@ at the geometry, by explicitly listing the coordinates (nodes
 \texttt{TextureCoordinate}, \texttt{TextureCoordinate3D},
 \texttt{TextureCoordinate4D}) or by explicitly giving the generation
 algorithm (nodes \texttt{TextureCoordinateGenerator},
-\texttt{ProjectedTextureCoordinate}.
+\texttt{ProjectedTextureCoordinate}).
+Note that our engine has some extensions to \texttt{TextureCoordinateGenerator},
+and \texttt{"BOUNDS2D"} and \texttt{"BOUNDS3D"} are also valid names
+for the \texttt{TextureCoordinateGenerator.mode}, see
+\cite{vrmleng:texcoordbounds}.
+
 The \texttt{defaultTexCoord} says only what is the default approach,
 when you don't use \texttt{texCoord} at the geometry node.
 The idea is that using a \texttt{ShaderTexture} should be as comfortable
-as any other normal texture.
+as any other texture node.
 
-Note that our engine has some extensions to \texttt{TextureCoordinateGenerator}.
-In particular \texttt{"BOUNDS2D"} and \texttt{"BOUNDS3D"} are also valid names
-for the \texttt{TextureCoordinateGenerator.mode}, see
-\cite{vrmleng:texcoordbounds}.
-Projective texture mapping by \texttt{ProjectedTextureCoordinate}
-is also our extension, see \cite{vrmleng:projectivetexturing}.
+%% Projective texture mapping by \texttt{ProjectedTextureCoordinate}
+%% is also our extension, see \cite{vrmleng:projectivetexturing}.
 
 \subsubsection{When to use the ShaderTexture}
 
-For textures that are not \texttt{ShaderTexture},
+For textures other than the \texttt{ShaderTexture},
 when the \texttt{texture\_color} plugs are called,
-the internal shaders already calculated the initial texture
-color by actually sampling the texture image. This is useful for you if you
-want to modify this color. If you simply want to ignore the normal
-texture color, and always override it with your own, consider using
+the internal shaders have already calculated the initial texture
+color by actually sampling the texture image. This is useful if you
+want to modify this color. If you'd rather ignore the normal
+sampled color, and always override it with your own, consider using
 the special \texttt{ShaderTexture} node instead. Using
 a normal texture node (like \texttt{ImageTexture}) for this
 would be uncomfortable, as you would have to load a dummy texture image,
 and the shaders could (depending on optimization) waste some time
-on sampling a dummy texture color that will be actually overridden later.
+on calculating a color that will be actually ignored later.
 
 Remember that in all cases (effects at \texttt{ImageTexture},
 at \texttt{ShaderTexture}, etc.) you can always use additional
@@ -710,23 +727,22 @@ you can declare an \texttt{SFNode} field inside an \texttt{Effect}
 to pass any texture node to the shader as uniform value.
 This allows you to base your effects calculation on any number of textures,
 and combine them in any way you like. The only difference
-between various \texttt{X3DTextureNode} descendants is what the browser
+between \texttt{ShaderTexture} and other textures is what the browser
 does automatically for you, that is what color is passed
 to the first \texttt{texture\_color} plug.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=3in]{shader_texture_edge_detection}
-  \caption{ShaderTexture showing an edge detection operation on normal ImageTexture.}
+  \caption{ShaderTexture doing an edge detection operation on a normal ImageTexture.}
 \end{figure}
 
-\subsubsection{No aliasing}
+\subsubsection{Independence from texture filtering}
 
-The nice thing about the effects used on textures (both for \texttt{ShaderTexture}
-and for standard texture nodes) is that they are sampled at each
-screen fragment. So your effects are not concerned with texture filtering
-options. You just use the texture coordinate, passed for example to the
-\texttt{texture\_color} plug.
+Note that the shader effects for textures are calculated at each screen fragment
+(not at each texel). So your effects are not concerned about the texture size
+or texture filtering options. You just use the interpolated texture
+coordinates in the \texttt{texture\_color} plug.
 
 \begin{figure}[H]
   \centering
@@ -737,7 +753,7 @@ options. You just use the texture coordinate, passed for example to the
 
 \section{Defining your own plug points}
 
-When you write shader code, you can define your own plug points by a
+In your shader code, you can define your own plug points by a
 magic comment:
 
 \begin{mycode}
@@ -876,15 +892,6 @@ pass the current time from a \texttt{TimeSensor} and make dynamic effects.
   \centering
   \includegraphics[width=3in]{terrain}
   \caption{ElevationGrid with 3 textures mixed based on height by GLSL effect.}
-\end{figure}
-
-An example effect for a light source is to use a fancy shape and equation
-for light's spot.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=3in]{fancy_light_spot_shape}
-  \caption{Textured spot light with shadow.}
 \end{figure}
 
 Even inside the browse implementation, using plugs to implement internal
