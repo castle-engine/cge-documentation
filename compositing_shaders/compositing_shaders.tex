@@ -846,6 +846,17 @@ must occur at the beginning of the shader code. You should place
 \texttt{/* PLUG-DECLARATIONS */} after such directives,
 and before any \texttt{/* PLUG: ... */} declarations.
 
+\begin{figure*}[t]
+  \centering
+%  \includegraphics[width=2.3in]{water_shaders_0}
+  \includegraphics[width=2.3in]{water_shaders_1}
+  \includegraphics[width=2.3in]{water_shaders_2}
+  \includegraphics[width=2.3in]{water_shaders_3}
+  \caption{Water using our effects: 1) Per-pixel lighting and bump mapping.
+2) Per-pixel lighting and reflections and refractions (by a single environment cube map texture).
+3) All effects.}
+\end{figure*}
+
 \subsection{Invalid shader code}
 
 We guarantee the behavior only if the provided shading language code
@@ -920,6 +931,17 @@ X3D authors have the power to implement such effects easily by themselves.
 %% Same thing with shadow maps, they only plug to the \texttt{light\_scale}
 %% calculation of appropriate light.
 
+We can also wrap 2D and 3D noise inside a \texttt{ShaderTexture}.
+A texture node like \texttt{NoiseTexture} from InstantReality
+\myhref{http://doc.instantreality.org/documentation/nodetype/NoiseTexture/}{http://doc.instantreality.org/documentation/nodetype/NoiseTexture/}
+may be implemented on GPU by a simple prototype using \texttt{ShaderTexture}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=3in]{noise}
+  \caption{3D and 2D smooth noise on GPU, wrapped in ShaderTexture.}
+\end{figure}
+
 Another example is \emph{water}. Water is very nice to implement by our effects,
 as a proper water simulation
 is naturally a combination of a couple effects.
@@ -953,28 +975,6 @@ new plug names, that can be used by the other effects.
 %% but also improves the quality noticeably. With GPU noise, there is no problem
 %% with aliasing of the noise texture, and the noise parameters can be adjusted
 %% in real-time.)
-
-\begin{figure*}[t]
-  \centering
-%  \includegraphics[width=2.3in]{water_shaders_0}
-  \includegraphics[width=2.3in]{water_shaders_1}
-  \includegraphics[width=2.3in]{water_shaders_2}
-  \includegraphics[width=2.3in]{water_shaders_3}
-  \caption{Water using our effects: 1) Per-pixel lighting and bump mapping.
-2) Per-pixel lighting and reflections and refractions (by a single environment cube map texture).
-3) All effects.}
-\end{figure*}
-
-We can also wrap 2D and 3D noise inside a \texttt{ShaderTexture}.
-A texture node like \texttt{NoiseTexture} from InstantReality
-\myhref{http://doc.instantreality.org/documentation/nodetype/NoiseTexture/}{http://doc.instantreality.org/documentation/nodetype/NoiseTexture/}
-may be implemented on GPU by a simple prototype using \texttt{ShaderTexture}.
-
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=3in]{noise}
-  \caption{3D and 2D smooth noise on GPU, wrapped in ShaderTexture.}
-\end{figure}
 
 We also provide plugs to easily change the geometry in object space.
 Again, since the effect is integrated with all the browser shaders,
