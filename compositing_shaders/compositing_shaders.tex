@@ -249,7 +249,8 @@ algorithm of this layer.
 
 %% (see also http://groups.google.com/group/blendertorenderman/browse_thread/thread/aaf07831b91be9db?pli=1 , confirms my findings)
 
-A different approach is presented by the Sh language (\myhref{http://libsh.org/}{http://libsh.org/}, \cite{sh:book}).
+A different approach is presented by the Sh language (\myhref{http://libsh.org/}{http://libsh.org/}).
+%% No space at the end: , \cite{sh:book}).
 It allows writing shaders code (that can run on GPU) directly inside a
 C++ program. For this, Sh extends the C++ language (through C++
 operator overloading and macros tricks). It allows an excellent
@@ -1184,7 +1185,7 @@ described in this paper, shadow maps and such).
 Forcing shader rendering for everything allows to see
 how our shaders implement the whole X3D lighting and texturing model.
 It also makes the whole lighting calculation per-pixel, resulting
-in particular in perfect specular highlights and spot light shapes.
+in perfect specular highlights and spot light shapes.
 
 %% Development notes: only the SVN demo\_models contain
 %% compositing\_shaders subdirectory.
@@ -1192,7 +1193,7 @@ in particular in perfect specular highlights and spot light shapes.
 %% see \myhref{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
 
 \bibliographystyle{acmsiggraph}
-\nocite{*}
+% \nocite{*}
 \bibliography{compositing_shaders}
 
 \end{document}
