@@ -92,20 +92,20 @@
 
 \teaser{
   \includegraphics[width=2.19in]{rhan_shrine_5_everything}
-  \caption{Bump mapping and 2 shadow maps on the same shape.}
+%%  \caption{Bump mapping and 2 shadow maps on the same shape.}
 }
 
 \maketitle
 
 \begin{abstract}
 We present a flexible system for implementing effects in X3D
-using the GPU shading languages.
+using the shading languages.
 Our approach makes the effects naturally integrated with appropriate
 X3D nodes, like shape's appearance, light sources and textures.
 Our effects seamlessly cooperate with each other and with
 the shaders used internally by the X3D browser.
-Thus the effects are more reusable, and work in various combinations
-and under various lighting and texturing conditions.
+Thus the effects are reusable, and work in various combinations
+and under various lighting and texture conditions.
 This makes the GPU shaders more useful to the authors.
 The browser implementation may also gain from using the same approach
 for composing internal shaders.
@@ -130,31 +130,32 @@ X3D \cite{x3d:spec} is an open standard for representing rich 3D data.
 Many advanced graphic features are available for the authors.
 In particular, we can use \emph{shaders} to change the look of the rendered
 geometry.
-\emph{Shaders} are programs executed typically on the graphic processor unit
-(GPU). They control the per-vertex and per-pixel processing done
-during the rendering, for example summing the lights contribution,
+\emph{Shaders} are programs usually executed on the graphic processor unit
+(GPU). They control the per-vertex and per-pixel processing,
+for example summing the lights contribution
 and mixing the texture colors.
-The X3D standard \textit{Programmable shaders component} already allows to use
-the shaders by the authors. However, the shaders designed using
+
+The X3D standard \textit{Programmable shaders component} already makes
+the shaders available for the authors. However, the shaders designed using
 the standard nodes
 \textit{replace} the normal rendering functionality, not \textit{enhance} it.
-This approach reflects the underlying API (like OpenGL or Direct X),
-where a shader code should be a complete and optimized program designed for
-a particular shape.
+This reflects the underlying API (like OpenGL or Direct 3D),
+and the idea that a shader code should be a complete and optimized program
+designed for rendering a particular shape.
 
-We argue that a better approach is needed in most situations.
+We argue that a different approach is needed in many situations.
 Authors usually would like to keep the normal rendering features working,
 and only add their own effects on top of it. The browser
-implementations already have an extensive internal shaders system,
+implementation usually already has an extensive internal shaders system,
 and the authors should be able to depend on these internal shaders
 to do the common job.
 
 For a simple example, consider the simplified lighting equation with shadows
-and bump mapping. We have
+and bump mapping:
 
 $$ \sum_{l\in Lights} shadow(l) * light\_color(l, material, normal(point)) $$
 
-The \textit{shadow} function returns values in the [0..1] range
+The \textit{shadow} function returns values in the [0..1] range,
 scaling the light color. If the object is not in the shadow, it returns 1.
 The \textit{normal} function returns a normal vector at given point.
 Now realize that we would like to configure various parts of this equation,
@@ -183,18 +184,17 @@ shadows from 2nd light, shadows from both lights.}
 \end{figure*}
 
 We present a system for creating effects by essentially compositing together
-a pieces of a shader code. All the defined effects effortlessly
+a pieces of shader code. All the effects defined this way effortlessly
 cooperate and can be combined with each other and with browser internal
-shaders. This allows to:
+shaders. This makes shader programs:
 
 \begin{enumerate}
-\item Make the shader programs much easier to create. That's because we
-  can jump straight into the implementation of our imagined algorithm
-  in the shader.
+\item Much easier to create. We can jump straight into the implementation
+  of our imagined algorithm in the shader.
   We are only interested in modifying the relevant shader calculation
   parameter, and we can completely ignore other parts of the shader.
 
-\item Make the shader programs much more powerful. That's because our effect
+\item Much more powerful. Our effect
   immediately cooperates with absolutely every normal feature of X3D rendering.
   This makes the implemented effect useful for a wide range of real uses,
   not only for a particular situation or a particular model (as it often happens
@@ -203,12 +203,12 @@ shaders. This allows to:
   are correctly applied.
 \end{enumerate}
 
-The important property is that authors still design the effects using
-the full power of a GPU shading language.
-We deliberately do not invent a new language, thus allowing
-the authors the use all the shading language features for given GPU.
-It also allows for easy implementation --- there is no need for any complex
-language processing inside X3D browser.
+The important property is that we still keep
+the full power of a given GPU shading language.
+We deliberately do not try to invent here a new language, or wrap existing
+language in some cumbersome limitations. This is most flexible for authors,
+and it also allows an easy implementation --- there is no need for any complex
+shading language processing inside the X3D browser.
 
 \section{Motivation and previous work}
 
@@ -629,22 +629,20 @@ knowing the current texture coordinates and other information.
 \subsubsection{ShaderTexture effects}
 
 We introduce a new X3D node designed specifically for generating
-textures using the shading language. This is especially suitable
-if your texture is defined completely by the shaders.
+textures using the shaders. This is suitable
+if your texture is defined completely using the shading language.
 The texture contents are not stored anywhere (not even on GPU),
 and the X3D browser doesn't manage any texture resources.
 From a GPU point of view, there is no texture\footnote{But the spoon is real,
 we swear.}. There is only a shader function that generates colors
-based on some vectors.
-
-While not necessary, it's often comfortable to wrap a texture generation
-function inside the \texttt{ShaderTexture} node. Since \texttt{ShaderTexture}
-is treated much like other X3D texture nodes by the browser,
-you can provide texture coordinates (explicit or generated) for this texture.
+based on some vectors. By wrapping such function inside
+the new \texttt{ShaderTexture} node, you can treat it much like other X3D textures.
+In particular, you can provide texture coordinates (explicit or generated)
+for the texture.
 Effectively, it behaves like a normal texture node, with all the related
 X3D features.
 
-The new texture node specification:
+%% The new texture node specification:
 
 \begin{mycode}
 \underline{ShaderTexture : X3DTextureNode}
@@ -688,16 +686,16 @@ doesn't specify the texture coordinates to use for this texture:
 \end{myenumerate}
 
 Remember that the texture coordinates can be always explicitly specified
-at the geometry, by explicitly listing the coordinates (nodes
-\texttt{TextureCoordinate}, \texttt{TextureCoordinate3D},
-\texttt{TextureCoordinate4D}) or by explicitly giving the generation
-algorithm (nodes \texttt{TextureCoordinateGenerator},
-\texttt{ProjectedTextureCoordinate}).
-Note that our engine has some extensions to \texttt{TextureCoordinateGenerator},
-and \texttt{"BOUNDS2D"} and \texttt{"BOUNDS3D"} are also valid names
-for the \texttt{TextureCoordinateGenerator.mode}, see
-\cite{vrmleng:texcoordbounds}.
-
+at the geometry, by any of the \texttt{X3DTextureCoordinateNode} nodes.
+%% Both explicit texture coordinate lists (\texttt{TextureCoordinate}
+%% \texttt{TextureCoordinate3D}, \texttt{TextureCoordinate4D})
+%% and the coordinate generator nodes
+%% (like \texttt{TextureCoordinateGenerator}) are suitable.
+%% %% , \texttt{ProjectedTextureCoordinate}
+%% Note that our engine has some extensions to allow
+%% the \texttt{"BOUNDS2D"} and \texttt{"BOUNDS3D"} values to be also
+%% used for the \texttt{TextureCoordinateGenerator.mode} field, see
+%% \cite{vrmleng:texcoordbounds}.
 The \texttt{defaultTexCoord} says only what is the default approach,
 when you don't use \texttt{texCoord} at the geometry node.
 The idea is that using a \texttt{ShaderTexture} should be as comfortable
@@ -811,6 +809,18 @@ some previous code. This also means that using a procedural plug
 concept to keep. We want the effects to cooperate with each other,
 not to ,,hijack'' from each other some parts of the functionality.
 
+The nice feature of our magic \texttt{/* PLUG ... */} comments is that a shader source
+is still valid even if you completely ignore the plugs. For example,
+you can write a custom \texttt{ComposedShader} node, defining some plugs,
+and for browsers that understand them --- the plugs can be used,
+for other browsers --- plugs will be gracefully ignored (but still
+the shader will run, although without any effects).
+
+You can define new plug points in your own effects code, as well as in your
+complete custom shaders (like \texttt{ComposedShader}) code.
+In the latter case, the plug points
+are only available for the following effects of the same node.
+
 \subsection{Where the forward declarations are placed}
 
 Special comment \texttt{/* PLUG-DECLARATIONS */} may be used
@@ -835,21 +845,6 @@ the \texttt{\#version} as well as some \texttt{\#extension} directives
 must occur at the beginning of the shader code. You should place
 \texttt{/* PLUG-DECLARATIONS */} after such directives,
 and before any \texttt{/* PLUG: ... */} declarations.
-
-\subsection{Why plugs are defined as comments}
-
-The nice feature of our magic \texttt{/* PLUG ... */} comments is that a shader source
-is still valid even if you completely ignore the plugs. For example,
-you can write a custom \texttt{ComposedShader} node, defining some plugs,
-and for browsers that understand them --- the plugs can be used,
-for other browsers --- plugs will be gracefully ignored (but still
-the shader will run, although without any effects).
-
-\subsection{Plugs from effects}
-
-You can define plug points both inside your custom ComposedShader code,
-as in the ,,effects'' code. In the latter case, the plug points
-are only available for the following effects of the same node.
 
 \subsection{Invalid shader code}
 
