@@ -84,15 +84,15 @@
 \maketitle
 
 \begin{abstract}
-We present a flexible system for implementing effects in X3D
-using the shading languages.
+We present a number of X3D extensions for implementing effects using
+the GPU shading languages.
 Our approach makes the effects naturally integrated with appropriate
 X3D nodes, like shape's appearance, light sources and textures.
 Our effects seamlessly cooperate with each other and with
 the shaders used internally by the X3D browser.
-Thus the effects are reusable, and work in various combinations
-and under various lighting and texture conditions.
-This makes the GPU shaders more useful to the authors.
+Thus the effects are reusable, work in various combinations
+and under all lighting and texture conditions.
+This makes the GPU shaders useful for typical authoring needs.
 The browser implementation may also gain from using the same approach
 for composing internal shaders.
 \end{abstract}
@@ -113,7 +113,7 @@ for composing internal shaders.
 \copyrightspace
 
 X3D \cite{x3d:spec} is an open standard for representing rich 3D data.
-Many advanced graphic features are available for the authors.
+Many advanced graphic features are available to the authors.
 In particular, we can use \emph{shaders} to change the look of the rendered
 geometry.
 \emph{Shaders} are programs usually executed on the graphic processor unit
@@ -122,7 +122,7 @@ for example summing the lights contribution
 and mixing the texture colors.
 
 The X3D standard \textit{Programmable shaders component} already makes
-the shaders available for the authors. However, the shaders designed using
+the shaders available to the authors. However, the shaders designed using
 the standard nodes
 \textit{replace} the normal rendering functionality, not \textit{enhance} it.
 This reflects the underlying API (like OpenGL or Direct 3D),
@@ -136,22 +136,20 @@ implementation usually already has an extensive internal shaders system,
 and the authors should be able to depend on these internal shaders
 to do the common job.
 
-For a simple example, consider the simplified lighting equation with shadows
+As an example, consider the simplified lighting equation with shadows
 and bump mapping:
-
 $$ \sum_{l\in Lights} shadow(l) * light\_color(l, material, normal(point)) $$
-
 The \textit{shadow} function returns values in the [0..1] range,
 scaling the light color. If the object is not in the shadow, it returns 1.
 The \textit{normal} function returns a normal vector at given point.
-Now realize that we would like to configure various parts of this equation,
+Now we would like to configure various parts of this equation,
 without touching the others.
 For example, the \textit{shadow} may check a shadow map pixel,
 or (when shadow map is not available) always return 1.
 The \textit{normal} function may take the vector straight from
 the geometry description, or calculate it using a texture value.
 The \textit{light\_color} function may be replaced to use different
-light models (Phong, Ward, Cook-Torrance and so on). Sometimes it makes sense
+lighting models (Phong, Ward, Cook-Torrance and so on). Sometimes it makes sense
 to change these functions only for some chosen light sources, and sometimes
 we want to modify all the light sources.
 
@@ -189,8 +187,8 @@ shaders. This makes shader programs:
   are correctly applied.
 \end{enumerate}
 
-The important property is that we still keep
-the full power of a given GPU shading language.
+It is important that we still keep
+the full power of a chosen GPU shading language.
 We deliberately do not try to invent here a new language, or wrap existing
 language in some cumbersome limitations. This is most flexible for authors,
 and it also allows an easy implementation --- there is no need for any complex
@@ -208,17 +206,17 @@ and expect the result to be a valid program.
 
 An oldest solution to combining effects, used even before the shading languages,
 was to perform a multi-pass rendering. Each rendering pass adds or multiplies
-the current buffer contents, adding a layer with desired effect.
+to the buffer contents, adding a layer with desired effect.
 However, this is expensive --- in each pass we usually have to repeat
-some work, like least transforming and clipping the geometry.
+some work, at least transforming and clipping the geometry.
 It is also not flexible --- you can only modify
 the complete result of the previous pass.
 %% In our work, we want to allow a single rendering pass to be as
 %% powerful as it can.
 
-One approach to writing flexible shader code is to create
+One approach for writing a flexible shader code is to create
 a library of functions, and allow the author to choose and compose them
-in any order to achieve the desired look. But this approach is very limited,
+in a final shader to achieve the desired look. But this approach is very limited,
 as it doesn't allow to modify a particular calculation part without
 replicating the algorithm outside of this calculation.
 For example, if you want to scale the light contribution by a shadow function,
@@ -227,7 +225,7 @@ you will have to also replicate the code iterating over the light sources.
 Another common solution is to arrange shaders in a pipe, where one
 shader processes the result of another. This can be visualized as
 layers of materials, where each layer modifies the previous
-layer. It is actually similar to a multi-pass rendering approach,
+color. It is actually similar to a multi-pass rendering approach,
 except you don't lose speed on repeating the geometry transformation work.
 Still it suffers from the same limitations, as you cannot change
 the calculation within an existing layer, without replicating the whole
@@ -243,14 +241,14 @@ operator overloading and macros tricks). It allows an excellent
 integration between C++ code and shaders, hiding the ugly details of
 passing variables between normal code (that executes on CPU) and
 shader code (that usually executes on GPU). You can use
-object-oriented methods there to create a general shader that can
-later be extended through various means, like overriding virtual
+object-oriented concepts to create a general shader that can
+later be extended, for example by overriding virtual
 methods. However, this is a solution closely coupled with C++. It's
-suitable if you have a 3D engine in C++, and you want to use in your
+suitable if you have a 3D engine in C++, and you want to use it in your
 own C++ program and extend its shaders. In this paper, we want to
 create a solution that is absolutely separate from the programming
-language used to make a browser. Invoking a compiler to generate a
-final GPU shader, not to mention teaching user's C++, is out of the
+language used to develop a browser. Invoking a compiler to generate a
+final GPU shader, not to mention forcing users to learn C++, is out of the
 question.
 
 OGRE (\myhref{http://www.ogre3d.org/}{http://www.ogre3d.org/}), an open-source 3D engine written in C++, has a system
