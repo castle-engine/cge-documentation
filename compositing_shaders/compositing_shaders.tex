@@ -1016,7 +1016,7 @@ shading languages is the \emph{separate compilation units}.
 It's a useful feature, as it forces
 cleaner shader code (you cannot use undeclared functions from other
 shader parts) and it gives you better line numbers in error messages
-(although a pre-processor directive like \#line could also be used for
+(although a pre-processor directive like \texttt{\#line} could also be used for
 this). But it's not necessary for a working implementation of our effects
 --- we know it because our early implementation was keeping
 the full generated shader code inside one unit, and this approach
@@ -1034,11 +1034,10 @@ for the most up-to-date list.
 % Remember that you can always define your own plugs in your effects
 % and shader nodes.
 
-Parameter names are shown merely to easily document the parameter
+Parameter names are shown below merely to document the parameter
 meaning. Of course you can change the parameter names when declaring
-your own plug function.
-
-You can also change to some extent the parameter qualifiers:
+your own plug function. To some extent you can also change the parameter
+qualifiers:
 
 \begin{itemize}
   \item If a parameter below is "inout", you can change it to "in", or
@@ -1128,7 +1127,7 @@ Calculate or modify the texture color.
 This plug is available for texture effects. The second parameter of
 this plug is special: its existence and type depends on the texture
 node where it is used. For ShaderTexture, it's not available. For
-other X3DTextureNode, its type corresponds to the GLSL sampler type
+other \texttt{X3DTextureNode}, its type corresponds to the GLSL sampler type
 of given texture node: \texttt{sampler2D} for 2D textures,
 \texttt{sampler3D} for 3D textures, \texttt{samplerCube} for cube
 maps, and \texttt{sampler2DShadow} for \texttt{GeneratedShadowMap}
@@ -1173,8 +1172,8 @@ like \texttt{view3dscene}.
 You can run \texttt{view3dscene} with \texttt{--debug-log-shaders} command-line
 option. Output will show you the final shader code generated,
 and also the OpenGL log after linking shaders.
-Be sure to redirect the output to a file, and you may want to test it first
-with a simple scene with one shape --- as the output may be quite large.
+%% Be sure to redirect the output to a file, and you may want to test it first
+%% with a simple scene with one shape --- as the output may be quite large.
 This is a useful way to learn about our shader rendering internals.
 
 Another useful option to try in \texttt{view3dscene} is to switch to
@@ -1183,10 +1182,10 @@ This will force shader rendering for all the shapes,
 while by default we use shader rendering only for the shapes that
 require particular effects (shaders by \texttt{ComposedShader}, effects
 described in this paper, shadow maps and such).
-Forcing shader rendering for everything allows to visually see
+Forcing shader rendering for everything allows to see
 how our shaders implement the whole X3D lighting and texturing model.
 It also makes the whole lighting calculation per-pixel, resulting
-in particular in beautiful light spot highlights.
+in particular in perfect specular highlights and spot light shapes.
 
 %% Development notes: only the SVN demo\_models contain
 %% compositing\_shaders subdirectory.
