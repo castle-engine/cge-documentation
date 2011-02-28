@@ -371,43 +371,54 @@ like this \texttt{PLUG\_texture\_apply}, we define a list of parameters
 (you have to declare them exactly the same in your code), and we define
 when it is called.
 
-Many usage scenarios are available:
+Many usage scenarios are possible:
 
-\begin{myenumerate}
-\itemsep 0pt
-\item Browser internal shaders can be connected with each other. For example,
-we have a basic shader code that defines lighting and texturing. Our bump
-mapping is implemented by simply plugging the code to modify the normals
-into the base shader. This way, the base shader is completely
-independent from the bump mapping implementation. We can change the bump
-mapping implementations (for example, use bump texture from image or
-from a generated random noise) without trouble.
+\begin{enumerate}
 
-So even inside the browser, this allows for much easier shader handling.
+\item The \texttt{Effect} nodes may refer to plug names
+defined inside the browser internal shaders. This is the most usual case.
+It allows the authors to extend or override a particular shading parameter.
 
-\item User shaders may plug into browser shaders. This is the most usual
-case. Our shaders define various points when you can plug your code,
-and override or enhance our shading.
+\item The \texttt{Effect} nodes may also use the plug names defined
+in the previous \texttt{Effect} nodes on the same shape.
+It is trivially easy (you just add a ,,magic'' comment) to define
+plugging points in your own shader code, and this way your own effects
+can be customized.
 
-\item User shaders can trivially (by just adding a "magic" comment)
-define new plugging points, which are available for the following
-user shaders on the same shape. This is available for user shaders
-defined inside our \texttt{Effect} nodes, and also for the complete user shaders
-in standard \texttt{ComposedShader} and similar nodes.
+\item Inside the browser implementation, the same approach can be used
+to implement some internal effects.
+We have reimplemented many internal effects of our engine,
+like the fog, shadow maps and the bump mapping to use our ,,plugs'' approach.
+This made their implementation very clean, short
+and nicely separated from each other. It also proves that
+the authors have the power to implement such effects easily by themselves.
 
-This way some of your effects may be further customized by the other effects.
-\end{myenumerate}
+%% without any traditional hassles. For example, bump mapping can be
+%% achieved using standard \texttt{ComposedShader} as well,
+%% but then you have to write all this ,,boilerplate'' code to also deal
+%% with all the possible lighting and textures configurations.
+%% Well, the browser is still useful to calculate nice tangent vectors,
+%% although an authoring program could generate GLSL attributes for them as well.
 
-When you don't use an explicit shader (like \texttt{ComposedShader} node),
-browser uses its own internal basic shader. This shader is then
-extended by effects like bump mapping (coming from internal browser
-implementation), or by user effects. But you can also define your own
-\texttt{ComposedShader} node. Then your own shader is enhanced by the
-browser. If you define the same (or compatible) plugging
-points, then the browser effects will be even added to your own
-shader. And of course user effects are added to your shader.
-So the system is useful regardless if you use or not an explicit
-shader on the \texttt{Appearance.shaders} list.
+%% Same thing with shadow maps, they only plug to the \texttt{light\_scale}
+%% calculation of appropriate light.
+
+\end{enumerate}
+
+Actually, there are even more possibilities.
+Above we have been talking about the ,,browser internal shaders'',
+but the full truth is a little more flexible.
+When you place a standard shader node
+(like a \texttt{ComposedShader} node for GLSL shaders) on the
+\texttt{Appearance.shaders} list,
+then it replaces the internal browser shaders.
+If you define the same (or compatible) plugging points inside your shader,
+then the browser effects will be even added to your own
+shader. And of course user effects are added to your shader too.
+This way we have made even the standard shader nodes much more flexible.
+Note that if you don't define any plugs inside your \texttt{ComposedShader} node,
+it continues to function as before --- no effects, from browser or author,
+will be added.
 
 \subsection{Effect node}
 
@@ -912,24 +923,6 @@ pass the current time from a \texttt{TimeSensor} and make dynamic effects.
   \caption{ElevationGrid with 3 textures mixed inside the shader,
 based on the point height.}
 \end{figure}
-
-Even inside the browse implementation, using plugs to implement internal
-effects allows for a great code simplification and separation.
-Many internal effects of our engine, like fog, shadow maps
-and the bump mapping have been reimplemented using our plugs approach.
-This made their implementation very clean and short,
-and nicely separated from each other. It also shows that
-X3D authors have the power to implement such effects easily by themselves.
-
-%% without any traditional hassles. For example, bump mapping can be
-%% achieved using standard \texttt{ComposedShader} as well,
-%% but then you have to write all this ,,boilerplate'' code to also deal
-%% with all the possible lighting and textures configurations.
-%% Well, the browser is still useful to calculate nice tangent vectors,
-%% although an authoring program could generate GLSL attributes for them as well.
-
-%% Same thing with shadow maps, they only plug to the \texttt{light\_scale}
-%% calculation of appropriate light.
 
 We can also wrap 2D and 3D noise inside a \texttt{ShaderTexture}.
 A texture node like \texttt{NoiseTexture} from InstantReality
