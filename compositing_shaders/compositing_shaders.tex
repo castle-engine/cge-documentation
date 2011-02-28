@@ -930,7 +930,7 @@ heights, or vary per-fragment normal vectors (for best results,
 you want to do both things).
 You also want to simulate the fact that water has reflections, and
 is transparent. We have implemented a nice water using this approach,
-with two independent effects.
+with (initially) two independent effects.
 
 Our approach also allowed us to easily implement and test
 two alternative versions for generating water normals.
@@ -957,10 +957,11 @@ new plug names, that can be used by the other effects.
 %% in real-time.)
 
 We also provide plugs to easily change the geometry in object space.
-Again, since the effect is integrated with all the browser shaders,
-you only need to code a simple function to change the vertex positions
-as you want. The effect instantly works with all the lighting and texturing
-conditions. Since the transformation is done on GPU, there's practically
+%% Again, since the effect is integrated with all the browser shaders,
+%% you only need to code a simple function to change the vertex positions
+%% as you want. The effect instantly works with all the lighting and texturing
+%% conditions. 
+Since the transformation is done on GPU, there's practically
 no speed penalty for animating thousands of flowers in our test scene.
 
 \begin{figure}[H]
@@ -1012,7 +1013,7 @@ was also working correctly.
 
 \section{Short reference of available plugs}
 
-The table below is a quick reference of plugs available in our
+Below is a quick reference of plugs available in our
 implementation. We have found these plugs to be sufficient for a wide
 range of effects, although of course there's always a place for
 changes and improvements. See our engine website,
@@ -1028,7 +1029,10 @@ your own plug function. To some extent you can also change the parameter
 qualifiers:
 
 \begin{itemize}
-  \item If a parameter below is "inout", you can change it to "in", or
+\itemsep 0pt
+\parskip 0pt
+\parsep 0pt
+\item If a parameter below is "inout", you can change it to "in", or
     "const in" if you don't want to modify the given value.
   \item You can also change the "inout" parameter to just "out", if
     you want to unconditionally overwrite the given value. Although
