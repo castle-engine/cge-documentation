@@ -909,19 +909,19 @@ pass the current time from a \texttt{TimeSensor} and make dynamic effects.
 \begin{figure}[H]
   \centering
   \includegraphics[width=3in]{terrain}
-  \caption{ElevationGrid with 3 textures mixed inside the shader,
-based on the point height.}
+  \caption{ElevationGrid with 3 textures mixed inside the shader.}
+%%based on the point height.}
 \end{figure}
 
 We can also wrap 2D and 3D noise inside a \texttt{ShaderTexture}.
 A texture node like \texttt{NoiseTexture} from InstantReality
-\myhref{http://doc.instantreality.org/documentation/nodetype/NoiseTexture/}{http://doc.instantreality.org/documentation/nodetype/NoiseTexture/}
-may be implemented on GPU by a simple prototype using \texttt{ShaderTexture}.
+%% \myhref{http://doc.instantreality.org/documentation/nodetype/NoiseTexture/}{http://doc.instantreality.org/documentation/nodetype/NoiseTexture/}
+may be implemented on GPU by a simple prototype using the \texttt{ShaderTexture}.
 
 \begin{figure}[H]
   \centering
   \includegraphics[width=3in]{noise}
-  \caption{3D and 2D smooth noise on GPU, wrapped in ShaderTexture.}
+  \caption{3D and 2D smooth noise on GPU, wrapped in a ShaderTexture.}
 \end{figure}
 
 Another example is \emph{water}. Water is very nice to implement by our effects,
