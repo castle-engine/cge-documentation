@@ -1018,15 +1018,16 @@ plugs will be useful for them --- but it's just a theory. An
 implementation of our effects for other shading languages may likely
 find other opportunities for plugs.
 
-What we know for a fact is that the GLSL ,,separate compilation
-units'' idea is \textit{not} necessary for a successful
-implementation of our effects. That's because our initial
-implementation for GLSL didn't actually need the separate compilation
-of GLSL. ,,Separate compilation units'' of GLSL are useful to force
+One important feature that makes GLSL slightly different from other
+shading languages is the \emph{separate compilation units}.
+It's a useful feature, as it forces
 cleaner shader code (you cannot use undeclared functions from other
 shader parts) and it gives you better line numbers in error messages
 (although a pre-processor directive like \#line could also be used for
-this). But they are not a necessary feature.
+this). But it's not necessary for a working implementation of our effects
+--- we know it because our early implementation was keeping
+the full generated shader code inside one unit, and this approach
+was also working correctly.
 
 \section{Short reference of available plugs}
 
@@ -1103,7 +1104,7 @@ void PLUG_light_scale(
   inout float light_scale,
   const in vec3 normal_eye,
   const in vec3 light_dir,
-  const in gl_LightSourceParameters light_source,
+  const in gl_LightSourceParameters light,
   const in gl_LightProducts light_products,
   const in gl_MaterialParameters material)
 \end{Verbatim}
@@ -1173,16 +1174,11 @@ Examples are available inside our engine demo models on
 The relevant demos are mostly inside the \texttt{compositing\_shaders}
 subdirectory, also the \texttt{water} subdirectory contains
 the water implementation using our effects.
-You can checkout them from SVN, or just browse through a web browser,
-using the URL
-\myhref{https://vrmlengine.svn.sourceforge.net/svnroot/vrmlengine/trunk/demo\_models/compositing\_shaders/}{https://vrmlengine.svn.sourceforge.net/svnroot/vrmlengine/trunk/demo_models/compositing_shaders/}.
-
 You can open the examples using any of our engine tools,
-like \texttt{view3dscene} from
-\myhref{http://vrmlengine.sourceforge.net/view3dscene.php}{http://vrmlengine.sourceforge.net/view3dscene.php}.
+like \texttt{view3dscene}.
 
 You can run \texttt{view3dscene} with \texttt{--debug-log-shaders} command-line
-option. Output (stdout) will show you the final shader code generated,
+option. Output will show you the final shader code generated,
 and also the OpenGL log after linking shaders.
 Be sure to redirect the output to a file, and you may want to test it first
 with a simple scene with one shape --- as the output may be quite large.
@@ -1199,10 +1195,10 @@ how our shaders implement the whole X3D lighting and texturing model.
 It also makes the whole lighting calculation per-pixel, resulting
 in particular in beautiful light spot highlights.
 
-Development notes: only the SVN demo\_models contain
-compositing\_shaders subdirectory.
-You also have to use view3dscene from SVN or nightly builds,
-see \myhref{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
+%% Development notes: only the SVN demo\_models contain
+%% compositing\_shaders subdirectory.
+%% You also have to use view3dscene from SVN or nightly builds,
+%% see \myhref{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
 
 \bibliographystyle{acmsiggraph}
 \nocite{*}
