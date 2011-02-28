@@ -57,7 +57,6 @@
 %% http://www.ctan.org/tex-archive/macros/latex/contrib/fancyvrb/
 \usepackage{fancyvrb}
 
-%% To allow tex_projected at the bottom.
 %% Without this, figure* can only go to the top (or separate page).
 %% http://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions#Wide_figures_in_two_column_documents
 \usepackage{stfloats}
@@ -68,19 +67,6 @@
 % \nolinkurl is a trick to allow links to break across lines in pdf,
 % from http://www.miwie.org/tex-refs/html/latex-packages.html#hyperref
 \newcommand*{\myhref}[2]{\texttt{\href{#1}{\nolinkurl{#2}}}}
-
-% The above \myhref unfortunately (due to \nolinkurl trick)
-% makes it impossible to break links manually.
-% So below is the same as \myhref, but does not break link text automatically,
-% and allows to break it manually (by inserting \\ etc.)
-% \newcommand*{\myhrefm}[2]{\texttt{\href{#1}{#2}}}
-
-\newenvironment{myenumerate}
-{\begin{enumerate}
-  \setlength{\itemsep}{0pt}
-  \setlength{\parskip}{0pt}
-  \setlength{\parsep}{0pt}}
-{\end{enumerate}}
 
 \title{Compositing shaders in X3D}
 
@@ -677,7 +663,7 @@ reminding you to override it.
 The \texttt{defaultTexCoord} field is used only when a particular geometry
 doesn't specify the texture coordinates to use for this texture:
 
-\begin{myenumerate}
+\begin{enumerate}
 
 \item
   \texttt{"BOUNDS2D"} means that the algorithm described in the specification
@@ -695,7 +681,7 @@ doesn't specify the texture coordinates to use for this texture:
   component, or treat it as homogeneous, as \texttt{"BOUNDS3D"} will always
   set it to 1).
 
-\end{myenumerate}
+\end{enumerate}
 
 Remember that the texture coordinates can be always explicitly specified
 at the geometry, by any of the \texttt{X3DTextureCoordinateNode} nodes.
