@@ -1063,7 +1063,7 @@ You can also change to some extent the parameter qualifiers:
 \subsection{Vertex shaders plugs}
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
-void PLUG_vertex_object_space_change(
+void PLUG_\codeem{vertex_object_space_change}(
   inout vec4 vertex_object,
   inout vec3 normal_object)
 \end{Verbatim}
@@ -1073,7 +1073,7 @@ If you don't want to modify them, consider using \texttt{vertex\_object\_space}
 instead, that may result in more optimized shader.
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
-void PLUG_vertex_object_space(
+void PLUG_\codeem{vertex_object_space}(
   const in vec4 vertex_object,
   const in vec3 normal_object)
 \end{Verbatim}
@@ -1081,7 +1081,7 @@ void PLUG_vertex_object_space(
 Process the vertex and normal in object space.
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
-void PLUG_vertex_eye_space(
+void PLUG_\codeem{vertex_eye_space}(
   const in vec4 vertex_eye,
   const in vec3 normal_eye)
 \end{Verbatim}
@@ -1091,7 +1091,7 @@ Process the vertex and normal in eye (camera) space.
 \subsection{Fragment shaders plugs}
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
-void PLUG_fragment_eye_space(
+void PLUG_\codeem{fragment_eye_space}(
   const vec4 vertex_eye,
   inout vec3 normal_eye)
 \end{Verbatim}
@@ -1100,7 +1100,7 @@ Process the vertex and normal in eye space, at fragment shader.
 You can modify the normal vector here, this is useful for bump mapping.
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
-void PLUG_light_scale(
+void PLUG_\codeem{light_scale}(
   inout float light_scale,
   const in vec3 normal_eye,
   const in vec3 light_dir,
@@ -1113,7 +1113,7 @@ Scale the given light source contribution.
 This plug is also available at light source nodes' effects.
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
-void PLUG_add_light_contribution_front(
+void PLUG_\codeem{add_light_contribution_front}(
   inout vec4 color,
   const in vec4 vertex_eye,
   const in vec3 normal_eye,
@@ -1125,7 +1125,7 @@ There is also the \texttt{add\_light\_contribution\_back},
 for light contribution on the back side of the faces.
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
-void PLUG_texture_color(
+void PLUG_\codeem{texture_color}(
   inout vec4 texture_color,
   [const in samplerXxx texture,]
   const in vec4 tex_coord)
@@ -1141,7 +1141,7 @@ of given texture node: \texttt{sampler2D} for 2D textures,
 maps, and \texttt{sampler2DShadow} for \texttt{GeneratedShadowMap}
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
-void PLUG_texture_apply(
+void PLUG_\codeem{texture_apply}(
   inout vec4 fragment_color,
   const in vec3 normal_eye)
 \end{Verbatim}
@@ -1149,7 +1149,7 @@ void PLUG_texture_apply(
 Apply a texture color.
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
-void PLUG_fog_apply(
+void PLUG_\codeem{fog_apply}(
   inout vec4 fragment_color,
   const vec3 normal_eye_fragment)
 \end{Verbatim}
@@ -1159,7 +1159,7 @@ the \texttt{texture\_apply}, because you usually want to apply the fog
 to the final (textured) fragment color.
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
-void PLUG_fragment_end(
+void PLUG_\codeem{fragment_end}(
   const in vec4 fragment_color)
 \end{Verbatim}
 
