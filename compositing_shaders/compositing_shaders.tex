@@ -317,13 +317,13 @@ The basic idea of our approach is that the base shader code defines
 points when a calls to user-defined functions may be inserted. We call
 these places \textit{plugs}, as they act like sockets where a logic
 may be added. Each plug has a name, and a given set of parameters.
-The effects can now use special function names, starting with \texttt{PLUG\_}
+The effects can use special function names, starting with \texttt{PLUG\_}
 and followed by the plug name. These declarations will be found,
 and the browser will insert appropriate calls to them from the base shader.
 
 A trivial example of an effect that makes colors two times brighter
-follows. This is written in X3D classic encoding,
-you should add this inside any \texttt{Appearance} node:
+is below. This example is presented in the X3D classic (VRML) encoding.
+You can add this inside any \texttt{Appearance} node:
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
 effects Effect \{
@@ -341,16 +341,16 @@ effects Effect \{
 \}
 \end{Verbatim}
 
-It defines a GLSL function named \texttt{PLUG\_texture\_apply}
+This defines a GLSL function named \texttt{PLUG\_texture\_apply}
 within an \texttt{EffectPart} node. The call to this function will
 be automatically inserted at the \texttt{texture\_apply} plug point in
 the browser internal shader. This particular plug,
 the \texttt{PLUG\_texture\_apply}, is called after the normal texture colors
 are applied, but before the alpha test, and is a usual place to ,,just modify the pixel color''.
 \texttt{fragment\_color} is an \texttt{inout} parameter, by modifying it
-you modify the color that will be displayed on screen.
+you modify the color that will be displayed on the screen.
 
-We have a short reference (at the end of this document) of all
+We put a short reference at the end of this paper of all
 the plugging points available in our shaders. For each plugging point,
 like this \texttt{PLUG\_texture\_apply}, we define a list of parameters
 (you have to declare them exactly the same in your code), and we define
@@ -391,8 +391,8 @@ the authors have the power to implement such effects easily by themselves.
 \end{enumerate}
 
 Actually, there are even more possibilities.
-Above we have been talking about the ,,browser internal shaders'',
-but the full truth is a little more flexible.
+We have been talking above about the ,,browser internal shaders'',
+but the truth is a little more flexible.
 When you place a standard shader node
 (like a \texttt{ComposedShader} node for GLSL shaders) on the
 \texttt{Appearance.shaders} list,
@@ -408,7 +408,7 @@ will be added.
 \subsection{Effect node}
 
 We define new \texttt{Effect} node that holds information about
-the source code and uniform values specific to given effect.
+the source code and uniform values specific to a given effect.
 
 \begin{mycode}
 \underline{Effect : X3DChildNode}
@@ -426,10 +426,12 @@ SFBool [in,out] \codeem{enabled} TRUE
   # this field is easier for scripts.
 MFNode [] \codeem{parts} [] # EffectPart
 
-... you can declare additional
-  new fields and events, that will be passed
-  as uniform values to the shader,
-  just like for ComposedShader node ...
+# And any number of uniform variables,
+# just like for ComposedShader node:
+fieldType []       fieldName
+fieldType [in]     fieldName
+fieldType [out]    fieldName
+fieldType [in,out] fieldName
 \end{Verbatim}
 \end{mycode}
 
@@ -474,7 +476,7 @@ but it must be completely contained within a given shader type.
 Note that it is completely reasonable to have an \texttt{EffectPart} node
 with source code that doesn't define any \texttt{PLUG\_xxx} functions.
 Such \texttt{EffectPart} node may be useful for defining shading language
-utility functions, used by your other effects.
+utility functions, used by the other effect parts.
 
 For shading languages that have separate compilation units
 (like the \emph{OpenGL Shading Language}) the implementation may choose to place
@@ -484,15 +486,15 @@ It also allows for cleaner error detection (parsing errors will be detected
 inside the given unit).
 
 At one point we tried the approach
-to not look at any special function names in shader code,
+to not look at any special function names in a shader code,
 and instead define a plug name in the separate field of the \texttt{EffectPart}
 node. However, the browser may need to know the full declaration
 of a function, to make a forward or external declaration of it.
 One way to overcome this problem was to force repeating this declaration
 in another field. Another way was to split shader code into much more
 parts (for example, one part declares the uniform variables, one part declares
-the plug function, one part declared the function body and so on).
-Both approaches seemed not natural and uncomfortable for authors,
+the plug function, one part defines the function body and so on).
+Both approaches seemed uncomfortable and not natural for authors,
 and they didn't really offer much simpler implementation, so we dropped this idea.
 The current approach, to find the declarations of \texttt{PLUG\_xxx} functions
 inside a complete shader code, is easy to implement, and results in clean
@@ -519,7 +521,7 @@ For effects, we choose all of them.
 
 The most basic idea of this paper is to allow you to define two
 independent shader effects, and then seamlessly connect them by simply
-placing them both on \texttt{Appearance.effects} list. This also allows to
+placing them both on the \texttt{Appearance.effects} list. This also allows to
 define a library of effects, that can be composited without any work
 needed by user.
 
@@ -543,7 +545,7 @@ shading language functions, and reuse if for various effects.
 Our \texttt{Effect} node is a descendant of the abstract \texttt{X3DChildNode}.
 As such it can be placed directly within X3D grouping nodes like
 \texttt{Group}, \texttt{Transform} and at the top level of the X3D file.
-Such effect will apply to all the shapes within given grouping node.
+Such effect will apply to all the shapes within the given group.
 The scope rules follow the X3D conventions for other nodes,
 like pointing device sensor nodes and \texttt{LocalFog}.
 
@@ -555,8 +557,8 @@ implementation of the standard \texttt{LocalFog} node, as is trivially easy.
 As one of the demos, we have implemented a realistic
 animated volumetric fog, where the fog density is stored in
 a 3D smooth noise texture (idea from \cite{humus:volumetricfog}).
-In a fragment shader, the 3D texture is sampled
-along the line between the camera and pixel position. This makes a very
+In a fragment shader, the 3D~texture is sampled
+along the line between the camera and pixel position in the 3D~space. This makes a very
 convincing effect of a dense fog. Since it is implemented as an effect,
 it can be instantly used with various lighting and texturing conditions
 --- it simply works for all X3D shapes.
