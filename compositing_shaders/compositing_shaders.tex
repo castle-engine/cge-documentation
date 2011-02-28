@@ -844,6 +844,7 @@ must occur at the beginning of the shader code. You should place
 \texttt{/* PLUG-DECLARATIONS */} after such directives,
 and before any \texttt{/* PLUG: ... */} declarations.
 
+\setcounter{figure}{8}
 \begin{figure*}[t]
   \centering
 %  \includegraphics[width=2.3in]{water_shaders_0}
@@ -854,6 +855,7 @@ and before any \texttt{/* PLUG: ... */} declarations.
 2) Per-pixel lighting and reflections and refractions (by a single environment cube map texture).
 3) All effects.}
 \end{figure*}
+\setcounter{figure}{6}
 
 \subsection{Invalid shader code}
 
@@ -960,10 +962,11 @@ We also provide plugs to easily change the geometry in object space.
 %% Again, since the effect is integrated with all the browser shaders,
 %% you only need to code a simple function to change the vertex positions
 %% as you want. The effect instantly works with all the lighting and texturing
-%% conditions. 
+%% conditions.
 Since the transformation is done on GPU, there's practically
 no speed penalty for animating thousands of flowers in our test scene.
 
+\setcounter{figure}{9}
 \begin{figure}[H]
   \centering
   \includegraphics[width=3in]{flowers}
