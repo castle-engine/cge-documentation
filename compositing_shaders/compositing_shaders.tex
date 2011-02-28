@@ -1124,13 +1124,12 @@ void PLUG_\codeem{texture_color}(
 \end{Verbatim}
 
 Calculate or modify the texture color.
-This plug is available for texture effects. The second parameter of
-this plug is special: its existence and type depends on the texture
-node where it is used. For ShaderTexture, it's not available. For
-other \texttt{X3DTextureNode}, its type corresponds to the GLSL sampler type
-of given texture node: \texttt{sampler2D} for 2D textures,
+This plug is available for texture effects. The second parameter
+is special: for \texttt{ShaderTexture}, it doesn't exist at all.
+For other texture nodes, the sampler type depends on the correspoding
+X3D texture node: \texttt{sampler2D} for 2D textures,
 \texttt{sampler3D} for 3D textures, \texttt{samplerCube} for cube
-maps, and \texttt{sampler2DShadow} for \texttt{GeneratedShadowMap}
+maps, and \texttt{sampler2DShadow} for \texttt{GeneratedShadowMap}.
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
 void PLUG_\codeem{texture_apply}(
