@@ -667,7 +667,7 @@ doesn't specify the texture coordinates to use for this texture:
 
 \item
   \texttt{"BOUNDS2D"} means that the algorithm described in the specification
-  for {IndexedFaceSet} should be used. This adapts 2D texture coordinates
+  for \texttt{IndexedFaceSet} should be used. This adapts 2D texture coordinates
   to the two largest bounding box sizes.
   It's most suitable for 2D textures that use only 2D coordinates
   (ignoring other coordinates, or assuming they are always 0,~1).
@@ -749,7 +749,7 @@ coordinates in the \texttt{texture\_color} plug.
 
 \section{Defining your own plug points}
 
-In your shader code, you can define your own plug points by a
+In your shader code, you can define new plug points by a
 magic comment:
 
 \begin{mycode}
@@ -758,8 +758,8 @@ magic comment:
 \end{Verbatim}
 \end{mycode}
 
-This defines a point when calls to user functions declared as
-\texttt{PLUG\_name} will be added. They will be called with given
+This defines a point where calls to user functions declared as
+\texttt{PLUG\_name} will be inserted. They will be called with given
 parameters.
 
 Many effects may use the same \texttt{PLUG\_name},
@@ -775,8 +775,8 @@ Although, preferably, for most effects this order will not matter.
 
 A plug is often defined to allow modifying some parameter
 repeatedly (like adding or modulating the fragment color),
-so one or more of the parameters are often allowed to be processed
-as \texttt{inout} parameters.
+so one or more of the parameters are often allowed to be handled
+as \texttt{inout} values.
 
 The same plug name may be declared many times in the source shader.
 This means that a single \texttt{PLUG\_xxx} function will be called
@@ -816,7 +816,7 @@ the shader will run, although without any effects).
 
 You can define new plug points in your own effects code, as well as in your
 complete custom shaders (like \texttt{ComposedShader}) code.
-In the latter case, the plug points
+In the first case, the plug points
 are only available for the following effects of the same node.
 
 \subsection{Where the forward declarations are placed}
