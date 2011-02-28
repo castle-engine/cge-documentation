@@ -991,12 +991,13 @@ uniform values and attributes are integrated with X3D fields.
 
 \section{Implementation notes: GLSL}
 
-Our implementation is concerned only with the OpenGL Shading Language
-(GLSL). We have designed our extensions to be useful with other
-shading languages (like Cg or HLSL), and we think that the same set of
-plugs will be useful for them --- but it's just a theory.
-An implementation of our effects for other shading languages may
-find other opportunities for plugging points.
+We have implemented the effects described here only for the
+\emph{OpenGL Shading Language} (GLSL). However, we have designed our extensions
+to be applicable to other shading languages as well (like Cg or HLSL),
+and we believe they can be handled in a similar fashion.
+%% and we think that the same set of plugs will be useful for them --- but it's just a theory.
+%% An implementation of our effects for other shading languages may
+%% find other opportunities for plugging points.
 
 One important feature that makes GLSL slightly different from other
 shading languages is the \emph{separate compilation units}.
@@ -1167,7 +1168,7 @@ and also the OpenGL log after linking shaders.
 This is a useful way to learn about our shader rendering internals.
 
 Another useful option to try in \texttt{view3dscene} is to switch to
-\textit{View $->$ Shaders $->$ Enable For Everything} mode.
+\textit{View $\rightarrow$ Shaders $\rightarrow$ Enable For Everything} mode.
 This will force shader rendering for all the shapes,
 while by default we use shader rendering only for the shapes that
 require particular effects (shaders by \texttt{ComposedShader}, effects
