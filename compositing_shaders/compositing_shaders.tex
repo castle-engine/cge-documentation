@@ -481,7 +481,7 @@ utility functions, used by the other effect parts.
 For shading languages that have separate compilation units
 (like the \emph{OpenGL Shading Language}) the implementation may choose to place
 each effect part in such separate unit. This forces the shader code to be
-cleaner, as you cannot use undeclared functions and uniform variables.
+cleaner, as you cannot use undeclared functions and variables.
 It also allows for cleaner error detection (parsing errors will be detected
 inside the given unit).
 
@@ -1170,7 +1170,7 @@ like \texttt{view3dscene}.
 
 You can run \texttt{view3dscene} with \texttt{--debug-log-shaders} command-line
 option. Output will show you the final shader code generated,
-and also the OpenGL log after linking shaders.
+and also the OpenGL log after linking the shaders.
 %% Be sure to redirect the output to a file, and you may want to test it first
 %% with a simple scene with one shape --- as the output may be quite large.
 This is a useful way to learn about our shader rendering internals.
