@@ -23,12 +23,8 @@ clean:
 	      compositing_shaders.dvi \
 	      compositing_shaders.ps
 
-# make zip for submission of the "Final LaTeX sources"
-.PHONY: zip
-zip:
-	rm -f compositing_shaders_src.zip
-	zip compositing_shaders_src.zip \
-	   $(shell find -maxdepth 1 -name '*.png' -not -name todo.png) \
-	   compositing_shaders.bib \
-	   compositing_shaders.tex \
-	   Makefile README.txt
+# make screenshots_targz, to submit screenshots as PNG
+.PHONY: screenshots_targz
+screenshots_targz:
+	rm -f compositing_shaders_screenshots.tar.gz
+	tar czvf compositing_shaders_screenshots.tar.gz *.png

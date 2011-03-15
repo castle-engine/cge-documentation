@@ -1,6 +1,7 @@
 This is my (Michalis) paper for Web3D 2011 conference.
 
-This directory contains the LaTeX source of the paper.
+This directory contains the LaTeX source of the paper,
+and the original screenshots PNG images.
 
 To actually generate the final PDF you will also
 need the acmsiggraph.cls and acmsiggraph.bst LaTeX style,
