@@ -1,24 +1,26 @@
 % "Compositing shaders in X3D" by Michalis Kamburelis,
-% for Web3D 2011.
-%
-% If accepted, this will be © Copyright 2011 by ACM, Inc.
-% See http://www.acm.org/publications/policies/copyright_policy
-%
+% for TGCP 2011.
+% If accepted, this will be Copyright 2011 by EUROGRAPHICS, details later.
 
 %% Template stuff begins here ------------------------------------------------
 
-\documentclass{acmsiggraph}                     % final
-%\documentclass[annualconference]{acmsiggraph}  % final (annual conference)
-%\documentclass[review]{acmsiggraph}            % review
-%\documentclass[widereview]{acmsiggraph}        % wide-spaced review
-%\documentclass[preprint]{acmsiggraph}          % preprint
+\documentclass{egpubl}
+\usepackage{EGUKTPCG11}
+\WsSubmission
+\electronicVersion
 
-\usepackage[scaled=.92]{helvet}
-\usepackage{times}
-\usepackage{graphicx}
-\usepackage{parskip}
-\usepackage[labelfont=bf,textfont=it]{caption}
-\onlineid{1010} %% I think this doesn't matter
+% for including postscript figures
+% mind: package option 'draft' will replace PS figure by a filname within a frame
+\ifpdf \usepackage[pdftex]{graphicx} \pdfcompresslevel=9
+\else \usepackage[dvips]{graphicx} \fi
+
+\PrintedOrElectronic
+
+% prepare for electronic version of your document
+\usepackage{t1enc,dfadobe}
+
+\usepackage{egweblnk}
+\usepackage{cite}
 
 %% Template stuff ends here ------------------------------------------------
 
@@ -70,10 +72,12 @@
 
 \title{Compositing Shaders in X3D}
 
-\author{Michalis Kamburelis\thanks{e-mail: michalis.kambi@gmail.com}\\Institute of Computer Science\\University of Wroc{\l}aw, Poland}
+\author{1} % TODO: submission id
+%Michalis Kamburelis\thanks{e-mail: michalis.kambi@gmail.com}\\Institute of Computer Science\\University of Wroc{\l}aw, Poland}
 %\author{(Author identification removed.)\thanks{e-mail: xxx@xxx.xxx}\\Xxx\\Xxx}
 
-\keywords{X3D, shaders, GLSL, effects, shadow maps, bump mapping}
+% For Web3D conf:
+%\keywords{X3D, shaders, GLSL, effects, shadow maps, bump mapping}
 
 \begin{document}
 
@@ -96,22 +100,25 @@ and under all lighting and texture conditions.
 This makes the GPU shaders useful for typical authoring needs.
 The browser implementation may also gain from using the same approach
 for composing internal shaders.
+
+\begin{classification}
+  \CCScat{I.3.7}{Computer Graphics}{Three-Dimensional Graphics and Realism}{Color, shading, shadowing, and texture};
+  \CCScat{I.3.6}{Computer Graphics}{Methodology and Techniques}{Languages, Standards}
+\end{classification}
+
 \end{abstract}
 
-\begin{CRcatlist}
-  \CRcat{I.3.7}{Computer Graphics}{Three-Dimensional Graphics and Realism}{Color, shading, shadowing, and texture};
-  \CRcat{I.3.6}{Computer Graphics}{Methodology and Techniques}{Languages, Standards}
-\end{CRcatlist}
-
-\keywordlist
+% For Web3D conf:
+%\keywordlist
 
 \section{Introduction}
 
+% For Web3D conf:
 %% The ``\copyrightspace'' command must be the first command after the
 %% start of the first section of the body of your paper. It ensures the
 %% copyright space is left at the bottom of the first column on the first
 %% page of your paper.
-\copyrightspace
+%\copyrightspace
 
 X3D \cite{x3d:spec} is an open standard for representing rich 3D data.
 Many advanced graphic features are available to the authors.
@@ -1202,7 +1209,7 @@ The Japanese shrine model, used for an eye-candy screenshots
 at the beginning of this paper, comes from
 \myhref{http://opengameart.org/content/shrine-shinto-japan}{http://opengameart.org/content/shrine-shinto-japan}.
 
-\bibliographystyle{acmsiggraph}
+\bibliographystyle{eg-alpha}
 % \nocite{*}
 \bibliography{compositing_shaders}
 
