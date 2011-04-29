@@ -1,5 +1,5 @@
 % "Compositing shaders in X3D" by Michalis Kamburelis,
-% for TGCP 2011.
+% for TPCG 2011.
 % If accepted, this will be Copyright 2011 by EUROGRAPHICS, details later.
 
 %% Template stuff begins here ------------------------------------------------
@@ -7,6 +7,7 @@
 \documentclass{egpubl}
 \usepackage{EGUKTPCG11}
 \WsSubmission
+% TODO: \WsPaper for final?
 \electronicVersion
 
 % for including postscript figures
@@ -30,14 +31,6 @@
 \sloppy
 
 \usepackage{needspace}
-
-%% For href
-\usepackage{ifpdf}
-\ifpdf
-  \usepackage[pdftex]{hyperref}
-\else
-  \usepackage[hypertex]{hyperref}
-\fi
 
 %% Put float in a nice box,
 %% http://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
@@ -66,14 +59,11 @@
 %% Bold inside our code/spec samples.
 \newcommand*{\codeem}[1]{\textbf{#1}}
 
-% \nolinkurl is a trick to allow links to break across lines in pdf,
-% from http://www.miwie.org/tex-refs/html/latex-packages.html#hyperref
-\newcommand*{\myhref}[2]{\texttt{\href{#1}{\nolinkurl{#2}}}}
-
 \title{Compositing Shaders in X3D}
 
 \author{1} % TODO: submission id
-%Michalis Kamburelis\thanks{e-mail: michalis.kambi@gmail.com}\\Institute of Computer Science\\University of Wroc{\l}aw, Poland}
+%\author[M. Kamburelis]{M. Kamburelis$^{1}$\\
+%  $^1$Institute of Computer Science, University of Wroc{\l}aw, Poland}
 %\author{(Author identification removed.)\thanks{e-mail: xxx@xxx.xxx}\\Xxx\\Xxx}
 
 % For Web3D conf:
@@ -90,17 +80,20 @@
 \maketitle
 
 \begin{abstract}
-We present a number of X3D extensions for implementing effects using
-the GPU shading languages.
-Our approach makes the effects naturally integrated with appropriate
-X3D nodes, like shape's appearance, light sources and textures.
+We present a new approach for implementing GPU shader effects.
 Our effects seamlessly cooperate with each other and with
-the shaders used internally by the X3D browser.
+the shaders used internally by the 3D application.
 Thus the effects are reusable, work in various combinations
 and under all lighting and texture conditions.
 This makes the GPU shaders useful for typical authoring needs.
-The browser implementation may also gain from using the same approach
-for composing internal shaders.
+We have designed our effects to fit naturally in 3D scene graph formats,
+in particular we present a number of extensions to the X3D standard.
+Our extensions integrate shader effects naturally with X3D
+%groups,
+shapes, light sources and textures.
+
+%% The browser implementation may also gain from using the same approach
+%% for composing internal shaders.
 
 \begin{classification}
   \CCScat{I.3.7}{Computer Graphics}{Three-Dimensional Graphics and Realism}{Color, shading, shadowing, and texture};
@@ -242,7 +235,7 @@ algorithm of this layer.
 
 %% (see also http://groups.google.com/group/blendertorenderman/browse_thread/thread/aaf07831b91be9db?pli=1 , confirms my findings)
 
-A different approach is presented by the Sh language (\myhref{http://libsh.org/}{http://libsh.org/}).
+A different approach is presented by the Sh language (\URL{http://libsh.org/}).
 %% No space at the end: , \cite{sh:book}).
 It allows writing shaders code (that can run on GPU) directly inside a
 C++ program. For this, Sh extends the C++ language (through C++
@@ -260,7 +253,7 @@ language used to develop a browser. Invoking a compiler to generate a
 final GPU shader, not to mention forcing users to learn C++, is out of the
 question.
 
-OGRE (\myhref{http://www.ogre3d.org/}{http://www.ogre3d.org/}), an open-source 3D engine written in C++, has a system
+OGRE (\URL{http://www.ogre3d.org/}), an open-source 3D engine written in C++, has a system
 for adding shader extensions (see \cite{ogre:shader}). Its idea is similar
 to our system (enhance the built-in shaders with your own effects),
 however the whole job of combining a shader is done by operating
@@ -274,7 +267,7 @@ language code quickly, and the integration is built inside appropriate X3D nodes
 
 At the end, we would like to mention a solution from a completely
 different domain, that is surprisingly similar to ours in some ways.
-Drupal (\myhref{http://drupal.org/}{http://drupal.org/}),
+Drupal (\URL{http://drupal.org/}),
 an open-source CMS system written in PHP,
 has a very nice system of modules. Each module
 can extend the functionality of the base system (or other module)
@@ -360,7 +353,7 @@ are applied, but before the alpha test, and is a usual place to ,,just modify th
 you modify the color that will be displayed on the screen.
 
 We have a reference of all the plugging points available in our implementation
-on \myhref{http://vrmlengine.sourceforge.net/compositing\_shaders.php}{http://vrmlengine.sourceforge.net/compositing_shaders.php}.
+on \URL{http://vrmlengine.sourceforge.net/compositing_shaders.php}.
 For each plugging point,
 like this \texttt{PLUG\_texture\_apply}, we define a list of parameters
 (you have to declare them exactly the same in your code), and we define
@@ -641,8 +634,10 @@ textures using the shaders. This is suitable
 if your texture is defined completely using the shading language.
 The texture contents are not stored anywhere (not even on GPU),
 and the X3D browser doesn't manage any texture resources.
-From a GPU point of view, there is no texture\footnote{But the spoon is real,
-we swear.}. There is only a shader function that generates colors
+From a GPU point of view, there is no texture.
+%\footnote{But the spoon is real,
+%we swear.}.
+There is only a shader function that generates colors
 based on some vectors. By wrapping such function inside
 the new \texttt{ShaderTexture} node, you can treat it much like other X3D textures.
 In particular, you can provide texture coordinates (explicit or generated)
@@ -1028,7 +1023,7 @@ was also working correctly.
 \section{Complete example models}
 
 Examples models using our effects are available inside our engine demo models on
-\myhref{http://vrmlengine.sourceforge.net/demo\_models.php}{http://vrmlengine.sourceforge.net/demo_models.php}.
+\URL{http://vrmlengine.sourceforge.net/demo_models.php}.
 The relevant demos are mostly inside the \texttt{compositing\_shaders}
 subdirectory, also the \texttt{water} subdirectory contains
 the water implementation using our effects.
@@ -1056,7 +1051,7 @@ in perfect specular highlights and spot light shapes.
 %% Development notes: only the SVN demo\_models contain
 %% compositing\_shaders subdirectory.
 %% You also have to use view3dscene from SVN or nightly builds,
-%% see \myhref{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
+%% see \URL{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
 
 \section*{Acknowledgements}
 
@@ -1066,7 +1061,7 @@ goes to all of you.
 
 The Japanese shrine model, used for an eye-candy screenshots
 at the beginning of this paper, comes from
-\myhref{http://opengameart.org/content/shrine-shinto-japan}{http://opengameart.org/content/shrine-shinto-japan}.
+\URL{http://opengameart.org/content/shrine-shinto-japan}.
 
 \bibliographystyle{eg-alpha}
 % \nocite{*}

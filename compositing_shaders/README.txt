@@ -24,5 +24,4 @@ After placing these files here, run "make".
 Michalis checklist to do at the end:
 - One from my thousand English mistakes: check "it's" is always used as "it is".
 - ispell (american)
-- Check "pdffonts compositing_shaders.pdf". Every font should have Embed=Yes
-  (this was required by Web3D conferences, not sure does TGCP require it too.)
+- Check "pdffonts compositing_shaders.pdf". Every font should have Embed=Yes.
