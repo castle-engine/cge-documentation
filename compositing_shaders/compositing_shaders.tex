@@ -88,9 +88,9 @@ and under all lighting and texture conditions.
 This makes the GPU shaders useful for typical authoring needs.
 We have designed our effects to fit naturally in 3D scene graph formats,
 in particular we present a number of extensions to the X3D standard.
-Our extensions integrate shader effects naturally with X3D
+Our extensions nicely integrate shader effects with X3D
 %groups,
-shapes, light sources and textures.
+concepts like shapes, light sources and textures.
 
 %% The browser implementation may also gain from using the same approach
 %% for composing internal shaders.
@@ -128,7 +128,7 @@ the shaders available to the authors. However, the shaders designed using
 the standard nodes
 \textit{replace} the normal rendering functionality, not \textit{enhance} it.
 This reflects the underlying API (like OpenGL or Direct 3D),
-and the idea that a shader code should be a complete and optimized program
+and the idea that shader code should be a complete and optimized program
 designed for rendering a particular shape.
 
 We argue that a different approach is needed in many situations.
@@ -169,7 +169,7 @@ The model is based on \texttt{http://opengameart.org/content/shrine-shinto-japan
 %%  \label{fig_xxx}
 \end{figure*}
 
-We present a system for creating effects by essentially compositing together
+We present a system for creating effects by essentially compositing
 pieces of a shader code. All the effects defined this way effortlessly
 cooperate and can be combined with each other and with application internal
 shaders. This makes shader programs:
@@ -225,7 +225,7 @@ replicating the algorithm outside of this calculation.
 For example, if you want to scale the light contribution by a shadow function,
 you will have to also replicate the code iterating over the light sources.
 
-Another common solution is to arrange shaders in a pipe, where one
+Another common solution is to arrange shaders in a pipeline, where one
 shader processes the result of another. This can be visualized as
 layers of materials, where each layer modifies the previous
 color. It is actually similar to a multi-pass rendering approach,
@@ -318,8 +318,8 @@ Drupal's modules, and our ,,plugging points'' are analogous to Drupal hooks.
 \section{Plugs: extending the base shader}
 
 The basic idea of our approach is that the base shader code defines
-points when a calls to user-defined functions may be inserted. We call
-these places \textit{plugs}, as they act like sockets where a logic
+points where calls to user-defined functions may be inserted. We call
+these places \textit{plugs}, as they act like sockets where logic
 may be added. Each plug has a name, and a given set of parameters.
 The effects can use special function names, starting with \texttt{PLUG\_}
 and followed by the plug name. These declarations will be found,
@@ -957,7 +957,7 @@ only with calculating the normal vectors in the object space.
 They override a special plug of yet another effect, that transforms
 these normal vectors into the eye space.
 This way we have extracted all the common logic into a separate effect,
-making it clear where the alternative versions differ and what do they have
+making it clear where the alternative versions differ and what they have
 in common.
 %% This was possible because one effect can define
 %% new plug names, that can be used by the other effects.
@@ -987,7 +987,7 @@ We would like to emphasize that all the effects demonstrated here
 are theoretically already possible to implement by the standard
 X3D \textit{Programmable shaders component}. However, such implementation
 would be extremely cumbersome.
-You would first have to prepare a shader code to calculate all
+You would first have to prepare shader code to calculate all
 the (multi-)texturing, lighting,
 shadows, and all the other effects that you use in your scene.
 This is a large work if you consider all the X3D rendering options, and note that
