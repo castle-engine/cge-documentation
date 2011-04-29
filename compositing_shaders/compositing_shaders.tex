@@ -885,25 +885,25 @@ and in practice it's usually obvious what problem causes the parsing error.
 This is also a direct consequence of our decision to \textbf{never require
 the browser to parse the shader code}.
 
-It should be noted however that in particularly nasty cases,
-a deliberately poorly coded effect may cause troubles for other effects.
-In particular, since you can use \texttt{\#define} and macros in your effect code,
-you can do nasty tricks to break other effects. You can make them compile,
-but function incorrectly. However, we don't consider
-it a real problem. You really have to deliberately want to do something bad,
-and be familiar with internals about how the shader is generated,
-to achieve some particular weird behavior.
-It doesn't happen by accident in our experience.
-%% And you may need to use the internal knowledge
-%% how the other effects are implemented (maybe how they are implemented
-%% inside the browser).
+%% It should be noted however that in particularly nasty cases,
+%% a deliberately poorly coded effect may cause troubles for other effects.
+%% In particular, since you can use \texttt{\#define} and macros in your effect code,
+%% you can do nasty tricks to break other effects. You can make them compile,
+%% but function incorrectly. However, we don't consider
+%% it a real problem. You really have to deliberately want to do something bad,
+%% and be familiar with internals about how the shader is generated,
+%% to achieve some particular weird behavior.
+%% It doesn't happen by accident in our experience.
+%% %% And you may need to use the internal knowledge
+%% %% how the other effects are implemented (maybe how they are implemented
+%% %% inside the browser).
 
-Note that this isn't a security problem --- bad shader code only breaks
-rendering of a particular shape. And X3D \texttt{ComposedShader} node allows users
-to execute any shading language code anyway. So if there's anything dangerous
-(for example a buggy OpenGL may cause the browser process to exit with
-segmentation fault on some special shader code snippets),
-you could do it without using our effects framework anyway.
+%% Note that this isn't a security problem --- bad shader code only breaks
+%% rendering of a particular shape. And X3D \texttt{ComposedShader} node allows users
+%% to execute any shading language code anyway. So if there's anything dangerous
+%% (for example a buggy OpenGL may cause the browser process to exit with
+%% segmentation fault on some special shader code snippets),
+%% you could do it without using our effects framework anyway.
 
 \section{Various examples}
 
