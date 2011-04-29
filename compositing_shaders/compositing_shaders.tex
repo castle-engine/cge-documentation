@@ -521,15 +521,16 @@ MFNode [] \codeem{effects} [] # Effect
 \end{mycode}
 
 All the effects on this list (with suitable language) will be used.
-Note that this is different
-than the \texttt{Appearance.shaders}, which chooses only one shader.
-For effects, we choose all of them.
-
-The most basic idea of this paper is to allow you to define two
-independent shader effects, and then seamlessly connect them by simply
-placing them both on the \texttt{Appearance.effects} list. This also allows to
-define a library of effects, that can be composited without any work
-needed by user.
+%% Note that this is different
+%% than the \texttt{Appearance.shaders}, which chooses only one shader.
+%% For effects, we choose all of them.
+This allows authors to define a library of independent shader effects,
+and then trivially pick desired effects for each particular shape.
+Simply placing two effects of the \texttt{Appearance.effects} list
+makes them cooperate correctly.
+%% . This also allows to
+%% define a library of effects, that can be composited without any work
+%% needed by user.
 
 \begin{figure}[H]
   \centering
