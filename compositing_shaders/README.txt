@@ -25,3 +25,5 @@ Michalis checklist to do at the end:
 - One from my thousand English mistakes: check "it's" is always used as "it is".
 - ispell (american)
 - Check "pdffonts compositing_shaders.pdf". Every font should have Embed=Yes.
+- Recheck to not repeat the same mistakes as
+  http://vrmlengine.svn.sourceforge.net/viewvc/vrmlengine/trunk/papers/compositing_shaders/compositing_shaders.tex?r1=8831&r2=8830&pathrev=8831
