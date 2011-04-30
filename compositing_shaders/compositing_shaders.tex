@@ -141,17 +141,20 @@ to do the common job.
 As an example, consider the simplified lighting equation with shadows
 and bump mapping:
 $$ \sum_{l\in Lights} shadow(l) * light\_color(l, material, normal(point)) $$
-The \textit{shadow} function returns values in the [0..1] range,
-scaling the light color. If the object is not in the shadow, it returns 1.
-The \textit{normal} function returns a normal vector at given point.
-Now we would like to configure various parts of this equation,
+%% The \textit{shadow} function returns values in the [0..1] range,
+%% scaling the light color. If the object is not in the shadow, it returns 1.
+%% The \textit{normal} function returns a normal vector at given point.
+Different effects want to change various parts of this equation,
 without touching the others.
 For example, the \textit{shadow} may check a shadow map pixel,
 or (when shadow map is not available) always return 1.
 The \textit{normal} function may take the vector straight from
-the geometry description, or calculate it using a texture value.
+the geometry description, or calculate it using a texture value (classic bump mapping).
+See figure \ref{fig_bump_mapping_shadows}.
 The \textit{light\_color} function may be replaced to use different
-lighting models (Phong, Ward, Cook-Torrance and so on). Sometimes it makes sense
+lighting models.
+% (Phong, Ward, Cook-Torrance and so on).
+Sometimes it makes sense
 to change these functions only for some chosen light sources, and sometimes
 we want to modify all the light sources.
 
@@ -166,7 +169,7 @@ we want to modify all the light sources.
   \caption{Japanese shrine model with more and more effects applied:
 Phong shading (per-pixel lighting), bump mapping, shadows from two lights.
 The model is based on \texttt{http://opengameart.org/content/shrine-shinto-japan}.}
-%%  \label{fig_xxx}
+  \label{fig_bump_mapping_shadows}
 \end{figure*}
 
 We present a system for creating effects by essentially compositing
