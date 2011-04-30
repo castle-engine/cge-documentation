@@ -553,6 +553,17 @@ would like to share a particular piece of code. For example,
 you can create an \texttt{EffectPart} with a library of useful
 shading language functions, and reuse if for various effects.
 
+\begin{figure*}[t]
+  \centering
+  \includegraphics[width=2.0in]{volumetric_animated_fog_no_fog}
+  \includegraphics[width=2.0in]{volumetric_animated_fog_no_light}
+  \includegraphics[width=2.0in]{volumetric_animated_fog_all}
+  \caption{Volumetric fog scene: 1) No fog; 2) No lighting; 3) Lights and fog.
+Note that the fog is assumed to have its own ambient lighting,
+so it colors the image even in the 2) case.}
+  \label{fig_fog}
+\end{figure*}
+
 \subsection{Effects for a group of nodes}
 
 Our \texttt{Effect} node is a descendant of the abstract \texttt{X3DChildNode}.
@@ -565,7 +576,7 @@ like pointing device sensor nodes and \texttt{LocalFog}.
 The \texttt{LocalFog} example is worth emphasizing. Using our system,
 a browser can implement the \texttt{LocalFog} node as a prototype
 that expands to our \texttt{Effect} node. This gives you a 100\% correct
-implementation of the standard \texttt{LocalFog} node, as is trivially easy.
+implementation of the standard \texttt{LocalFog} node, and is trivially easy.
 
 As one of the demos, we have implemented a realistic
 animated volumetric fog, where the fog density is stored in
@@ -576,17 +587,6 @@ convincing effect of a dense fog. Since it is implemented as an effect,
 it can be instantly used with various lighting and texturing conditions
 --- it simply works for all X3D shapes. See figure \ref{fig_fog}.
 
-\begin{figure*}[t]
-  \centering
-  \includegraphics[width=2.0in]{volumetric_animated_fog_no_fog}
-  \includegraphics[width=2.0in]{volumetric_animated_fog_no_light}
-  \includegraphics[width=2.0in]{volumetric_animated_fog_all}
-  \caption{Volumetric fog scene: 1) No fog; 2) No lighting; 3) Lights and fog.
-Note that the fog is assumed to have its own ambient lighting,
-so it colors the image even in the 2) case.}
-  \label{fig_fog}
-\end{figure*}
-
 \subsection{Light sources effects}
 
 The real power of our system comes from the fact that some nodes,
@@ -594,7 +594,6 @@ like light sources and textures, can define their own effects.
 So you can easily define a shader specific for a given light source,
 or texture.
 
-\needspace{1in}
 We add the \texttt{effects} field for every light node:
 
 \begin{mycode}
@@ -760,7 +759,7 @@ coordinates in the \texttt{texture\_color} plug.
 \begin{figure}[H]
   \centering
   \includegraphics[width=3in]{shader_texture_no_filtering_problems-cropped}
-  \caption{Yellowish arc is done by a texture effect, as so is not
+  \caption{Yellowish arc is done by a texture effect, and so is not
     affected by the pixelated look of the base image texture.}
 \end{figure}
 
