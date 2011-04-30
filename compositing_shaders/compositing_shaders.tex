@@ -123,7 +123,8 @@ geometry.
 for example summing the lights contribution
 and mixing the texture colors.
 
-The X3D standard \textit{Programmable shaders component} already makes
+The X3D \textit{Programmable shaders component} \cite{x3d:shaders} (currently part of the X3D standard)
+already makes
 the shaders available to the authors. However, the shaders designed using
 the standard nodes
 \textit{replace} the normal rendering functionality, not \textit{enhance} it.
@@ -209,6 +210,8 @@ in \emph{techniques} (for various graphic card capabilities),
 and within a single technique specify operations for each rendering pass.
 In neither case can we simply connect multiple shader source code files
 and expect the result to be a valid program.
+
+%% TODO: mark \cite{x3d:shaders} and shortly describe here
 
 An oldest solution to combining effects, used even before the shading languages,
 was to perform a multi-pass rendering. Each rendering pass adds or multiplies
