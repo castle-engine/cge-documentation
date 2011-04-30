@@ -571,7 +571,7 @@ In a fragment shader, the 3D~texture is sampled
 along the line between the camera and pixel position in the 3D~space. This makes a very
 convincing effect of a dense fog. Since it is implemented as an effect,
 it can be instantly used with various lighting and texturing conditions
---- it simply works for all X3D shapes.
+--- it simply works for all X3D shapes. See figure \ref{fig_fog}.
 
 \begin{figure*}[t]
   \centering
@@ -581,6 +581,7 @@ it can be instantly used with various lighting and texturing conditions
   \caption{Volumetric fog scene: 1) No fog; 2) No lighting; 3) Lights and fog.
 Note that the fog is assumed to have its own ambient lighting,
 so it colors the image even in the 2) case.}
+  \label{fig_fog}
 \end{figure*}
 
 \subsection{Light sources effects}
@@ -602,7 +603,7 @@ MFNode [] \codeem{effects} [] # Effect
 
 This allows you to modify the light source contribution of this particular
 light node. For example you can modify the spot light shape, possibly
-based on some texture information.
+based on some texture information (see figure \ref{fig_fancy_spot}).
 Or you can implement a different lighting model, like anisotropic Ward
 or Cook-Torrance.
 
@@ -610,6 +611,7 @@ or Cook-Torrance.
   \centering
   \includegraphics[width=3in]{fancy_light_spot_shape-cropped}
   \caption{Textured spot light with shadow.}
+  \label{fig_fancy_spot}
 \end{figure}
 
 %% , or even replace the default
@@ -866,6 +868,7 @@ and before any \texttt{/* PLUG: ... */} declarations.
   \caption{Water using our effects: 1) Per-pixel lighting and bump mapping.
 2) Per-pixel lighting and reflections and refractions (by a single environment cube map texture).
 3) All effects.}
+  \label{fig_water}
 \end{figure*}
 \setcounter{figure}{6}
 
@@ -914,7 +917,8 @@ the browser to parse the shader code}.
 Remember that effects may define their own uniform variables,
 just like the standard shader nodes. So you can pass your own textures
 to effects. For example you can write an effect that mixes a couple of textures,
-using any information available in the shader as a criteria for mixing.
+using any information available in the shader as a criteria for mixing
+(see figure \ref{fig_terrain}).
 You can also pass any other values for an effect, for example you can
 pass the current time from a \texttt{TimeSensor} and make dynamic effects.
 
@@ -922,10 +926,12 @@ pass the current time from a \texttt{TimeSensor} and make dynamic effects.
   \centering
   \includegraphics[width=3in]{terrain}
   \caption{ElevationGrid with 3 textures mixed inside the shader.}
+  \label{fig_terrain}
 %%based on the point height.}
 \end{figure}
 
-We can also wrap 2D and 3D noise inside a \texttt{ShaderTexture}.
+We can also wrap 2D and 3D noise inside a \texttt{ShaderTexture}
+(see figure \ref{fig_noise}).
 A texture node like \texttt{NoiseTexture} from InstantReality
 % (\cite{instant:noisetex})
 may be implemented on GPU by a simple prototype using the \texttt{ShaderTexture}.
@@ -934,9 +940,10 @@ may be implemented on GPU by a simple prototype using the \texttt{ShaderTexture}
   \centering
   \includegraphics[width=3in]{noise-cropped}
   \caption{3D and 2D smooth noise on GPU, wrapped in a ShaderTexture.}
+  \label{fig_noise}
 \end{figure}
 
-Another example is \emph{water}. Water is very nice to implement by our effects,
+Another example is \emph{water}. Water is very easy to implement using our effects,
 as a proper water simulation
 is naturally a combination of a couple effects.
 You want to simulate waves, so you want to vary vertex
@@ -944,7 +951,7 @@ heights, or vary per-fragment normal vectors (for best results,
 you want to do both things).
 You also want to simulate the fact that water has reflections, and
 is transparent. We have implemented a nice water using this approach,
-with (initially) two independent effects.
+with (initially) two independent effects. See figure \ref{fig_water}.
 
 Our approach also allowed us to easily implement and test
 two alternative versions for generating water normals.
@@ -978,12 +985,14 @@ We also provide plugs to easily change the geometry in object space.
 %% conditions.
 Since the transformation is done on GPU, there's practically
 no speed penalty for animating thousands of flowers in our test scene.
+See figure \ref{fig_flowers}.
 
 \setcounter{figure}{9}
 \begin{figure}[H]
   \centering
   \includegraphics[width=3in]{flowers}
   \caption{Flowers bending under the wind, transformed on GPU in object space.}
+  \label{fig_flowers}
 \end{figure}
 
 We would like to emphasize that all the effects demonstrated here
