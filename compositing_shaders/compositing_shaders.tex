@@ -1050,23 +1050,23 @@ the water implementation using our effects.
 You can open the examples using any of our engine tools,
 like \texttt{view3dscene}.
 
-You can run \texttt{view3dscene} with \texttt{--debug-log-shaders} command-line
-option. Output will show you the final shader code generated,
-and also the OpenGL log after linking the shaders.
-%% Be sure to redirect the output to a file, and you may want to test it first
-%% with a simple scene with one shape --- as the output may be quite large.
-This is a useful way to learn about our shader rendering internals.
+%% You can run \texttt{view3dscene} with \texttt{--debug-log-shaders} command-line
+%% option. Output will show you the final shader code generated,
+%% and also the OpenGL log after linking the shaders.
+%% %% Be sure to redirect the output to a file, and you may want to test it first
+%% %% with a simple scene with one shape --- as the output may be quite large.
+%% This is a useful way to learn about our shader rendering internals.
 
-Another useful option to try in \texttt{view3dscene} is to switch to
-\textit{View $\rightarrow$ Shaders $\rightarrow$ Enable For Everything} mode.
-This will force shader rendering for all the shapes,
-while by default we use shader rendering only for the shapes that
-require particular effects (shaders by \texttt{ComposedShader}, effects
-described in this paper, shadow maps and such).
-Forcing shader rendering for everything allows to see
-how our shaders implement the whole X3D lighting and texturing model.
-It also forces all the lighting calculation to be done per-pixel, resulting
-in perfect specular highlights and spot light shapes.
+%% Another useful option to try in \texttt{view3dscene} is to switch to
+%% \textit{View $\rightarrow$ Shaders $\rightarrow$ Enable For Everything} mode.
+%% This will force shader rendering for all the shapes,
+%% while by default we use shader rendering only for the shapes that
+%% require particular effects (shaders by \texttt{ComposedShader}, effects
+%% described in this paper, shadow maps and such).
+%% Forcing shader rendering for everything allows to see
+%% how our shaders implement the whole X3D lighting and texturing model.
+%% It also forces all the lighting calculation to be done per-pixel, resulting
+%% in perfect specular highlights and spot light shapes.
 
 %% Development notes: only the SVN demo\_models contain
 %% compositing\_shaders subdirectory.
