@@ -211,7 +211,15 @@ and within a single technique specify operations for each rendering pass.
 In neither case can we simply connect multiple shader source code files
 and expect the result to be a valid program.
 
-%% TODO: mark \cite{x3d:shaders} and shortly describe here
+The X3D \textit{Programmable shaders component} \cite{x3d:shaders}
+makes the three shading languages mentioned above available to X3D authors.
+Complete shader code may be assigned to specific shapes.
+Although it doesn't offer any way of compositing shader effects,
+%the point of this component
+%is to expose functionality that maps straightforward to graphic APIs like OpenGL.
+this component is still an important base for our work. It defines
+how to comfortably keep shader code inside X3D nodes, and how to pass uniform
+values (including textures) to the shaders.
 
 An oldest solution to combining effects, used even before the shading languages,
 was to perform a multi-pass rendering. Each rendering pass adds or multiplies
