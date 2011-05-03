@@ -345,7 +345,7 @@ and the renderer will insert appropriate calls to them from the base shader.
 
 A trivial example of an effect that makes colors two times brighter
 is below. This example is presented in the X3D classic (VRML) encoding.
-You can add this inside any \texttt{Appearance} node:
+You can add this inside any \texttt{Appearance} node in the X3D file:
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single]
 effects Effect \{
@@ -437,22 +437,25 @@ the source code and uniform values specific to a given effect.
 \underline{Effect : X3DChildNode}
 \begin{Verbatim}[commandchars=\\\{\}]
 SFString [] \codeem{language} ""
-  # Shading language: "GLSL", "CG",
-  # "HLSL". This effect will be used
+  # Language like "GLSL", "CG", or "HLSL".
+  # This effect will be used
   # only when the base renderer shader
   # uses the same language.
 SFBool [in,out] \codeem{enabled} TRUE
   # Easily turn on/off the effect.
 MFNode [] \codeem{parts} [] # EffectPart
 
-# And any number of uniform variables,
-# just like for ComposedShader node:
+# A number of uniform values may also
+# be passed to the shader:
 fieldType []       fieldName
 fieldType [in]     fieldName
 fieldType [out]    fieldName
 fieldType [in,out] fieldName
 \end{Verbatim}
 \end{mycode}
+
+%% , just like
+%% # for ComposedShader node
 
 % Comments for ,,enabled'':
 %% # You could also remove/add the node
