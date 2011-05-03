@@ -203,7 +203,7 @@ language in some cumbersome limitations.
 
 \section{Motivation and previous work}
 
-The popular real-time shading languages (OpenGL \texttt{GLSL} \cite{glsl}, NVidia \texttt{Cg}, Direct 3D \texttt{HLSL})
+The popular real-time shading languages (OpenGL \texttt{GLSL} \cite{glsl:book}, NVidia \texttt{Cg}, Direct 3D \texttt{HLSL})
 don't provide a ready solution for connecting shaders from independent sources.
 The \texttt{CgFX} and HLSL \texttt{.fx} files encapsulate shading language code
 in \emph{techniques} (for various graphic card capabilities),
@@ -285,6 +285,11 @@ features as well, however the whole system must be carefully controlled by
 the C++ code. In our approach, we allow the authors to write direct shading
 language code quickly, and the integration is built inside appropriate X3D nodes.
 
+AnySL \cite{anysl} is an approach to integrate renderer
+shaders with user shaders. We strive to do something more (allow effortless
+integration between various user shaders too), and simpler (without
+introducing any new shading language).
+
 At the end, we would like to mention a solution from a completely
 different domain, that is surprisingly similar to ours in some ways.
 Drupal (\URL{http://drupal.org/}),
@@ -347,7 +352,7 @@ A trivial example of an effect that makes colors two times brighter
 is below. This example is presented in the X3D classic (VRML) encoding.
 You can add this inside any \texttt{Appearance} node in the X3D file:
 
-\begin{Verbatim}[commandchars=\\\{\},frame=single]
+\begin{Verbatim}[commandchars=\\\{\},frame=single,fontsize=\small]
 effects Effect \{
   language "GLSL"
   parts EffectPart \{
@@ -437,7 +442,7 @@ the source code and uniform values specific to a given effect.
 
 \begin{mycode}
 \underline{Effect : X3DChildNode}
-\begin{Verbatim}[commandchars=\\\{\}]
+\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
 SFString [] \codeem{language} ""
   # Language like "GLSL", "CG", "HLSL".
   # This effect will be used
@@ -469,7 +474,7 @@ The effect source code is split into a number of parts:
 
 \begin{mycode}
 \underline{EffectPart : X3DNode, X3DUrlObject}
-\begin{Verbatim}[commandchars=\\\{\}]
+\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
 SFString [] \codeem{type} "VERTEX"
   # Like ShaderPart.type:
   # allowed values are
@@ -538,7 +543,7 @@ on the \texttt{Appearance.effects} list:
 
 \begin{mycode}
 \underline{Appearance}
-\begin{Verbatim}[commandchars=\\\{\}]
+\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
 MFNode [] \codeem{effects} [] # Effect
 \end{Verbatim}
 \end{mycode}
@@ -620,7 +625,7 @@ To make this possible, we add the \texttt{effects} field to every light node:
 
 \begin{mycode}
 \underline{X3DLightNode}
-\begin{Verbatim}[commandchars=\\\{\}]
+\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
 MFNode [] \codeem{effects} [] # Effect
 \end{Verbatim}
 \end{mycode}
@@ -643,7 +648,7 @@ Just like the light sources, also each texture node may define its own effects:
 
 \begin{mycode}
 \underline{X3DTextureNode}
-\begin{Verbatim}[commandchars=\\\{\}]
+\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
 MFNode [] \codeem{effects} [] # Effect
 \end{Verbatim}
 \end{mycode}
@@ -676,7 +681,7 @@ X3D features.
 
 \begin{mycode}
 \underline{ShaderTexture : X3DTextureNode}
-\begin{Verbatim}[commandchars=\\\{\}]
+\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
 MFNode [] \codeem{effects} [] # Effect
 SFString [] \codeem{defaultTexCoord} "BOUNDS2D"
   # ["BOUNDS2D"|"BOUNDS3D"]
@@ -783,7 +788,7 @@ In your shader code, you can define new plug points by a
 magic comment:
 
 \begin{mycode}
-\begin{Verbatim}[commandchars=\\\{\}]
+\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
 /* PLUG: name (param1, param2, ...) */
 \end{Verbatim}
 \end{mycode}
