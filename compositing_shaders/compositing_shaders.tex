@@ -681,40 +681,20 @@ SFString [] \codeem{defaultTexCoord} "BOUNDS2D"
 \end{Verbatim}
 \end{mycode}
 
-Actually, the \texttt{effects} field is already defined at
-the \texttt{X3DTextureNode} class (see above). We just mention it here
-for completeness.
+%% Actually, the \texttt{effects} field is already defined at
+%% the \texttt{X3DTextureNode} class (see above). We just mention it here
+%% for completeness.
 
 You should include an effect overriding at least the \texttt{texture\_color}
 plug, otherwise texture contents are undefined. Our implementation actually
 sets the default texture color to pink (RGB(1,~0,~1)), so it stands out,
 reminding you to override it.
 
-The \texttt{defaultTexCoord} field is used only when a particular geometry
-doesn't specify the texture coordinates to use for this texture:
-
-\begin{enumerate}
-
-\item
-  \texttt{"BOUNDS2D"} means that the algorithm described in the specification
-  for \texttt{IndexedFaceSet} should be used. This adapts 2D texture coordinates
-  to the two largest bounding box sizes.
-  It's most suitable for 2D textures that use only 2D coordinates
-  (ignoring other coordinates, or assuming they are always 0,~1).
-
-\item
-  \texttt{"BOUNDS3D"} means that the algorithm described in the specification
-  of \textit{Texturing3D} component (section \textit{"Texture coordinate generation for primitive objects"})
-  is used.
-  This adapts 3D texture coordinates to the bounding box sizes.
-  It's most suitable for 3D textures (you can ignore the 4th texture coordinate
-  component, or treat it as homogeneous, as \texttt{"BOUNDS3D"} will always
-  set it to 1).
-
-\end{enumerate}
-
-Remember that the texture coordinates can be always explicitly specified
-at the geometry, by any of the \texttt{X3DTextureCoordinateNode} nodes.
+The texture coordinates, or the algorithm to generate them,
+can be explicitly specified, just like for any other texture in X3D.
+%% . This follows the usual rules for all
+%% when you place a \texttt{X3DTextureCoordinateNode} node
+%% inside the geometry \texttt{texCoord} field.
 %% Both explicit texture coordinate lists (\texttt{TextureCoordinate}
 %% \texttt{TextureCoordinate3D}, \texttt{TextureCoordinate4D})
 %% and the coordinate generator nodes
@@ -724,10 +704,28 @@ at the geometry, by any of the \texttt{X3DTextureCoordinateNode} nodes.
 %% the \texttt{"BOUNDS2D"} and \texttt{"BOUNDS3D"} values to be also
 %% used for the \texttt{TextureCoordinateGenerator.mode} field, see
 %% \cite{vrmleng:texcoordbounds}.
-The \texttt{defaultTexCoord} says only what is the default approach,
-when you don't use \texttt{texCoord} at the geometry node.
-The idea is that using a \texttt{ShaderTexture} should be as comfortable
-as any other texture node.
+When the texture coordinates are not explicitly given,
+the \texttt{defaultTexCoord} field determines how they are generated.
+\texttt{"BOUNDS2D"} generates 2D texture coordinates,
+adapting to the two largest bounding box sizes
+(the 3rd texture coordinate is always 0). This is most comfortable
+when the texture color depends only on the XY components of the texture coordinate.
+The precise behavior
+of \texttt{"BOUNDS2D"} follows the X3D \texttt{IndexedFaceSet} specification,
+and the precise behavior of \texttt{"BOUNDS3D"} is described in
+the \textit{Texturing3D} component of the X3D specification.
+
+%%  (section \textit{"Texture coordinate generation for primitive objects"})
+%%   is used.
+%%   This adapts 3D texture coordinates to the bounding box sizes.
+%%   It's most suitable for 3D textures (you can ignore the 4th texture coordinate
+%%   component, or treat it as homogeneous, as \texttt{"BOUNDS3D"} will always
+%%   set it to 1).
+
+%% \end{enumerate}
+
+%% The idea is that using a \texttt{ShaderTexture} should be as comfortable
+%% as any other texture node.
 
 %% Projective texture mapping by \texttt{ProjectedTextureCoordinate}
 %% is also our extension, see \cite{vrmleng:projectivetexturing}.
