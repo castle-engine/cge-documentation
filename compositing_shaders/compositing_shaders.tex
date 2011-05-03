@@ -1076,26 +1076,30 @@ like \texttt{view3dscene}.
 
 \section{Implementation notes}
 
-Our current implementation is directed at
-the \emph{OpenGL Shading Language} (GLSL). The \emph{separate compilation units}
-concept, that is specific to GLSL, is useful here:
-it forces
-cleaner shader code (you cannot use undeclared functions from other
-shader parts) and it gives you better line numbers in error messages
-(although a pre-processor directive like \texttt{\#line} could also be used for
-this).
-
+We have implemented all the X3D extensions described in this paper
+for the \emph{OpenGL Shading Language} (GLSL).
 However, we have designed our extensions
 to be applicable to other shading languages as well (like Cg or HLSL),
 and we believe they can be handled in a similar fashion.
+In particular, we have tested that the \emph{separate compilation units}
+concept of GLSL, while very useful, is not necessary for proper implementation
+of our effects.
+
+%% concept, that is specific to GLSL, is useful here:
+%% it forces
+%% cleaner shader code (you cannot use undeclared functions from other
+%% shader parts) and it gives you better line numbers in error messages
+%% (although a pre-processor directive like \texttt{\#line} could also be used for
+%% this).
+
 %% and we think that the same set of plugs will be useful for them --- but it's just a theory.
 %% An implementation of our effects for other shading languages may
 %% find other opportunities for plugging points.
-In particular, we have tested that the \emph{separate compilation units}
-of GLSL are not necessary for a correct implementation of our effects.
-We also believe that most of our plug points (like ,,do something in object space'',
-,,do something in eye space'') are generic enough to be usable
-with all shading languages.
+%% In particular, we have tested that the \emph{separate compilation units}
+%% of GLSL are not necessary for a correct implementation of our effects.
+%% We also believe that most of our plug points (like ,,do something in object space'',
+%% ,,do something in eye space'') are generic enough to be usable
+%% with all shading languages.
 
 %% \section*{Acknowledgements}
 
