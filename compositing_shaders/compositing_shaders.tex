@@ -379,6 +379,7 @@ like this \texttt{PLUG\_texture\_apply}, we define a list of parameters
 (you have to declare them exactly the same in your code), and we define
 when it is called.
 
+\needspace{1in}
 Many usage scenarios are possible:
 
 \begin{enumerate}
@@ -396,7 +397,8 @@ can be customized.
 \item Inside the application implementation, the same approach can be used
 to implement some internal effects.
 We have reimplemented many internal effects of our engine,
-like the fog, shadow maps and the bump mapping to use our ,,plugs'' approach.
+like the fog, shadow maps (see \cite{vrmleng:shadowmaps})
+and the bump mapping to use our ,,plugs'' approach.
 This made their implementation very clean, short
 and nicely separated from each other. It also proves that
 the authors have the power to implement such effects easily by themselves.
