@@ -744,13 +744,13 @@ would be uncomfortable, as you would have to load a dummy texture image,
 and the shaders could (depending on optimization) waste some time
 on calculating a color that will be actually ignored later.
 
-Remember that in all cases (effects at \texttt{ImageTexture},
+Note that in all cases (effects at \texttt{ImageTexture},
 at \texttt{ShaderTexture}, etc.) you can always use additional
 textures inside the effect. Just like inside a standard \texttt{ComposedShader},
 you can declare an \texttt{SFNode} field inside an \texttt{Effect}
-to pass any texture node to the shader as uniform value.
-This allows you to base your effects calculation on any number of textures,
-and combine them in any way you like. The only difference
+to pass any texture node to the shader as a uniform value.
+This allows to combine any number of textures inside an effect.
+The only difference
 between \texttt{ShaderTexture} and other textures is what the browser
 does automatically for you, that is what color is passed
 to the first \texttt{texture\_color} plug.
@@ -808,7 +808,7 @@ as \texttt{inout} values.
 
 The same plug name may be declared many times in the source shader.
 This means that a single \texttt{PLUG\_xxx} function will be called
-many times. This is typically useful when your shader calculation is naturally
+many times. For example, this is useful when your shader calculation is naturally
 expressed as a loop, but you had to unroll this loop for shader source
 (for example, to slightly tweak some loop iterations).
 The plug names that are available per-light source and per-texture
@@ -889,22 +889,23 @@ and before any \texttt{/* PLUG: ... */} declarations.
 \subsection{Invalid shader code}
 
 We guarantee the behavior only if the provided shading language code
-is a correct, self-contained code.
-X3D browser doesn't validate this code in any way, so any error (like undeclared
-variable, unterminated block (,,\texttt{\{}'' without matching ,,\texttt{\}}''),
-or an unterminated comment) may be only detected after the complete shader
+is a correct, self-contained code. The errors (like unterminated block)
+%%  (,,\texttt{\{}'' without matching ,,\texttt{\}}'')
+%% ,
+%% or an unterminated comment)
+may only be detected after the complete shader
 is determined and compiled by the GPU.
-
+The \textbf{application does not need to parse the shader code} at any point.
 Although in case of shading languages with separate compilation units,
-the separation is actually better, and parsing errors will cause
-problems in your own code only. Still, by writing incorrect code,
-you can cause the whole shader to malfunction.
+the parsing errors will be reported always for the correct code piece
+(effect part).
+%% Still, by writing incorrect code,
+%% you can cause the whole shader to malfunction.
+%% is actually better, and
 
 In all our practical tests, this approach didn't cause any problems.
-Since you code each effect separately, you also test them separately,
-and in practice it's usually obvious what problem causes the parsing error.
-This is also a direct consequence of our decision to \textbf{never require
-the browser to parse the shader code}.
+Since you can implement each effect separately, you can also test them separately,
+and in practice it's usually obvious where to look for the parsing error.
 
 %% It should be noted however that in particularly nasty cases,
 %% a deliberately poorly coded effect may cause troubles for other effects.
@@ -928,7 +929,7 @@ the browser to parse the shader code}.
 
 \section{Various examples}
 
-Remember that effects may define their own uniform variables,
+Note that effects may define their own uniform variables,
 just like the standard shader nodes. So you can pass your own textures
 to effects. For example you can write an effect that mixes a couple of textures,
 using any information available in the shader as a criteria for mixing
@@ -947,7 +948,7 @@ pass the current time from a \texttt{TimeSensor} and make dynamic effects.
 We can also wrap 2D and 3D noise inside a \texttt{ShaderTexture}
 (see figure \ref{fig_noise}).
 A texture node like \texttt{NoiseTexture} from InstantReality
-% (\cite{instant:noisetex})
+(\cite{instant:noisetex})
 may be implemented on GPU by a simple prototype using the \texttt{ShaderTexture}.
 
 \begin{figure}[H]
@@ -957,14 +958,13 @@ may be implemented on GPU by a simple prototype using the \texttt{ShaderTexture}
   \label{fig_noise}
 \end{figure}
 
-Another example is \emph{water}.
-Water is very easy to implement with the help of our effects,
+\emph{Water} is very nice to implement with the help of our effects,
 as a proper water simulation
 is naturally a combination of a couple effects.
-You want to simulate waves, so you want to vary vertex
+To simulate waves we want to vary vertex
 heights, or vary per-fragment normal vectors (for best results,
-you want to do both things).
-You also want to simulate the fact that water has reflections, and
+we want to do both things).
+We also want to simulate the fact that water has reflections, and
 is transparent. We have implemented a nice water using this approach,
 with (initially) two independent effects. See figure \ref{fig_water}.
 
@@ -1030,26 +1030,28 @@ that affect the given shape. And all the information is nicely integrated
 with X3D nodes, effects are specified at suitable nodes, and their
 uniform values and attributes are integrated with X3D fields.
 
-\section{Implementation notes: GLSL}
+\section{Implementation notes}
 
-We have implemented the effects described here only for the
-\emph{OpenGL Shading Language} (GLSL). However, we have designed our extensions
+Our current implementation is directed at
+the \emph{OpenGL Shading Language} (GLSL). The \emph{separate compilation units}
+concept, that is specific to GLSL, is useful here:
+it forces
+cleaner shader code (you cannot use undeclared functions from other
+shader parts) and it gives you better line numbers in error messages
+(although a pre-processor directive like \texttt{\#line} could also be used for
+this).
+
+However, we have designed our extensions
 to be applicable to other shading languages as well (like Cg or HLSL),
 and we believe they can be handled in a similar fashion.
 %% and we think that the same set of plugs will be useful for them --- but it's just a theory.
 %% An implementation of our effects for other shading languages may
 %% find other opportunities for plugging points.
-
-One important feature that makes GLSL slightly different from other
-shading languages is the \emph{separate compilation units}.
-It's a useful feature, as it forces
-cleaner shader code (you cannot use undeclared functions from other
-shader parts) and it gives you better line numbers in error messages
-(although a pre-processor directive like \texttt{\#line} could also be used for
-this). But it's not necessary for a working implementation of our effects
---- we know it because our early implementation was keeping
-the full generated shader code inside one unit, and this approach
-was also working correctly.
+In particular, we have tested that the \emph{separate compilation units}
+of GLSL are not necessary for a correct implementation of our effects.
+We also believe that most of our plug points (like ,,do something in object space'',
+,,do something in eye space'') are generic enough to be usable
+with all shading languages.
 
 \section{Complete example models}
 
