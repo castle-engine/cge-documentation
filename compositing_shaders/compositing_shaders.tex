@@ -927,15 +927,15 @@ and in practice it's usually obvious where to look for the parsing error.
 %% segmentation fault on some special shader code snippets),
 %% you could do it without using our effects framework anyway.
 
-\section{Various examples}
+\section{Examples}
 
-Note that effects may define their own uniform variables,
-just like the standard shader nodes. So you can pass your own textures
-to effects. For example you can write an effect that mixes a couple of textures,
-using any information available in the shader as a criteria for mixing
-(see figure \ref{fig_terrain}).
-You can also pass any other values for an effect, for example you can
-pass the current time from a \texttt{TimeSensor} and make dynamic effects.
+Effects may define and use their own uniform variables, including textures,
+just like the standard shader nodes. So we can combine any number of textures
+inside an effect. As an example we wrote a simple effect that mixes a couple of
+textures based on a terrain height (see figure \ref{fig_terrain}).
+We could also pass any other uniform value to the effect, for example
+passing the current time from an X3D \texttt{TimeSensor} allows to make
+animated effects.
 
 \begin{figure}[H]
   \centering
@@ -945,7 +945,7 @@ pass the current time from a \texttt{TimeSensor} and make dynamic effects.
 %%based on the point height.}
 \end{figure}
 
-We can also wrap 2D and 3D noise inside a \texttt{ShaderTexture}
+We can wrap 2D or 3D noise inside a \texttt{ShaderTexture}
 (see figure \ref{fig_noise}).
 A texture node like \texttt{NoiseTexture} from InstantReality
 (\cite{instant:noisetex})
@@ -993,7 +993,7 @@ in common.
 %% with aliasing of the noise texture, and the noise parameters can be adjusted
 %% in real-time.)
 
-We also provide plugs to easily change the geometry in object space.
+We also have plugs to change the geometry in object space.
 %% Again, since the effect is integrated with all the browser shaders,
 %% you only need to code a simple function to change the vertex positions
 %% as you want. The effect instantly works with all the lighting and texturing
@@ -1014,9 +1014,8 @@ We would like to emphasize that all the effects demonstrated here
 are theoretically already possible to implement by the standard
 X3D \textit{Programmable shaders component}. However, such implementation
 would be extremely cumbersome.
-You would first have to prepare shader code to calculate all
-the (multi-)texturing, lighting,
-shadows, and all the other effects that you use in your scene.
+You would first have to implement all the necessary (multi-)texturing, lighting,
+shadows, and other rendering features in a shader code.
 This is a large work if you consider all the X3D rendering options, and note that
 a shader should remain optimized for a particular setting.
 Actually, it isn't even possible, unless you can calculate some global options,
@@ -1030,37 +1029,13 @@ that affect the given shape. And all the information is nicely integrated
 with X3D nodes, effects are specified at suitable nodes, and their
 uniform values and attributes are integrated with X3D fields.
 
-\section{Implementation notes}
-
-Our current implementation is directed at
-the \emph{OpenGL Shading Language} (GLSL). The \emph{separate compilation units}
-concept, that is specific to GLSL, is useful here:
-it forces
-cleaner shader code (you cannot use undeclared functions from other
-shader parts) and it gives you better line numbers in error messages
-(although a pre-processor directive like \texttt{\#line} could also be used for
-this).
-
-However, we have designed our extensions
-to be applicable to other shading languages as well (like Cg or HLSL),
-and we believe they can be handled in a similar fashion.
-%% and we think that the same set of plugs will be useful for them --- but it's just a theory.
-%% An implementation of our effects for other shading languages may
-%% find other opportunities for plugging points.
-In particular, we have tested that the \emph{separate compilation units}
-of GLSL are not necessary for a correct implementation of our effects.
-We also believe that most of our plug points (like ,,do something in object space'',
-,,do something in eye space'') are generic enough to be usable
-with all shading languages.
-
-\section{Complete example models}
-
-Examples models using our effects are available inside our engine demo models on
+Many complete example models using our effects
+are available inside our engine demo models on
 \URL{http://vrmlengine.sourceforge.net/demo_models.php}.
 The relevant demos are mostly inside the \texttt{compositing\_shaders}
 subdirectory, also the \texttt{water} subdirectory contains
-the water implementation using our effects.
-You can open the examples using any of our engine tools,
+the mentioned water effects.
+You can open these examples using any of our engine tools,
 like \texttt{view3dscene}.
 
 %% You can run \texttt{view3dscene} with \texttt{--debug-log-shaders} command-line
@@ -1085,6 +1060,29 @@ like \texttt{view3dscene}.
 %% compositing\_shaders subdirectory.
 %% You also have to use view3dscene from SVN or nightly builds,
 %% see \URL{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
+
+\section{Implementation notes}
+
+Our current implementation is directed at
+the \emph{OpenGL Shading Language} (GLSL). The \emph{separate compilation units}
+concept, that is specific to GLSL, is useful here:
+it forces
+cleaner shader code (you cannot use undeclared functions from other
+shader parts) and it gives you better line numbers in error messages
+(although a pre-processor directive like \texttt{\#line} could also be used for
+this).
+
+However, we have designed our extensions
+to be applicable to other shading languages as well (like Cg or HLSL),
+and we believe they can be handled in a similar fashion.
+%% and we think that the same set of plugs will be useful for them --- but it's just a theory.
+%% An implementation of our effects for other shading languages may
+%% find other opportunities for plugging points.
+In particular, we have tested that the \emph{separate compilation units}
+of GLSL are not necessary for a correct implementation of our effects.
+We also believe that most of our plug points (like ,,do something in object space'',
+,,do something in eye space'') are generic enough to be usable
+with all shading languages.
 
 %% \section*{Acknowledgements}
 
