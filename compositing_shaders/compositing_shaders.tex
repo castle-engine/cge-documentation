@@ -604,12 +604,17 @@ it can be instantly used with various lighting and texturing conditions
 
 \subsection{Light sources effects}
 
-The real power of our system comes from the fact that some nodes,
-like light sources and textures, can define their own effects.
-So you can easily define a shader specific for a given light source,
-or texture.
-
-We add the \texttt{effects} field for every light node:
+The nice feature of our system is that effects can be defined at other
+concepts than just at visible shapes. For example a particular light source
+may have a shader effect assigned.
+This allows you to modify the contribution of a particular light.
+For example you can modify the spot light shape, possibly
+based on some texture information (see figure \ref{fig_fancy_spot}).
+Or you can implement a different lighting model, like anisotropic Ward
+or Cook-Torrance.
+%% So you can easily define a shader specific for a given light source,
+%% or texture.
+To make this possible, we add the \texttt{effects} field to every light node:
 
 \begin{mycode}
 \underline{X3DLightNode}
@@ -618,15 +623,9 @@ MFNode [] \codeem{effects} [] # Effect
 \end{Verbatim}
 \end{mycode}
 
-This allows you to modify the light source contribution of this particular
-light node. For example you can modify the spot light shape, possibly
-based on some texture information (see figure \ref{fig_fancy_spot}).
-Or you can implement a different lighting model, like anisotropic Ward
-or Cook-Torrance.
-
 \begin{figure}[H]
   \centering
-  \includegraphics[width=3in]{fancy_light_spot_shape-cropped}
+  \includegraphics[width=2.5in]{fancy_light_spot_shape-cropped}
   \caption{Textured spot light with shadow.}
   \label{fig_fancy_spot}
 \end{figure}
