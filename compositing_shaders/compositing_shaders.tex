@@ -230,6 +230,9 @@ It is also not flexible --- you can only modify
 the complete result of the previous pass.
 %% In our work, we want to allow a single rendering pass to be as
 %% powerful as it can.
+The approach when you arrange your shader functions in a pipeline
+has similar limitations, except you
+don't lose speed on repeating the geometry transformation work.
 
 One approach for writing a flexible shader code is to create
 a library of functions, and allow the author to choose and compose them
@@ -239,22 +242,23 @@ replicating the algorithm outside of this calculation.
 For example, if you want to scale the light contribution by a shadow function,
 you will have to also replicate the code iterating over the light sources.
 
-Another common solution is to arrange shaders in a pipeline, where one
-shader processes the result of another. This can be visualized as
-layers of materials, where each layer modifies the previous
-color. It is actually similar to a multi-pass rendering approach,
-except you don't lose speed on repeating the geometry transformation work.
-Still it suffers from the same limitations, as you cannot change
-the calculation within an existing layer, without replicating the whole
-algorithm of this layer.
+%% Another common solution is to arrange shaders in a pipeline, where one
+%% shader processes the result of another. This can be visualized as
+%% layers of materials, where each layer modifies the previous
+%% color. It is actually similar to a multi-pass rendering approach,
+%% except you don't lose speed on repeating the geometry transformation work.
+%% Still it suffers from the same limitations, as you cannot change
+%% the calculation within an existing layer, without replicating the whole
+%% algorithm of this layer.
 
 %% (see also http://groups.google.com/group/blendertorenderman/browse_thread/thread/aaf07831b91be9db?pli=1 , confirms my findings)
 
-A different approach is presented by the Sh language (\URL{http://libsh.org/}).
-%% No space at the end: , \cite{sh:book}).
-It allows writing shaders code (that can run on GPU) directly inside a
-C++ program. For this, Sh extends the C++ language (through C++
-operator overloading and macros tricks). It allows an excellent
+Sh (\URL{http://libsh.org/}, \cite{sh:book})
+allows writing shaders code (that can run on GPU) directly inside a
+C++ program.
+%% For this, Sh extends the C++ language (through C++
+%% operator overloading and macros tricks).
+It allows an excellent
 integration between C++ code and shaders, hiding the ugly details of
 passing variables between normal code (that executes on CPU) and
 shader code (that usually executes on GPU). You can use
@@ -296,7 +300,7 @@ Many modules can implement the same hook and cooperate without any problems.
 %% The whole hook system is defined completely in PHP, as it's a scripting
 %% language, and you can query the list of loaded functions by name,
 %% and call function by its name.
-Drupal approach is actually quite similar to our
+Drupal approach is quite similar to our
 core idea of combining effects. Our effects are similar to
 Drupal's modules, and our ,,plugging points'' are analogous to Drupal hooks.
 
