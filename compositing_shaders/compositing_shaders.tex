@@ -116,7 +116,7 @@ concepts like shapes, light sources and textures.
 
 X3D \cite{x3d:spec} is an open standard for representing rich 3D data.
 Many advanced graphic features are available to the authors.
-In particular, we can use \emph{shaders} to change the look of the rendered
+In particular, \emph{shaders} can be used to change the look of the rendered
 geometry.
 \emph{Shaders} are programs usually executed on the graphic processor unit
 (GPU). They control the per-vertex and per-pixel processing,
@@ -134,7 +134,7 @@ designed for rendering a particular shape.
 
 We argue that a different approach is needed in many situations.
 Authors usually would like to keep the normal rendering features working,
-and only add their own effects on top of it. The 3D renderer
+and only add their own effects. The 3D renderer
 implementation usually already has an extensive internal shaders system,
 and the authors should be able to depend on these internal shaders
 to do the common job.
@@ -155,9 +155,9 @@ See figure \ref{fig_bump_mapping_shadows}.
 The \textit{light\_color} function may be replaced to use different
 lighting models.
 % (Phong, Ward, Cook-Torrance and so on).
-Sometimes it makes sense
-to change these functions only for some chosen light sources, and sometimes
-we want to modify all the light sources.
+Sometimes it makes sense to change these functions
+for all the light sources, and sometimes only a specific light source
+should behave differently.
 
 \begin{figure*}[t]
   \centering
@@ -222,7 +222,7 @@ how to comfortably keep shader code inside X3D nodes, and how to pass uniform
 values (including textures) to the shaders.
 
 An oldest solution to combining effects, used even before the shading languages,
-was to perform a multi-pass rendering. Each rendering pass adds or multiplies
+is a multi-pass rendering. Each rendering pass adds or multiplies
 to the buffer contents, adding a layer with desired effect.
 However, this is expensive --- in each pass we usually have to repeat
 some work, at least transforming and clipping the geometry.
@@ -230,11 +230,10 @@ It is also not flexible --- you can only modify
 the complete result of the previous pass.
 %% In our work, we want to allow a single rendering pass to be as
 %% powerful as it can.
-The approach when you arrange your shader functions in a pipeline
-has similar limitations, except you
-don't lose speed on repeating the geometry transformation work.
+Arranging your shader functions in a pipeline has similar disadvantages
+as multi-pass rendering, except there's no speed penalty in this case.
 
-One approach for writing a flexible shader code is to create
+Common approach for writing a flexible shader code is to create
 a library of functions, and allow the author to choose and compose them
 in a final shader to achieve the desired look. But this approach is very limited,
 as it doesn't allow to modify a particular calculation part without
@@ -338,9 +337,9 @@ Drupal's modules, and our ,,plugging points'' are analogous to Drupal hooks.
 % ./Ketsji/BL_BlenderShader.h
 % ./Ketsji/BL_BlenderShader.cpp
 
-\section{Plugs: extending the base shader}
+\section{Extending the shaders with plugs}
 
-The basic idea of our approach is that the base shader code defines
+The core idea of our approach is that the base shader code defines
 points where calls to user-defined functions may be inserted. We call
 these places \textit{plugs}, as they act like sockets where logic
 may be added. Each plug has a name, and a given set of parameters.
@@ -363,7 +362,9 @@ effects Effect \{
 \textbf{      const in vec3 normal)}
 \textbf{    \{}
 \textbf{      fragment_color.rgb *= 2.0;}
-\textbf{    \}}" \} \}
+\textbf{    \}}"
+  \}
+\}
 \end{Verbatim}
 
 This defines a GLSL function named \texttt{PLUG\_texture\_apply}
@@ -428,7 +429,7 @@ then it replaces the internal application shaders.
 If you define the same (or compatible) plugging points inside your shader,
 then the application effects will be even added to your own
 shader. And of course user effects are added to your shader too.
-This way we have made even the standard shader nodes much more flexible.
+This way we have made even the standard X3D shader nodes much more flexible.
 Note that if you don't define any plugs inside your \texttt{ComposedShader} node,
 it continues to function as before --- no effects, from application or author,
 will be added.
@@ -449,6 +450,7 @@ SFString [] \codeem{language} ""
 SFBool [in,out] \codeem{enabled} TRUE
   # Easily turn on/off the effect.
 MFNode [] \codeem{parts} [] # EffectPart
+  # Source code of the effect.
 
 # A number of uniform values may also
 # be passed to the shader:
