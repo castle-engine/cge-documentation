@@ -488,22 +488,22 @@ MFString [] \codeem{url} []
   %% # or inline (following "data:text/plain,").
   %% # In XML encoding, may also be inlined in CDATA.
 
-The functions that enhance standard shaders behavior are recognized
-by names starting with \texttt{PLUG\_} in the source code.
-You can also freely define your own utility functions.
-You can pass uniform variables to the shader,
+Inside the effect part source code, the functions that enhance
+standard shaders behavior are recognized by names starting with \texttt{PLUG\_}.
+Of course you can also define and use other functions.
+You can pass uniform variables to the effect,
 and you can pass varying variables between the vertex and fragment
-shaders, just like with standard shader nodes.
+parts, just like with standard shader nodes.
 
 In a single \texttt{EffectPart} node, you can define many \texttt{PLUG\_}
-functions. However, you can only plug functions into the declared shader
-type. For example, you cannot use the \texttt{texture\_apply} plug within
+functions. However, your plug functions must be defined in the appropriate
+effect type. For example, you cannot use the \texttt{texture\_apply} plug within
 a \texttt{VERTEX} shader.
 If your effect requires some processing per-vertex and some per-fragment,
 you will probably use two \texttt{EffectPart} nodes, with appropriate types.
 While this may seem like an arbitrary limitation,
 this reflects how shader parts are declared in shading languages with
-separate namespaces for vertex and fragment parts.
+separate namespaces for vertex and fragment parts (like GLSL).
 A single part may declare many variables and functions,
 but it must be completely contained within a given shader type.
 
@@ -515,15 +515,15 @@ utility functions, used by the other effect parts.
 For shading languages that have separate compilation units
 (like the \emph{OpenGL Shading Language}) the implementation may choose to place
 each effect part in such separate unit. This forces the shader code to be
-cleaner, as you cannot use undeclared functions and variables.
+cleaner, as you cannot use undeclared functions and variables from other parts.
 It also allows for cleaner error detection (parsing errors will be detected
 inside the given unit).
 
 At one point we tried the approach
 to not look at any special function names in a shader code,
 and instead define a plug name in the separate field of the \texttt{EffectPart}
-node. However, the browser may need to know the full declaration
-of a function, to make a forward or external declaration of it.
+node. However, the renderer may need to know the full declaration
+of a plug function, to make a forward or external declaration of it.
 One way to overcome this problem was to force repeating this declaration
 in another field. Another way was to split shader code into much more
 parts (for example, one part declares the uniform variables, one part declares
@@ -535,7 +535,7 @@ inside a complete shader code, is easy to implement, and results in clean
 shader code of the effects. It also allows us to naturally use
 the separate compilation units in case of GLSL.
 
-\subsection{Effects for particular shapes appearance}
+\subsection{Effects for particular shapes}
 
 There are various places where an \texttt{Effect} node may be used.
 If it's specific to a given shape appearance, you can place it
@@ -554,7 +554,7 @@ All the effects on this list (with suitable language) will be used.
 %% For effects, we choose all of them.
 This allows authors to define a library of independent shader effects,
 and then trivially pick desired effects for each particular shape.
-Simply placing two effects of the \texttt{Appearance.effects} list
+Simply placing two effects on the \texttt{Appearance.effects} list
 makes them cooperate correctly.
 %% . This also allows to
 %% define a library of effects, that can be composited without any work
