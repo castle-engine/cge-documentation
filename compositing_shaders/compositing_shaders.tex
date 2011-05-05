@@ -611,8 +611,8 @@ it can be instantly used with various lighting and texturing conditions
 
 \subsection{Light sources effects}
 
-The nice feature of our system is that effects can be defined at other
-concepts than just at visible shapes. For example a particular light source
+The nice feature of our system is that effects can be attached to various
+types of objects, not just shapes. For example a particular light source
 may have a shader effect assigned.
 This allows you to modify the contribution of a particular light.
 For example you can modify the spot light shape, possibly
@@ -805,7 +805,7 @@ will be uniquely renamed to not collide with each other.
 The calls will be added in the order they are specified on the
 \texttt{effects} list. More precisely, the most local effects
 (at light sources and textures) are called first, then the effects
-at appearance, and finally the effects inside the grouping nodes.
+at shape appearance, and finally the effects inside the grouping nodes.
 Although, preferably, for most effects this order will not matter.
 
 A plug is often defined to allow modifying some parameter
@@ -902,17 +902,18 @@ is a correct, self-contained code. The errors (like unterminated block)
 %% or an unterminated comment)
 may only be detected after the complete shader
 is determined and compiled by the GPU.
-The \textbf{application does not need to parse the shader code} at any point.
 Although in case of shading languages with separate compilation units,
-the parsing errors will be reported always for the correct code piece
+the parsing errors will be at least reported always for the correct code piece
 (effect part).
+
+The \textbf{application does not need to parse the shader code} at any point.
 %% Still, by writing incorrect code,
 %% you can cause the whole shader to malfunction.
 %% is actually better, and
 
-In all our practical tests, this approach didn't cause any problems.
-Since you can implement each effect separately, you can also test them separately,
-and in practice it's usually obvious where to look for the parsing error.
+%% In all our practical tests, this approach didn't cause any problems.
+%% Since you can implement each effect separately, you can also test them separately,
+%% and in practice it's usually obvious where to look for the parsing error.
 
 %% It should be noted however that in particularly nasty cases,
 %% a deliberately poorly coded effect may cause troubles for other effects.
@@ -955,7 +956,7 @@ animated effects.
 We can wrap 2D or 3D noise inside a \texttt{ShaderTexture}
 (see figure \ref{fig_noise}).
 A texture node like \texttt{NoiseTexture} from InstantReality
-(\cite{instant:noisetex})
+\cite{instant:noisetex}
 may be implemented on GPU by a simple prototype using the \texttt{ShaderTexture}.
 
 \begin{figure}[H]
@@ -978,7 +979,7 @@ Then we have tested two alternative
 approaches for normal generation (take from pre-recorded series of normalmaps,
 or calculate from a smooth 3D noise). They both generate normal
 vectors in the tangent space, overriding a plug defined by yet another effect
-that transforms normals into eye space.
+that transforms normals into the eye space.
 This way we have extracted all the common logic into a separate effect,
 making it clear where the alternative normal generation methods differ
 and what they have in common.
