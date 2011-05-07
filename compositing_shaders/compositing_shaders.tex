@@ -603,7 +603,7 @@ The scope rules follow the X3D conventions for other nodes,
 like pointing device sensor nodes and \texttt{LocalFog}.
 
 The \texttt{LocalFog} example is worth emphasizing. Using our system,
-a browser can implement the \texttt{LocalFog} node as a prototype
+an X3D viewer can implement the \texttt{LocalFog} node as a prototype
 that expands to our \texttt{Effect} node. This gives you a 100\% correct
 implementation of the standard \texttt{LocalFog} node, and is trivially easy.
 
@@ -672,7 +672,7 @@ We introduce a new X3D node designed specifically for generating
 textures using the shaders. This is suitable
 if your texture is defined completely using the shading language.
 The texture contents are not stored anywhere (not even on GPU),
-and the X3D browser doesn't manage any texture resources.
+and the application doesn't manage any texture resources.
 From a GPU point of view, there is no texture.
 %\footnote{But the spoon is real,
 %we swear.}.
@@ -765,7 +765,7 @@ you can declare an \texttt{SFNode} field inside an \texttt{Effect}
 to pass any texture node to the shader as a uniform value.
 This allows to combine any number of textures inside an effect.
 The only difference
-between \texttt{ShaderTexture} and other textures is what the browser
+between \texttt{ShaderTexture} and other textures is what the system
 does automatically for you, that is what color is passed
 to the first \texttt{texture\_color} plug.
 
@@ -866,7 +866,7 @@ not to ,,hijack'' from each other some parts of the functionality.
 The nice feature of our magic \texttt{/* PLUG ... */} comments is that a shader source
 is still valid even if you completely ignore the plugs. For example,
 you can write a custom \texttt{ComposedShader} node, defining some plugs,
-and for browsers that understand them --- the plugs can be used,
+and for X3D browsers that understand them --- the plugs can be used,
 for other browsers --- plugs will be gracefully ignored (but still
 the shader will run, although without any effects).
 
@@ -881,9 +881,9 @@ Special comment \texttt{/* PLUG-DECLARATIONS */} may be used
 near the beginning of your shader source code. It is only useful
 if your shader code defines any new plugging points, that is if you
 have any magic \texttt{/* PLUG: ... */} comments inside.
-When some other effect uses your plugging point, the browser adds
+When some other effect uses your plugging point, the renderer adds
 an appropriate call to a function in that effect.
-Additionally, the browser has to declare the function,
+Additionally, the renderer has to declare the function,
 because it may be in a separate compilation unit (in case of GLSL),
 or just defined later in the code.
 These (forward or external) declarations are inserted at
