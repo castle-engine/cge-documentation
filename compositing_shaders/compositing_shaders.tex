@@ -226,11 +226,11 @@ is a multi-pass rendering. Each rendering pass adds or multiplies
 to the buffer contents, adding a layer with desired effect.
 However, this is expensive --- in each pass we usually have to repeat
 some work, at least transforming and clipping the geometry.
-It is also not flexible --- you can only modify
+It is also not flexible --- we can only modify
 the complete result of the previous pass.
 %% In our work, we want to allow a single rendering pass to be as
 %% powerful as it can.
-Arranging your shader functions in a pipeline has similar disadvantages
+Arranging shader functions in a pipeline has similar disadvantages
 as multi-pass rendering, except there's no speed penalty in this case.
 
 Common approach for writing a flexible shader code is to create
@@ -238,15 +238,15 @@ a library of functions, and allow the author to choose and compose them
 in a final shader to achieve the desired look. But this approach is very limited,
 as it doesn't allow to modify a particular calculation part without
 replicating the algorithm outside of this calculation.
-For example, if you want to scale the light contribution by a shadow function,
-you will have to also replicate the code iterating over the light sources.
+For example, if we want to scale the light contribution by a shadow function,
+we will have to also replicate the code iterating over the light sources.
 
 %% Another common solution is to arrange shaders in a pipeline, where one
 %% shader processes the result of another. This can be visualized as
 %% layers of materials, where each layer modifies the previous
 %% color. It is actually similar to a multi-pass rendering approach,
-%% except you don't lose speed on repeating the geometry transformation work.
-%% Still it suffers from the same limitations, as you cannot change
+%% except we don't lose speed on repeating the geometry transformation work.
+%% Still it suffers from the same limitations, as we cannot change
 %% the calculation within an existing layer, without replicating the whole
 %% algorithm of this layer.
 
@@ -260,12 +260,12 @@ C++ program.
 It allows an excellent
 integration between C++ code and shaders, hiding the ugly details of
 passing variables between normal code (that executes on CPU) and
-shader code (that usually executes on GPU). You can use
+shader code (that usually executes on GPU). We can use
 object-oriented concepts to create a general shader that can
 later be extended, for example by overriding virtual
 methods. However, this is a solution closely coupled with C++. It's
-suitable if you have a 3D engine in C++, and you want to use it in your
-own C++ program and extend its shaders. Our solution is simpler,
+suitable if we have a 3D engine in C++, and we want to use it in
+our own C++ program and extend its shaders. Our solution is simpler,
 treating shader effects as part of the 3D content, and can
 be integrated into a renderer regardless of it's programming language.
 Invoking a compiler to generate a
@@ -274,7 +274,7 @@ question.
 
 OGRE (\URL{http://www.ogre3d.org/}), an open-source 3D engine written in C++, has a system
 for adding shader extensions (see \cite{ogre:shader}). Its idea is similar
-to our system (enhance the built-in shaders with your own effects),
+to our system (enhance the built-in shaders with our own effects),
 however the whole job of combining a shader is done by operating
 on particular shader by C++ code. The developer has to code
 the logic deciding which shaders are extended, and most of the specification
@@ -309,7 +309,7 @@ This creates a system where it's trivially easy to define a hook,
 and to use a hook.
 Many modules can implement the same hook and cooperate without any problems.
 %% The whole hook system is defined completely in PHP, as it's a scripting
-%% language, and you can query the list of loaded functions by name,
+%% language, and we can query the list of loaded functions by name,
 %% and call function by its name.
 Drupal approach is quite similar to our
 core idea of combining effects. Our effects are similar to
@@ -356,7 +356,7 @@ and the renderer will insert appropriate calls to them from the base shader.
 
 A trivial example of an effect that makes colors two times brighter
 is below. This example is presented in the X3D classic (VRML) encoding.
-You can add this inside any \texttt{Appearance} node in the X3D file:
+We can add this inside any \texttt{Appearance} node in the X3D file:
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single,fontsize=\small]
 effects Effect \{
@@ -381,13 +381,13 @@ the renderer internal shader. This particular plug,
 the \texttt{PLUG\_texture\_apply}, is called after the normal texture colors
 are applied, but before the alpha test, and is a usual place to ,,just modify the pixel color''.
 \texttt{fragment\_color} is an \texttt{inout} parameter, by modifying it
-you modify the color that will be displayed on the screen.
+we modify the color that will be displayed on the screen.
 
 We have a reference of all the plugging points available in our implementation
 on \URL{http://vrmlengine.sourceforge.net/compositing_shaders.php}.
 For each plugging point,
 like this \texttt{PLUG\_texture\_apply}, we define a list of parameters
-(you have to declare them exactly the same in your code), and we define
+(they have to be declared exactly the same in an effect), and we define
 when it is called.
 
 \needspace{1in}
@@ -604,8 +604,8 @@ like pointing device sensor nodes and \texttt{LocalFog}.
 
 The \texttt{LocalFog} example is worth emphasizing. Using our system,
 an X3D viewer can implement the \texttt{LocalFog} node as a prototype
-that expands to our \texttt{Effect} node. This gives you a 100\% correct
-implementation of the standard \texttt{LocalFog} node, and is trivially easy.
+that expands to our \texttt{Effect} node. This results in a 100\% correct
+implementation of the standard \texttt{LocalFog} node, and is very easy.
 
 As one of the demos, we have implemented a realistic
 animated volumetric fog, where the fog density is stored in
@@ -621,13 +621,11 @@ it can be instantly used with various lighting and texturing conditions
 The nice feature of our system is that effects can be attached to various
 types of objects, not just shapes. For example a particular light source
 may have a shader effect assigned.
-This allows you to modify the contribution of a particular light.
-For example you can modify the spot light shape, possibly
+This allows to modify the contribution of a particular light.
+For example the spot light shape can be modified, possibly
 based on some texture information (see figure \ref{fig_fancy_spot}).
-Or you can implement a different lighting model, like anisotropic Ward
+Or a different lighting model may be implemented, like anisotropic Ward
 or Cook-Torrance.
-%% So you can easily define a shader specific for a given light source,
-%% or texture.
 To make this possible, we add the \texttt{effects} field to every light node:
 
 \begin{mycode}
@@ -803,7 +801,7 @@ to the first \texttt{texture\_color} plug.
 \end{figure*}
 \setcounter{figure}{5}
 
-\section{Defining your own plug points}
+\section{Defining custom plug points}
 
 In your shader code, you can define new plug points by a
 magic comment:
@@ -1039,9 +1037,9 @@ X3D \textit{Programmable shaders component} \cite{x3d:shaders}. However, such im
 would be extremely cumbersome.
 You would first have to implement all the necessary (multi-)texturing, lighting,
 shadows, and other rendering features in a shader code.
-This is a large work if you consider all the X3D rendering options, and note that
+This is a large work if we consider all the X3D rendering options, and note that
 a shader should remain optimized for a particular setting.
-%% Actually, it isn't even possible, unless you can calculate some global options,
+%% Actually, it isn't even possible, unless we can calculate some global options,
 %% like which light sources and fog nodes affect the given shape.
 The only manageable way to do this, that would work for all the lighting
 and texturing conditions, is to write a shader generator program.
