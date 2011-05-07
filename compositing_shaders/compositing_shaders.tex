@@ -123,7 +123,7 @@ geometry.
 for example summing the lights contribution
 and mixing the texture colors.
 
-The X3D \textit{Programmable shaders component} \cite{x3d:shaders} (currently part of the X3D standard)
+The X3D \textit{Programmable shaders component} \cite{x3d:shaders} (part of the X3D standard)
 already makes
 the shaders available to the authors. However, the shaders designed using
 the standard nodes
@@ -782,6 +782,20 @@ to the first \texttt{texture\_color} plug.
 %%     affected by the pixelated look of the base image texture.}
 %% \end{figure}
 
+\setcounter{figure}{8}
+\begin{figure*}[b]
+  \centering
+%  \includegraphics[width=2.3in]{water_shaders_0}
+  \includegraphics[width=2.0in]{water_shaders_1}
+  \includegraphics[width=2.0in]{water_shaders_2}
+  \includegraphics[width=2.0in]{water_shaders_3}
+  \caption{Water using our effects: 1) Per-pixel lighting and bump mapping.
+2) Per-pixel lighting and reflections and refractions (by a single environment cube map texture).
+3) All effects.}
+  \label{fig_water}
+\end{figure*}
+\setcounter{figure}{6}
+
 \section{Defining your own plug points}
 
 In your shader code, you can define new plug points by a
@@ -868,8 +882,8 @@ or just defined later in the code.
 These (forward or external) declarations are inserted at
 the point of special \texttt{/* PLUG-DECLARATIONS */}
 comment, or (when it is missing) simply at the beginning of your shader source.
-This applies in the same way to shader code inside an \texttt{EffectPart},
-or inside standard X3D node like \texttt{ShaderPart}.
+%% This applies in the same way to shader code inside an \texttt{EffectPart},
+%% or inside standard X3D node like \texttt{ShaderPart}.
 
 Using \texttt{/* PLUG-DECLARATIONS */} may be necessary
 as some shading language directives are required to be placed before
@@ -878,20 +892,6 @@ the \texttt{\#version} as well as some \texttt{\#extension} directives
 must occur at the beginning of the shader code. You should place
 \texttt{/* PLUG-DECLARATIONS */} after such directives,
 and before any \texttt{/* PLUG: ... */} declarations.
-
-\setcounter{figure}{8}
-\begin{figure*}[t]
-  \centering
-%  \includegraphics[width=2.3in]{water_shaders_0}
-  \includegraphics[width=2.0in]{water_shaders_1}
-  \includegraphics[width=2.0in]{water_shaders_2}
-  \includegraphics[width=2.0in]{water_shaders_3}
-  \caption{Water using our effects: 1) Per-pixel lighting and bump mapping.
-2) Per-pixel lighting and reflections and refractions (by a single environment cube map texture).
-3) All effects.}
-  \label{fig_water}
-\end{figure*}
-\setcounter{figure}{6}
 
 \subsection{Invalid shader code}
 
@@ -902,8 +902,8 @@ is a correct, self-contained code. The errors (like unterminated block)
 %% or an unterminated comment)
 may only be detected after the complete shader
 is determined and compiled by the GPU.
-Although in case of shading languages with separate compilation units,
-the parsing errors will be at least reported always for the correct code piece
+It should be noted that for shading languages with separate compilation units,
+the parsing errors can be at least reported always for the correct code piece
 (effect part).
 
 The \textbf{application does not need to parse the shader code} at any point.
@@ -961,7 +961,7 @@ may be implemented on GPU by a simple prototype using the \texttt{ShaderTexture}
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=3in]{noise-cropped}
+  \includegraphics[width=2.2in]{noise-cropped}
   \caption{3D and 2D smooth noise on GPU, wrapped in a ShaderTexture.}
   \label{fig_noise}
 \end{figure}
@@ -1027,15 +1027,15 @@ See figure \ref{fig_flowers}.
 \end{figure}
 
 We would like to emphasize that all the effects demonstrated here
-are theoretically already possible to implement by the standard
-X3D \textit{Programmable shaders component}. However, such implementation
+are theoretically already possible to implement using the standard
+X3D \textit{Programmable shaders component} \cite{x3d:shaders}. However, such implementation
 would be extremely cumbersome.
 You would first have to implement all the necessary (multi-)texturing, lighting,
 shadows, and other rendering features in a shader code.
 This is a large work if you consider all the X3D rendering options, and note that
 a shader should remain optimized for a particular setting.
-Actually, it isn't even possible, unless you can calculate some global options,
-like which light sources and fog nodes affect the given shape.
+%% Actually, it isn't even possible, unless you can calculate some global options,
+%% like which light sources and fog nodes affect the given shape.
 The only manageable way to do this, that would work for all the lighting
 and texturing conditions, is to write a shader generator program.
 Which is actually exactly what our effects already do for you ---
@@ -1103,6 +1103,18 @@ of our effects.
 %% We also believe that most of our plug points (like ,,do something in object space'',
 %% ,,do something in eye space'') are generic enough to be usable
 %% with all shading languages.
+
+\section{Conclusion}
+
+We show a new approach for developing effects using the GPU shading languages.
+It allows to combine various shader effects with each other
+and with application internal shaders.
+Our approach is relatively easy
+to implement, and allows the authors to directly use the existing GPU shading
+languages.
+We propose a number of extensions to the X3D,
+an open standard for 3D data, to make our effects available for 3D
+content authors. We have implemented our approach for the GLSL shading language.
 
 %% \section*{Acknowledgements}
 
