@@ -123,9 +123,9 @@ to particular shapes. % and how they interact with other X3D features.
 \emph{Shaders} are programs usually executed on the graphic processor unit
 (GPU). They control the per-vertex and per-pixel processing,
 for example summing the lights contribution
-and mixing the texture colors. Since the authors, creators of 3D content,
-can directly write and assign shaders to shapes, a myriad of interesting
-graphic effects can be expressed in X3D models.
+and mixing the texture colors. The authors
+can create and assign shaders to shapes, which makes
+a myriad of interesting graphic effects possible in X3D models.
 
 However, the shaders designed using the standard nodes
 \textit{replace} the normal rendering functionality, not \textit{enhance} it.
@@ -158,7 +158,7 @@ lighting models.
 Sometimes it makes sense to change these functions
 for all the light sources, and sometimes only a specific light source
 should behave differently.
-Our approach allows you to do everything mentioned above.
+Our approach allows you to do everything mentioned here.
 %% by inserting a piece
 %% of custom shader code into a calculation of a particular function.
 %on a particular object.
