@@ -114,19 +114,20 @@ concepts like shapes, light sources and textures.
 %% page of your paper.
 %\copyrightspace
 
-X3D \cite{x3d:spec} is an open standard for representing rich 3D data.
-Many advanced graphic features are available to the authors.
-In particular, \emph{shaders} can be used to change the look of the rendered
-geometry.
+X3D \cite{x3d:spec} is an open standard for representing interactive 3D models,
+with many advanced graphic features.
+
+The X3D \textit{Programmable shaders component} \cite{x3d:shaders}
+(part of the X3D standard) defines how \emph{shaders} can be assigned
+to particular shapes. % and how they interact with other X3D features.
 \emph{Shaders} are programs usually executed on the graphic processor unit
 (GPU). They control the per-vertex and per-pixel processing,
 for example summing the lights contribution
-and mixing the texture colors.
+and mixing the texture colors. Since the authors, creators of 3D content,
+can directly write and assign shaders to shapes, a myriad of interesting
+graphic effects can be expressed in X3D models.
 
-The X3D \textit{Programmable shaders component} \cite{x3d:shaders} (part of the X3D standard)
-already makes
-the shaders available to the authors. However, the shaders designed using
-the standard nodes
+However, the shaders designed using the standard nodes
 \textit{replace} the normal rendering functionality, not \textit{enhance} it.
 This reflects the underlying API (like OpenGL or Direct 3D),
 and the idea that shader code should be a complete and optimized program
@@ -136,18 +137,17 @@ We argue that a different approach is needed in many situations.
 Authors usually would like to keep the normal rendering features working,
 and only add their own effects. The 3D renderer
 implementation usually already has an extensive internal shaders system,
-and the authors should be able to depend on these internal shaders
+and the authors want to depend on these internal shaders
 to do the common job.
 
-As an example, consider the simplified lighting equation with shadows
-and bump mapping:
+As an example, consider this simplified lighting equation:
 $$ \sum_{l\in Lights} shadow(l) * light\_color(l, material, normal(point)) $$
 %% The \textit{shadow} function returns values in the [0..1] range,
 %% scaling the light color. If the object is not in the shadow, it returns 1.
 %% The \textit{normal} function returns a normal vector at given point.
 Different effects want to change various parts of this equation,
 without touching the others.
-For example, the \textit{shadow} may check a shadow map pixel,
+For example, the \textit{shadow} function may check a shadow map pixel,
 or (when shadow map is not available) always return 1.
 The \textit{normal} function may take the vector straight from
 the geometry description, or calculate it using a texture value (classic bump mapping).
@@ -158,6 +158,10 @@ lighting models.
 Sometimes it makes sense to change these functions
 for all the light sources, and sometimes only a specific light source
 should behave differently.
+Our approach allows you to do everything mentioned above.
+%% by inserting a piece
+%% of custom shader code into a calculation of a particular function.
+%on a particular object.
 
 \begin{figure*}[t]
   \centering
@@ -182,7 +186,9 @@ shaders. This makes shader programs:
 \item Much easier to create. We can jump straight into the implementation
   of our imagined algorithm in the shader.
   We are only interested in modifying the relevant shader calculation
-  parameter, and we can completely ignore other parts of the shader.
+  parameter, and
+  %don't need to care about the rest of the shader.
+  we can completely ignore other parts of the shader.
 
 \item Much more powerful. Our effect
   immediately cooperates with absolutely every normal feature of X3D rendering.
