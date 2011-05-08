@@ -1,4 +1,4 @@
-This is my (Michalis) paper, for TGCP 2011 (http://www.eguk.org.uk/TPCG11/)
+This is my (Michalis) paper, for TPCG 2011 (http://www.eguk.org.uk/TPCG11/)
 conference.
 
 This directory contains the LaTeX source of the paper,
@@ -23,7 +23,7 @@ After placing these files here, run "make".
 
 Michalis checklist to do at the end:
 - Remember to add a couple of references, in particular to scientific papers.
-  It kooks like I assume too often that people are familiar with some stuff
+  It looks like I assume too often that people are familiar with some stuff
   / can google them for themselves.
 - One from my thousand English mistakes: check "it's" is always used as "it is".
 - ispell (american)
