@@ -290,10 +290,13 @@ features as well, however the whole system must be carefully controlled by
 the C++ code. In our approach, we allow the authors to write direct shading
 language code quickly, and the integration is built inside appropriate X3D nodes.
 
-AnySL \cite{anysl} is an approach to integrate renderer
+AnySL \cite{anysl} allows to integrate renderer
 shaders with user shaders. We strive to do something more (allow effortless
 integration between various user shaders too), and simpler (without
-introducing any new shading language).
+introducing any new shading language). On the other hand,
+we do not hide the differences between various shading languages.
+User effects have to be implemented in the same GPU shading language
+that is used by the renderer.
 
 %% \cite{web3d2010:declarativeshader} presents a declarative approach
 %% to an advanced shader in X3D. However, it only allows a fixed set
@@ -402,7 +405,7 @@ Many usage scenarios are possible:
 \begin{enumerate}
 
 \item The \texttt{Effect} nodes may refer to plug names
-defined inside the application internal shaders. This is the most usual case.
+defined inside the renderer internal shaders. This is the most usual case.
 It allows the authors to extend or override a particular shading parameter.
 
 \item The \texttt{Effect} nodes may also use the plug names defined
@@ -411,20 +414,21 @@ It is trivially easy (you just add a ,,magic'' comment) to define
 plugging points in your own shader code, and this way your own effects
 can be customized.
 
-\item Inside the application implementation, the same approach can be used
+\item Inside the renderer implementation, the same approach can be used
 to implement some internal effects.
 We have reimplemented many internal effects of our engine,
 like the fog, shadow maps (see \cite{vrmleng:shadowmaps})
 and the bump mapping to use our ,,plugs'' approach.
 This made their implementation very clean, short
-and nicely separated from each other. It also proves that
-the authors have the power to implement such effects easily by themselves.
+and nicely separated from each other.
+%% It also proves that
+%% the authors have the power to implement such effects easily by themselves.
 
 %% without any traditional hassles. For example, bump mapping can be
 %% achieved using standard \texttt{ComposedShader} as well,
 %% but then you have to write all this ,,boilerplate'' code to also deal
 %% with all the possible lighting and textures configurations.
-%% Well, the application is still useful to calculate nice tangent vectors,
+%% Well, the renderer is still useful to calculate nice tangent vectors,
 %% although an authoring program could generate GLSL attributes for them as well.
 
 %% Same thing with shadow maps, they only plug to the \texttt{light\_scale}
@@ -433,18 +437,18 @@ the authors have the power to implement such effects easily by themselves.
 \end{enumerate}
 
 Actually, there are even more possibilities.
-We have been talking above about the ,,application internal shaders'',
+We have been talking above about the ,,renderer internal shaders'',
 but the truth is a little more flexible.
 When you place a standard shader node
 (like a \texttt{ComposedShader} node for GLSL shaders) on the
 \texttt{Appearance.shaders} list,
-then it replaces the internal application shaders.
+then it replaces the internal renderer shaders.
 If you define the same (or compatible) plugging points inside your shader,
-then the application effects will be even added to your own
+then the internal renderer effects will be even added to your own
 shader. And of course user effects are added to your shader too.
 This way we have made even the standard X3D shader nodes much more flexible.
 Note that if you don't define any plugs inside your \texttt{ComposedShader} node,
-it continues to function as before --- no effects, from application or author,
+it continues to function as before --- no effects
 will be added.
 
 \subsection{Effect node}
@@ -676,7 +680,7 @@ We introduce a new X3D node designed specifically for generating
 textures using the shaders. This is suitable
 if your texture is defined completely using the shading language.
 The texture contents are not stored anywhere (not even on GPU),
-and the application doesn't manage any texture resources.
+and the renderer doesn't manage any texture resources.
 From a GPU point of view, there is no texture.
 %\footnote{But the spoon is real,
 %we swear.}.
