@@ -624,9 +624,9 @@ animated volumetric fog, where the fog density is stored in
 a 3D smooth noise texture (idea from \cite{humus:volumetricfog}).
 In a fragment shader, the 3D~texture is sampled
 along the line between the camera and pixel position in the 3D~space. This makes a very
-convincing effect of a dense fog. Since it is implemented as an effect,
-it can be instantly used with various lighting and texturing conditions
---- it simply works for all X3D shapes. See figure \ref{fig_fog}.
+convincing effect of a dense fog. The \texttt{Effect} node with
+appropriate shader code is placed at the top level of the X3D file,
+and so it simply works for all X3D shapes. See figure \ref{fig_fog}.
 
 \subsection{Light sources effects}
 
