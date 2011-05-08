@@ -517,9 +517,11 @@ functions. However, your plug functions must be defined in the appropriate
 effect type. For example, you cannot use the \texttt{texture\_apply} plug within
 a \texttt{VERTEX} shader.
 If your effect requires some processing per-vertex and some per-fragment,
-you will probably use two \texttt{EffectPart} nodes, with appropriate types.
-While this may seem like an arbitrary limitation,
-this reflects how shader parts are declared in shading languages with
+you have to use two \texttt{EffectPart} nodes, with different types.
+This is necessary to enable implementation of our system for
+%% While this may seem like an arbitrary limitation,
+%% this reflects how shader parts are declared in
+shading languages with
 separate namespaces for vertex and fragment parts (like GLSL).
 A single part may declare many variables and functions,
 but it must be completely contained within a given shader type.
@@ -527,7 +529,7 @@ but it must be completely contained within a given shader type.
 Note that it is completely reasonable to have an \texttt{EffectPart} node
 with source code that doesn't define any \texttt{PLUG\_xxx} functions.
 Such \texttt{EffectPart} node may be useful for defining shading language
-utility functions, used by the other effect parts.
+utility functions, used by other effect parts.
 
 For shading languages that have separate compilation units
 (like the \emph{OpenGL Shading Language}) the implementation may choose to place
@@ -541,8 +543,8 @@ to not look at any special function names in a shader code,
 and instead define a plug name in the separate field of the \texttt{EffectPart}
 node. However, the renderer may need to know the full declaration
 of a plug function, to make a forward or external declaration of it.
-One way to overcome this problem was to force repeating this declaration
-in another field. Another way was to split shader code into much more
+One way to overcome this problem was to require repeating this declaration
+in another field. Another idea was to split shader code into much more
 parts (for example, one part declares the uniform variables, one part declares
 the plug function, one part defines the function body and so on).
 Both approaches seemed uncomfortable and not natural for authors,
