@@ -22,8 +22,18 @@ Place here (I usually just symlink them here) files:
 After placing these files here, run "make".
 
 Michalis checklist to do at the end:
+- Remember to add a couple of references, in particular to scientific papers.
+  It kooks like I assume too often that people are familiar with some stuff
+  / can google them for themselves.
 - One from my thousand English mistakes: check "it's" is always used as "it is".
 - ispell (american)
 - Check "pdffonts compositing_shaders.pdf". Every font should have Embed=Yes.
 - Recheck to not repeat the same mistakes as
   http://vrmlengine.svn.sourceforge.net/viewvc/vrmlengine/trunk/papers/compositing_shaders/compositing_shaders.tex?r1=8831&r2=8830&pathrev=8831
+- Recheck layout:
+  - Make sure figures are placed as close as possible to the text that refers
+    to them.
+  - Make sure figure size is maximized: width = column / page width,
+    and height = maximum that still keeps the page count within bounds,
+    crop if necessary.
+  - No hanging things at the end of columns/pages.
