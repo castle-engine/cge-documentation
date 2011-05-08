@@ -26,8 +26,6 @@ Michalis checklist to do at the end:
   It looks like I assume too often that people are familiar with some stuff
   / can google them for themselves.
 - One from my thousand English mistakes: check "it's" is always used as "it is".
-- ispell (american)
-- Check "pdffonts compositing_shaders.pdf". Every font should have Embed=Yes.
 - Recheck to not repeat the same mistakes as
   http://vrmlengine.svn.sourceforge.net/viewvc/vrmlengine/trunk/papers/compositing_shaders/compositing_shaders.tex?r1=8831&r2=8830&pathrev=8831
 - Recheck layout:
@@ -37,3 +35,5 @@ Michalis checklist to do at the end:
     and height = maximum that still keeps the page count within bounds,
     crop if necessary.
   - No hanging things at the end of columns/pages.
+- ispell (american)
+- Check "pdffonts compositing_shaders.pdf". Every font should have Embed=Yes.
