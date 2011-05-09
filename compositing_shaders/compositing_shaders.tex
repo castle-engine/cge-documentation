@@ -286,7 +286,8 @@ the logic deciding which shaders are extended and most of the specification
 about how the extension is called is done in the C++ code.
 This has the nice advantage of being able to encapsulate some fixed-function
 features as well, however the whole system must be carefully controlled by
-the C++ code. In our approach, we allow the authors to write direct shading
+the C++ code.
+In our approach, we allow the authors to write direct shading
 language code quickly and the integration is built inside appropriate X3D nodes.
 
 AnySL \cite{anysl} allows to integrate renderer
@@ -297,7 +298,8 @@ of our approach is that we do not hide the differences between various shading l
 User effects have to be implemented in the same GPU shading language
 that is used by the renderer.
 
-% \cite{spark}.
+Spark \cite{spark} is a recent work presenting a new language to develop
+composable shaders for GPU.
 
 %% \cite{web3d2010:declarativeshader} presents a declarative approach
 %% to an advanced shader in X3D. However, it only allows a fixed set
@@ -1065,7 +1067,6 @@ that affect the given shape. And all the information is nicely integrated
 with X3D nodes, effects are specified at suitable nodes, and their
 uniform values and attributes are integrated with X3D fields.
 
-\needspace{1in}
 Many complete example models using our effects
 are referenced from our page on
 \URL{http://vrmlengine.sourceforge.net/compositing_shaders.php}.
