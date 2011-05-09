@@ -219,7 +219,7 @@ and expect the result to be a valid program.
 The X3D \textit{Programmable shaders component} \cite{x3d:shaders}
 makes the three shading languages mentioned above available to X3D authors.
 Complete shader code may be assigned to specific shapes.
-Although it doesn't offer any way of compositing shader effects,
+Although it does not offer any way of compositing shader effects,
 %the point of this component
 %is to expose functionality that maps straightforward to graphic APIs like OpenGL.
 this component is still an important base for our work. It defines
@@ -241,7 +241,7 @@ as multi-pass rendering, except there's no speed penalty in this case.
 Common approach for writing a flexible shader code is to create
 a library of functions and allow the author to choose and compose them
 in a final shader to achieve the desired look. But this approach is very limited,
-as it doesn't allow to modify a particular calculation part without
+as we cannot modify a particular calculation part without
 replicating the algorithm outside of this calculation.
 For example, if we want to scale the light contribution by a shadow function,
 we will have to also replicate the code iterating over the light sources.
@@ -250,7 +250,7 @@ we will have to also replicate the code iterating over the light sources.
 %% shader processes the result of another. This can be visualized as
 %% layers of materials, where each layer modifies the previous
 %% color. It is actually similar to a multi-pass rendering approach,
-%% except we don't lose speed on repeating the geometry transformation work.
+%% except we do not lose speed on repeating the geometry transformation work.
 %% Still it suffers from the same limitations, as we cannot change
 %% the calculation within an existing layer, without replicating the whole
 %% algorithm of this layer.
@@ -299,7 +299,7 @@ that is used by the renderer.
 %% \cite{web3d2010:declarativeshader} presents a declarative approach
 %% to an advanced shader in X3D. However, it only allows a fixed set
 %% of functionality, kind od ,,advanced and exhanced material''.
-%% It doesn't expose any shader functionality to the authors.
+%% It does not expose any shader functionality to the authors.
 %% It merely allows the authors to use some advanced algorithms that in practice
 %% will be usually implemented by shaders inside the application.
 
@@ -331,7 +331,7 @@ Drupal's modules and our ,,plugging points'' are analogous to Drupal hooks.
 %% so calling the plugs must be implemented by text replacements)
 %% and some special opportunities (we can define effects at
 %% the appropriate nodes of X3D, like textures and lights sources,
-%% as we don't want to throw all the effects in one bag).
+%% as we do not want to throw all the effects in one bag).
 
 % OpenSceneGraph:
 % http://www.openscenegraph.org/projects/osg/wiki/Support/Tutorials/ShadersParameters
@@ -445,7 +445,7 @@ If you define the same (or compatible) plugging points inside your shader,
 then the internal renderer effects will be even added to your own
 shader. And of course user effects are added to your shader too.
 This way we have made even the standard X3D shader nodes much more flexible.
-Note that if you don't define any plugs inside your \texttt{ComposedShader} node,
+Note that if you do not define any plugs inside your \texttt{ComposedShader} node,
 it continues to function as before --- no effects
 will be added.
 
@@ -525,7 +525,7 @@ A single part may declare many variables and functions,
 but it must be completely contained within a given shader type.
 
 Note that it is completely reasonable to have an \texttt{EffectPart} node
-with source code that doesn't define any \texttt{PLUG\_xxx} functions.
+with source code that does not define any \texttt{PLUG\_xxx} functions.
 Such \texttt{EffectPart} node may be useful for defining shading language
 utility functions, used by other effect parts.
 
@@ -680,7 +680,7 @@ We introduce a new X3D node designed specifically for generating
 textures using the shaders. This is suitable
 if your texture is defined completely using the shading language.
 The texture contents are not stored anywhere (not even on GPU),
-and the renderer doesn't manage any texture resources.
+and the renderer does not manage any texture resources.
 From a GPU point of view, there is no texture.
 %\footnote{But the spoon is real,
 %we swear.}.
@@ -934,11 +934,11 @@ The \textbf{application does not need to parse the shader code} at any point.
 %% a deliberately poorly coded effect may cause troubles for other effects.
 %% In particular, since you can use \texttt{\#define} and macros in your effect code,
 %% you can do nasty tricks to break other effects. You can make them compile,
-%% but function incorrectly. However, we don't consider
+%% but function incorrectly. However, we do not consider
 %% it a real problem. You really have to deliberately want to do something bad,
 %% and be familiar with internals about how the shader is generated,
 %% to achieve some particular weird behavior.
-%% It doesn't happen by accident in our experience.
+%% It does not happen by accident in our experience.
 %% %% And you may need to use the internal knowledge
 %% %% how the other effects are implemented (maybe how they are implemented
 %% %% inside the browser).
