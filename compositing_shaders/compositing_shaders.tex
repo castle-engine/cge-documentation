@@ -207,8 +207,9 @@ language in some cumbersome limitations.
 
 \section{Motivation and previous work}
 
-The popular real-time shading languages (OpenGL \texttt{GLSL} \cite{glsl:book}, NVidia \texttt{Cg}, Direct 3D \texttt{HLSL})
-don't provide a ready solution for connecting shaders from independent sources.
+The most popular real-time shading languages right now are
+OpenGL \texttt{GLSL} \cite{glsl:book}, NVidia \texttt{Cg} and Direct 3D \texttt{HLSL}.
+They do not provide a ready solution for connecting shaders from independent sources.
 The \texttt{CgFX} and HLSL \texttt{.fx} files encapsulate shading language code
 in \emph{techniques} (for various graphic card capabilities),
 and within a single technique specify operations for each rendering pass.
@@ -225,7 +226,7 @@ this component is still an important base for our work. It defines
 how to comfortably keep shader code inside X3D nodes. It also shows
 how to pass uniform values (including textures) to the shaders.
 
-An oldest solution to combining effects, used even before the shading languages,
+An oldest solution to combine effects, used even before the shading languages,
 is a multi-pass rendering. Each rendering pass adds or multiplies
 to the buffer contents, adding a layer with desired effect.
 However, this is expensive --- in each pass we usually have to repeat
@@ -257,7 +258,7 @@ we will have to also replicate the code iterating over the light sources.
 %% (see also http://groups.google.com/group/blendertorenderman/browse_thread/thread/aaf07831b91be9db?pli=1 , confirms my findings)
 
 Sh (\URL{http://libsh.org/}, \cite{sh:book})
-allows writing shaders code (that can run on GPU) directly inside a
+allows writing shader code (that can run on GPU) directly inside a
 C++ program.
 %% For this, Sh extends the C++ language (through C++
 %% operator overloading and macros tricks).
@@ -272,9 +273,8 @@ suitable if we have a 3D engine in C++, we want to use it in
 our own C++ program and extend its shaders. Our solution is simpler,
 treating shader effects as part of the 3D content and can
 be integrated into a renderer regardless of its programming language.
-Invoking a compiler to generate a
-final GPU shader, not to mention forcing users to learn C++, is out of the
-question.
+We do not need a C++ compiler to generate a final GPU shader,
+and users do not need to be familiar with C++.
 
 OGRE (\URL{http://www.ogre3d.org/}), an open-source 3D engine written in C++, has a system
 for adding shader extensions (see \cite{ogre:shader}). Its idea is similar
@@ -289,10 +289,10 @@ the C++ code. In our approach, we allow the authors to write direct shading
 language code quickly and the integration is built inside appropriate X3D nodes.
 
 AnySL \cite{anysl} allows to integrate renderer
-shaders with user shaders. We strive to do something more (allow effortless
-integration between various user shaders too) and simpler (without
-introducing any new shading language). On the other hand,
-we do not hide the differences between various shading languages.
+shaders with user shaders. We strive to do something more and allow effortless
+integration between many user shaders. We also try to be simpler as we do not
+introduce any new shading language. On the other hand, the disadvantage
+of our approach is that we do not hide the differences between various shading languages.
 User effects have to be implemented in the same GPU shading language
 that is used by the renderer.
 
@@ -362,7 +362,7 @@ and followed by the plug name. These declarations will be found,
 and the renderer will insert appropriate calls to them from the base shader.
 
 A trivial example of an effect that makes colors two times brighter
-is below. This example is presented in the X3D classic (VRML) encoding.
+is below. This example is presented in the X3D classic VRML encoding.
 We can add this inside any \texttt{Appearance} node in the X3D file:
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single,fontsize=\small]
