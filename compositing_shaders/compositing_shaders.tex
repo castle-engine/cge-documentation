@@ -129,14 +129,15 @@ a myriad of interesting graphic effects possible in X3D models.
 
 However, the shaders designed using the standard nodes
 \textit{replace} the normal rendering functionality, not \textit{enhance} it.
-This reflects the underlying API (like OpenGL or Direct 3D),
-and the idea that shader code should be a complete and optimized program
+This reflects the underlying API, like OpenGL or Direct3D.
+The 3D libraries, in turn, follow the hardware idea that shader code
+should be a complete and optimized program
 designed for rendering a particular shape.
 
 We argue that a different approach is needed in many situations.
-Authors usually would like to keep the normal rendering features working,
+Authors usually would like to keep the normal rendering features working
 and only add their own effects. The 3D renderer
-implementation usually already has an extensive internal shaders system,
+implementation usually already has an extensive internal shaders system
 and the authors want to depend on these internal shaders
 to do the common job.
 
@@ -211,7 +212,7 @@ The most popular real-time shading languages right now are
 OpenGL \texttt{GLSL} \cite{glsl:book}, NVidia \texttt{Cg} and Direct 3D \texttt{HLSL}.
 They do not provide a ready solution for connecting shaders from independent sources.
 The \texttt{CgFX} and HLSL \texttt{.fx} files encapsulate shading language code
-in \emph{techniques} (for various graphic card capabilities),
+in \emph{techniques} (for various graphic card capabilities)
 and within a single technique specify operations for each rendering pass.
 In neither case can we simply connect multiple shader source code files
 and expect the result to be a valid program.
@@ -273,7 +274,7 @@ suitable if we have a 3D engine in C++, we want to use it in
 our own C++ program and extend its shaders. Our solution is simpler,
 treating shader effects as part of the 3D content and can
 be integrated into a renderer regardless of its programming language.
-We do not need a C++ compiler to generate a final GPU shader,
+We do not need a C++ compiler to generate a final GPU shader
 and users do not need to be familiar with C++.
 
 OGRE (\URL{http://www.ogre3d.org/}), an open-source 3D engine written in C++, has a system
@@ -312,8 +313,8 @@ can extend the functionality of the base system (or other module)
 by implementing a \textit{hook}, which is just a normal PHP function
 with a special name and appropriate set of parameters. Modules can also define
 their own hooks (for use by other modules) and invoke them when appropriate.
-This creates a system where it's trivially easy to define a hook,
-and to use a hook.
+This creates a system where it's trivially easy to define new hooks
+and to use existing hooks.
 Many modules can implement the same hook and cooperate without any problems.
 %% The whole hook system is defined completely in PHP, as it's a scripting
 %% language and we can query the list of loaded functions by name,
@@ -358,7 +359,7 @@ points where calls to user-defined functions may be inserted. We call
 these places \textit{plugs}, as they act like sockets where logic
 may be added. Each plug has a name and a given set of parameters.
 The effects can use special function names, starting with \texttt{PLUG\_}
-and followed by the plug name. These declarations will be found,
+and followed by the plug name. These declarations will be found
 and the renderer will insert appropriate calls to them from the base shader.
 
 A trivial example of an effect that makes colors two times brighter
@@ -507,7 +508,7 @@ Inside the effect part source code, the functions that enhance
 standard shaders behavior are recognized by names starting with \texttt{PLUG\_}.
 Of course you can also define and use other functions.
 You can pass uniform variables to the effect,
-and you can pass varying variables between the vertex and fragment
+you can also pass varying variables between the vertex and fragment
 parts, just like with standard shader nodes.
 
 In a single \texttt{EffectPart} node, you can define many \texttt{PLUG\_}
@@ -536,16 +537,18 @@ cleaner, as you cannot use undeclared functions and variables from other parts.
 It also allows for cleaner error detection (parsing errors will be detected
 inside the given unit).
 
-At one point we tried the approach
-to not look at any special function names in a shader code,
-and instead define a plug name in the separate field of the \texttt{EffectPart}
+We have also considered and rejected a different approach to define
+\texttt{PLUG\_} functions. In that rejected approach,
+we did not look at any special function names
+in a shader code, instead the plug name was defined in the separate field of
+the \texttt{EffectPart}
 node. However, the renderer may need to know the full declaration
 of a plug function, to make a forward or external declaration of it.
 One way to overcome this problem was to require repeating this declaration
 in another field. Another idea was to split shader code into much more
 parts (for example, one part declares the uniform variables, one part declares
 the plug function, one part defines the function body and so on).
-Both approaches seemed uncomfortable and not natural for authors,
+Both approaches seemed uncomfortable for authors
 and they didn't really offer much simpler implementation, so we dropped this idea.
 The current approach, to find the declarations of \texttt{PLUG\_xxx} functions
 inside a complete shader code, is easy to implement and results in clean
@@ -569,7 +572,7 @@ All the effects on this list (with suitable language) will be used.
 %% Note that this is different
 %% than the \texttt{Appearance.shaders}, which chooses only one shader.
 %% For effects, we choose all of them.
-This allows authors to define a library of independent shader effects,
+This allows authors to define a library of independent shader effects
 and then trivially pick desired effects for each particular shape.
 Simply placing two effects on the \texttt{Appearance.effects} list
 makes them cooperate correctly.
@@ -624,7 +627,7 @@ In a fragment shader, the 3D~texture is sampled
 along the line between the camera and pixel position in the 3D~space. This makes a very
 convincing effect of a dense fog. The \texttt{Effect} node with
 appropriate shader code is placed at the top level of the X3D file,
-and so it simply works for all X3D shapes. See figure \ref{fig_fog}.
+so it simply works for all shapes. See figure \ref{fig_fog}.
 
 \subsection{Light sources effects}
 
@@ -679,7 +682,7 @@ knowing the current texture coordinates and other information.
 We introduce a new X3D node designed specifically for generating
 textures using the shaders. This is suitable
 if your texture is defined completely using the shading language.
-The texture contents are not stored anywhere (not even on GPU),
+The texture contents are not stored anywhere (not even on GPU)
 and the renderer does not manage any texture resources.
 From a GPU point of view, there is no texture.
 %\footnote{But the spoon is real,
@@ -733,7 +736,7 @@ adapting to the two largest bounding box sizes
 (the 3rd texture coordinate is always 0). This is most comfortable
 when the texture color depends only on the XY components of the texture coordinate.
 The precise behavior
-of \texttt{"BOUNDS2D"} follows the X3D \texttt{IndexedFaceSet} specification,
+of \texttt{"BOUNDS2D"} follows the X3D \texttt{IndexedFaceSet} specification
 and the precise behavior of \texttt{"BOUNDS3D"} is described in
 the \textit{Texturing3D} component of the X3D specification.
 
@@ -905,7 +908,7 @@ as some shading language directives are required to be placed before
 all normal declarations. For example, in case of the \emph{OpenGL shading language},
 the \texttt{\#version} as well as some \texttt{\#extension} directives
 must occur at the beginning of the shader code. You should place
-\texttt{/* PLUG-DECLARATIONS */} after such directives,
+\texttt{/* PLUG-DECLARATIONS */} after such directives
 and before any \texttt{/* PLUG: ... */} declarations.
 
 \subsection{Invalid shader code}
@@ -1098,7 +1101,7 @@ like \texttt{view3dscene}.
 We have implemented all the X3D extensions described in this paper
 for the \emph{OpenGL Shading Language} (GLSL).
 However, we have designed our extensions
-to be applicable to other shading languages as well (like Cg or HLSL),
+to be applicable to other shading languages as well (like Cg or HLSL)
 and we believe they can be handled in a similar fashion.
 In particular, we have tested that the \emph{separate compilation units}
 concept of GLSL, while very useful, is not necessary for proper implementation
