@@ -1,0 +1,86 @@
+\documentclass{beamer}
+
+\mode<presentation>
+{
+  \useinnertheme[shadow=true]{rounded} % default from Warsaw theme
+  \useoutertheme{split}
+
+  \usecolortheme{orchid} % default from Warsaw theme
+  \usecolortheme{whale} % default from Warsaw theme
+  \usecolortheme{beaver} % this overrides both orchid and whale, as far as I see, but keep them for safety
+
+  % these override \usecolortheme above
+  \setbeamercolor{frametitle}{bg=,fg=darkred!80!black}
+  \setbeamercolor{frametitle right}{bg=}
+
+  \usefonttheme[onlylarge]{structurebold}
+  \setbeamerfont{block title}{size={}} % default from Warsaw theme
+  \setbeamerfont{frametitle}{series=\bfseries} % probably taken care of by structurebold anyway, but keep in case useful for the future
+
+  \setbeamercovered{transparent}
+}
+
+\usepackage[polish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{times}
+\usepackage[T1]{fontenc}
+
+\title{Compositing shaders in X3D\\
+Komponowanie shaderów w X3D}
+
+\author[Michalis Kamburelis]{Michalis Kamburelis \\ \texttt{michalis.kambi@gmail.com}}
+
+\pgfdeclareimage[height=2cm]{ii-and-kambivrml}{ii-and-kambivrml}
+\logo{\pgfuseimage{ii-and-kambivrml}}
+
+\newcommand*{\codeem}[1]{\textbf{#1}}
+
+\begin{document}
+
+\begin{frame}
+  \titlepage
+\end{frame}
+
+\begin{frame}{Outline}
+  \tableofcontents
+  % You might wish to add the option [pausesections]
+\end{frame}
+
+\section{Wstęp}
+
+\begin{frame}{Wstęp}
+Moja praca jest prosta:
+  - rozszerzenie 2 zintegrowanych ze sobą języków
+  - implementowalne (zrobiona w miesiąc 100% implementacja, z przykładami, dla GLSL)
+  Ale nikt inny tego jeszcze nie zrobił :)
+  - przynajmniej nie bez wymyślania zupełnie nowego języka; a w tej dziedzinie, nowy język specjalnie do tego problemu -> oznacza że zapewne niewiele osób tego użyje; idea musi być prosta i rozszerzać istniejące języki które *już* są zaimplementowane w rendererach. Dodawanie nowego języka mija się z celem, historia pokazuje że takie języki nie zyskują popularności --- zbyt wąskie zastosowanie, a język w GPU (jak GLSL) zawsze będzie istniał.
+  - wyniki bardzo ładne. Będą ładne obrazki.
+    Istotnie pozwalam na programowanie i łączenie efektów za pomocą shaderów w bardzo wygodny sposób.
+    IMHO dopiero teraz GLSL jest użyteczny dla autorów.
+\end{frame}
+
+\section{Co to są shadery, co to jest X3D}
+
+\begin{frame}{X3D}
+  VRML/X3D: język do opisu światów 3D.
+  TODO: Węzły, pola, przykład.
+\end{frame}
+
+\begin{frame}{X3D - język programowania}
+Wcale nie taki prosty:
+- Jest elegancki mechanizm zdarzeń, za pomocą których można wysyłać i reagować na zdarzenia. Coś jak deklaratywny odpowiednik wywołania metody obiektu. Np. otwórz drzwi kiedy user kliknie na klamkę.
+- Są prototypy/external prototypy, za pomocą których można wyrazić nowe węzły. Można zdefiniować część węzłów za pomocą innych węzłów.
+Ogólnie "format modeli 3D" to prosta definicja dla użytkowników. Definicja dla nas to "całkiem ładny deklaratywny język programowania".
+- Są węzły Script do integracji z innymi językami, np. JavaScript. U mnie --- z własnym prostym językiem skryptowym oraz ze skompilowanym kodem w ObjectPascalu.
+TODO:Więcej nowinek z vrml\_engine\_doc, sekcja "advanced features"?
+\end{frame}
+
+\begin{frame}{Shadery}
+Shadery: języki programowania na GPU. GLSL, Cg, HLSL. To są języki specjalnie do programowania grafiki 3D. Chociaż przy pomocy pewnych sztuczek (tekstury oparte na float, render to textury) można je wykorzystać do ogólnych obliczeń, obecnie do ogólnych obliczeń wygodniejsze są CUDA/OpenCL (google.com/q=gpgpu).
+
+Naturalnie, X3D posiada węzły do definiowania shaderów.
+
+Przykład.
+\end{frame}
+
+\end{document}
