@@ -83,4 +83,113 @@ Naturalnie, X3D posiada węzły do definiowania shaderów.
 Przykład.
 \end{frame}
 
+\begin{frame}{Shadery w X3D}
+\end{frame}
+
+\begin{frame}{O shaderach w X3D}
+  Existing shader nodes (ComposedShader and such):
+    - use the first matching shader
+      Good, allows to use various shading languages.
+    - can have uniform and attributes values from X3D fields
+      Very good (e.g. passing TimeSensor.time to shader is trivial)
+    - replace the normal shading
+      Good? This directly exposes the GPU (OpenGL, etc.)
+        functionality. So --- easy implementation, and following the idea
+        of having a specially crafted, optimized shaders for specific
+        situations.
+      Bad: Unless you are prepared to roll out your own shader generator
+        system, this isn't really usable. Before implementing the least
+        trivial GLSL effect, you usually want to replicate all the standard
+        X3D functionality. Huge task.
+\end{frame}
+
+\section{Nasz pomysł}
+
+\begin{frame}{Dlaczego}
+Chcelibyśmy intensywnie używać shaderów. Każda właściwość 3D powinna
+być programowalna --- po to stworzono shadery.
+
+Ale tradycyjne podejscie, ,,napisz shader który robi wszystko'',
+uniemożliwia to. Zaprogramowanie najmniejszej zmiany (np. przefiltruj
+światło przez szablon) wymaga reimplementacji skomplikowanego algorytmu naokoło.
+% (chociażby równania oświetlenia, ale
+\end{frame}
+
+\begin{frame}{Rozwiązanie}
+
+Pozwól programować efekty które modyfikują istniejące zachowanie.
+Idea: bardzo prosty w użyciu mechanizm do definiowania nowych,
+i używania istniejących, ,,gniazd'' (plugs) --- miejsc gdzie można
+dodać kod.
+
+  So
+  - You still have the full power of shading language like GLSL
+    (we do not hide it from you, we do not invent any new language
+    for writing shaders, and implementation doesn't have to do any
+    difficult operations to process your shading language code).
+  - You can jump straight into the implementation of your
+    interesting effect in shading language.
+    Mark when it should be used... and you're done.
+  - Your effects are immediately reusable: they work under all
+    lighting / (multi-)texturing conditions, because the browser
+    takes care of it.
+
+  More:
+  - Browser implementation can also use this,
+    to apply some internal effects this way. So we can have a base
+    shader, then a really easy (and separate from the rest)
+    implementation of stuff like fog, bump mapping and shadow mapping.
+  - Various author effects also instantly cooperate with each other.
+\end{frame}
+
+\begin{frame}{Przykłady na start}
+  Show examples:
+    Shinto shrine: bump mapping, and 2 x shadow maps.
+      Each shadow map correctly scales appropriate light source.
+      Browser implementation is easy!
+      (Show EnableBumpMapping, or maybe EnableFog source)
+    Water: 2 separate effects, cooperating with standard browser per-pixel lighting
+    Volumetric fog. Turn on/off fog.
+    fresnel\_and\_toon: show the X3D source:
+      I can just say: "this is a list of effects you should use:
+      this one, and this one. Now make it happen."
+      And both effects are applied.
+\end{frame}
+
+\begin{frame}{Węzły efektów}
+  Effects at Apperance.effects:
+  - Introducing Effect, EffectPart nodes.
+  - We steal ideas from ComposedShader and such: uniform values
+    can be trivially declared inside Effect (multiple Effects sum their
+    uniforms).
+  - Effect code is not complete: it will be plugged into full shader.
+    Magic PLUG\_xxx function names are used for this.
+\end{frame}
+
+\begin{frame}{Efekty dla źródeł światła}
+  Effects at light sources:
+\end{frame}
+
+\begin{frame}{Efekty tekstur}
+  Effects at textures:
+\end{frame}
+
+\begin{frame}{Procedurable tekstury na GPU}
+  ShaderTexture:
+\end{frame}
+
+\begin{frame}{Efekty działające na grupę}
+  Effects at grouping nodes:
+\end{frame}
+
+\begin{frame}{Definiuj własne plugs}
+  Defining plugs:
+  - Effect code may define plugs for following effects to use.
+    Trivially easy, just a magic /* PLUG: ... */ comment.
+  - You can even still define your own basic shader (like ComposedShader),
+    and if you define standard plug names there --- it will work
+    with effects. And you can define more of your own plugs,
+    for your effects.
+\end{frame}
+
 \end{document}
