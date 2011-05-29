@@ -1,5 +1,7 @@
 \documentclass{beamer}
 
+% TODO: no right top col on header?
+
 \mode<presentation>
 {
   \useinnertheme[shadow=true]{rounded} % default from Warsaw theme
@@ -32,7 +34,12 @@
 \pgfdeclareimage[height=2cm]{ii-and-kambivrml}{ii-and-kambivrml}
 \logo{\pgfuseimage{ii-and-kambivrml}}
 
-\newcommand*{\codeem}[1]{\textbf{#1}}
+\AtBeginSection[]
+{
+  \begin{frame}<beamer>{Outline}
+    \tableofcontents[currentsection,currentsubsection]
+  \end{frame}
+}
 
 \begin{document}
 
