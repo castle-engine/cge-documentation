@@ -1,11 +1,9 @@
 \documentclass{beamer}
 
-% TODO: no right top col on header?
-
 \mode<presentation>
 {
   \useinnertheme[shadow=true]{rounded} % default from Warsaw theme
-  \useoutertheme{split}
+  \useoutertheme[subsection=false]{miniframes}
 
   \usecolortheme{orchid} % default from Warsaw theme
   \usecolortheme{whale} % default from Warsaw theme
@@ -14,6 +12,7 @@
   % these override \usecolortheme above
   \setbeamercolor{frametitle}{bg=,fg=darkred!80!black}
   \setbeamercolor{frametitle right}{bg=}
+  \setbeamercolor{palette tertiary}{fg=black,bg=gray!15!white}
 
   \usefonttheme[onlylarge]{structurebold}
   \setbeamerfont{block title}{size={}} % default from Warsaw theme
@@ -31,8 +30,6 @@
 
 \author[Michalis Kamburelis]{Michalis Kamburelis \\ \texttt{michalis.kambi@gmail.com}}
 
-\pgfdeclareimage[height=2cm]{ii-and-kambivrml}{ii-and-kambivrml}
-\logo{\pgfuseimage{ii-and-kambivrml}}
 
 \AtBeginSection[]
 {
@@ -43,9 +40,14 @@
 
 \begin{document}
 
-\begin{frame}
-  \titlepage
-\end{frame}
+{
+  % logo on title page
+  \pgfdeclareimage[height=2cm]{ii-and-kambivrml}{ii-and-kambivrml}
+  \logo{\pgfuseimage{ii-and-kambivrml}}
+  \begin{frame}
+    \titlepage
+  \end{frame}
+}
 
 \begin{frame}{Outline}
   \tableofcontents
