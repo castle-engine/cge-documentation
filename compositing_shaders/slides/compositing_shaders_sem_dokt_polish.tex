@@ -219,86 +219,175 @@ uniemożliwia to. Zaprogramowanie najmniejszej zmiany (np. przefiltruj
 \end{frame}
 
 \begin{frame}{Rozwiązanie}
-
 Pozwól programować efekty które modyfikują istniejące zachowanie.
-Idea: bardzo prosty w użyciu mechanizm do definiowania nowych,
+
+% TODO: ramka, cos jak do twierdzenia
+\textbf{Idea 1}: bardzo prosty w użyciu mechanizm do definiowania nowych,
 i używania istniejących, ,,gniazd'' (plugs) --- miejsc gdzie można
-dodać kod.
+dodać własne obliczenia. Żeby użyć gniazda o nazwie \texttt{texture\_apply},
+po prostu zdefiniuj funkcję o magicznej nazwie \texttt{PLUG\_texture\_apply},
+i użyj nowego węzła \texttt{Effect}.
 
-  So
-  - You still have the full power of shading language like GLSL
-    (we do not hide it from you, we do not invent any new language
-    for writing shaders, and implementation doesn't have to do any
-    difficult operations to process your shading language code).
-  - You can jump straight into the implementation of your
-    interesting effect in shading language.
-    Mark when it should be used... and you're done.
-  - Your effects are immediately reusable: they work under all
-    lighting / (multi-)texturing conditions, because the browser
-    takes care of it.
-
-  More:
-  - Browser implementation can also use this,
-    to apply some internal effects this way. So we can have a base
-    shader, then a really easy (and separate from the rest)
-    implementation of stuff like fog, bump mapping and shadow mapping.
-  - Various author effects also instantly cooperate with each other.
+\begin{itemize}
+  \item + Zachowujemy pełną siłę języka shaderów (GLSL w naszej implementacji).
+    %% - You still have the full power of shading language like GLSL
+    %%   (we do not hide it from you, we do not invent any new language
+    %%   for writing shaders, and implementation doesn't have to do any
+    %%   difficult operations to process your shading language code).
+  \item + Implementacja w rendererze łatwa: rozszerzamy istniejący język).
+  \item + Implementacja efektów łatwa: zaczynamy od razu pisać nasz algorytm,
+    wskazujemy tylko gdzie go wstawić.
+  \item + Efekty reusable: wstawiane w wewnętrzny shader, wygenerowany
+    znając tekstury, oświetlenie etc.
+  \item + Efekty można łączyć: wiele efektów może używać tych samych gniazd.
+\end{itemize}
 \end{frame}
 
-\begin{frame}{Przykłady na start}
-  Show examples:
-    Shinto shrine: bump mapping, and 2 x shadow maps.
-      Each shadow map correctly scales appropriate light source.
-      Browser implementation is easy!
-      (Show EnableBumpMapping, or maybe EnableFog source)
-    Water: 2 separate effects, cooperating with standard browser per-pixel lighting
-    Volumetric fog. Turn on/off fog.
-    fresnel\_and\_toon: show the X3D source:
-      I can just say: "this is a list of effects you should use:
-      this one, and this one. Now make it happen."
-      And both effects are applied.
+\begin{frame}{Wewnętrzne efekty}
+
+Rozwiązanie przydatne także do wewnętrznych efektów.
+
+\begin{itemize}
+  \item Shadow maps: filtruj odpowiednie źródło światła,
+  \item Bump mapping klasyczny: zmien wektor normalny na podstawie tekstury,
+  \item Mgła: wymieszaj końcowy kolor pixela z kolorem mgły.
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1.8in]{../rhan_shrine_5_everything}
+  \caption{Połączenie dwóch shadow maps i bump mapping}
+\end{figure}
 \end{frame}
 
-\begin{frame}{Węzły efektów}
-  Effects at Apperance.effects:
-  - Introducing Effect, EffectPart nodes.
-  - We steal ideas from ComposedShader and such: uniform values
-    can be trivially declared inside Effect (multiple Effects sum their
-    uniforms).
-  - Effect code is not complete: it will be plugged into full shader.
-    Magic PLUG\_xxx function names are used for this.
+\begin{frame}{Przykład}
+\begin{semiverbatim}
+effects Effect \{
+  language "GLSL"
+  parts EffectPart \{
+    type "FRAGMENT"
+    url "data:text/plain,
+\textbf{    void PLUG\_texture\_apply(}
+\textbf{      inout vec4 fragment\_color,}
+\textbf{      const in vec3 normal)}
+\textbf{    \{}
+\textbf{      fragment\_color.rgb *= 2.0;}
+\textbf{    \}}"
+  \}
+\}
+\end{semiverbatim}
+\end{frame}
+
+\begin{frame}{Szczegóły}
+\begin{itemize}
+  \item Nowy węzeł \texttt{Effect}: wybierz język shaderów.
+  \item Nowy węzeł \texttt{EffectPart}: wybierz typ (vertex, pixel, etc.).
+  \item Można definiować własne uniform w \texttt{Effect}, np. przekazać
+    teksturę albo czas do efektu.
+    % jak ComposedShader
+  \item Wszystkie efekty będą dodane do bazowego shadera. (Upraszczając.)
+  \item Stary \texttt{ComposedShader} modyfikuje bazowy shader.
+    W ten sposób stary \texttt{ComposedShader} też jest lepszy:
+    może współpracować z wewnętrznymi efektami (shadow maps),
+    i efektami użytkownika (z węzłów \texttt{Effect}).
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Przykład łączenia: fresnel\_and\_toon}
+\begin{figure}
+  \centering
+  \includegraphics[width=1.8in]{../fresnel_and_toon}
+  \caption{Połączenie dwóch prostych efektów Fresnela i cieniowania kreskówkowego}
+\end{figure}
+
+(Kod: \texttt{demo\_models/compositing\_shaders/fresnel\_and\_toon.x3dv})
+
+  %% : show the X3D source:
+  %%   I can just say: "this is a list of effects you should use:
+  %%   this one, and this one. Now make it happen."
+  %%   And both effects are applied.
 \end{frame}
 
 \begin{frame}{Efekty dla źródeł światła}
-  Effects at light sources:
+Idea 2: efekty można dodawać nie tylko do widocznych obiektów 3D,
+także do innych elementów sceny. W ten sposob można zdefiniować
+światło które ma specyficzny kształt, specyficznie równanie etc.
+
+Takie światło automatycznie współpracuje z cieniami, bump mapping etc.!
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1.8in]{../fancy_light_spot_shape}
+  \caption{Światło filtrowane przez teksturę. Istotne jest że światło ciągle rzuca poprawny cień.}
+\end{figure}
 \end{frame}
 
 \begin{frame}{Efekty tekstur}
-  Effects at textures:
+Tekstury można modyfikować przy użyciu efektów. Tekstury mają mnóstwo
+zastosowań (to po prostu macierz, zazwyczaj 2D lub 3D), więc wiele nowych
+możliwości.
 \end{frame}
 
-\begin{frame}{Procedurable tekstury na GPU}
-  ShaderTexture:
+\begin{frame}{Proceduralne tekstury na GPU}
+Proceduralne tekstury to po prostu funkcje 2D lub 3D ->
+kolor, wektor normalny, etc.
+
+Tworzenie ich zawsze było łatwe, ale stare metody miały wadę:
+ponieważ nie jest to tekstura dla renderera, znikają możliwości wygodnego
+generowania i przypisywania współrzędnch. Rozwiązujemy to przez
+\texttt{ShaderTexture}.
+
+\begin{columns}[T]
+  \begin{column}{1in}
+    \includegraphics[width=1.5in]{../terrain}
+  \end{column}
+  \begin{column}{1in}
+    \includegraphics[width=1.5in]{../shader_texture_edge_detection}
+  \end{column}
+  \begin{column}{1in}
+    \includegraphics[width=1.5in]{../noise}
+  \end{column}
+\end{columns}
+
 \end{frame}
 
 \begin{frame}{Efekty działające na grupę}
-  Effects at grouping nodes:
+Naturalne rozszerzenie. Przykładowo, ciekawa mgła.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1.8in]{../volumetric_animated_fog_all}
+  \caption{Kłębiasta, ruchoma mgła (sauna).}
+\end{figure}
+
+(Kod: \texttt{demo\_models/compositing\_shaders/volumetric\_animated\_fog.x3dv}.\\
+\textbf{Krótki i działa na dowolnym modelu 3D!}\\
+Unline other implementation.)
+% Turn on/off fog.
+
 \end{frame}
 
-\begin{frame}{Popularne efekty stają się łatwe}
-W podobny sposób można zaimplementować typowo wewnętrzne efekty
-renderera: shadow maps (filtruj odpowiednie źródło światła),
-bump mapping (zmien wektor normalny na podstawie tekstury).
+\begin{frame}{Definiuj własne gniazda}
+Twój efekt może definiować gniazda do użycia przez inne efekty.
+Trywialne: magiczny komentarz \texttt{/* PLUG: ... */}.
 \end{frame}
 
-\begin{frame}{Definiuj własne plugs}
-  Defining plugs:
-  - Effect code may define plugs for following effects to use.
-    Trivially easy, just a magic /* PLUG: ... */ comment.
-  - You can even still define your own basic shader (like ComposedShader),
-    and if you define standard plug names there --- it will work
-    with effects. And you can define more of your own plugs,
-    for your effects.
+\begin{frame}{Przykłady na koniec}
+Woda:
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1.8in]{../water_shaders_3}
+  \caption{Woda, połączenie kilku efektów: generuj wektory normalne, transformuj je do eye space, połącz z reflection + refraction}
+\end{figure}
+
+Kwiatki:
+
+\begin{figure}
+  \centering
+  \includegraphics[width=1.8in]{../flowers}
+  \caption{Kwiatki: transformacja zmieniana przez shader.}
+\end{figure}
 \end{frame}
 
 \section{Pytania?}
