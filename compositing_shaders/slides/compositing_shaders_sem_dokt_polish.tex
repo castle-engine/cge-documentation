@@ -84,7 +84,7 @@ Proste, ale nikt inny tego jeszcze nie zrobił :)
 
 \section{Co to jest X3D, co to są shadery}
 
-\begin{frame}{X3D}
+\begin{frame}[fragile]{X3D}
 
 \begin{itemize}
   \item X3D to język do opisu światów 3D.
@@ -95,8 +95,7 @@ Proste, ale nikt inny tego jeszcze nie zrobił :)
   \item Każdy węzeł ma pola i dzieci.
 \end{itemize}
 
-Przykład:
-
+\begin{exampleblock}{Przykład}
 \begin{semiverbatim}
 \#X3D V3.2 utf8
 PROFILE Interchange
@@ -104,9 +103,12 @@ Shape \{
   geometry Sphere \{ radius 2 \}
 \}
 \end{semiverbatim}
+\end{exampleblock}
+\end{frame}
 
-Albo (pomijam XMLowe deklaracje):
+\begin{frame}[fragile]{X3D - przykład XML}
 
+\begin{exampleblock}{Alternatywna wersja poprzedniego przykładu}
 \begin{semiverbatim}
 ...
 <X3D version="3.2" profile="Interchange" ...>
@@ -117,6 +119,7 @@ Albo (pomijam XMLowe deklaracje):
   </Scene>
 </X3D>
 \end{semiverbatim}
+\end{exampleblock}
 
 \end{frame}
 
@@ -159,7 +162,8 @@ Shadery:
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Shadery w X3D - przykład}
+\begin{frame}[fragile]{Shadery w X3D - przykład}
+\begin{exampleblock}{Przykład X3D + GLSL}
 \begin{semiverbatim}
 \#X3D V3.2 utf8
 PROFILE Interchange
@@ -169,15 +173,16 @@ Shape \{
     parts [
       ShaderPart \{ type "FRAGMENT"
         url "data:text/plain,
-        void main(void)
-        \{
-          gl\_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-        \}" \}
+        \textbf{void main(void)}
+        \textbf{\{}
+          \textbf{gl\_FragColor = vec4(1.0, 0.0, 0.0, 1.0);}
+        \textbf{\}}" \}
     ]
   \} \}
   geometry Sphere \{ radius 2 \}
 \}
 \end{semiverbatim}
+\end{exampleblock}
 \end{frame}
 
 \begin{frame}{O shaderach w X3D}
@@ -262,8 +267,11 @@ Rozwiązanie przydatne także do wewnętrznych efektów.
 \end{figure}
 \end{frame}
 
-\begin{frame}{Przykład}
+\begin{frame}[fragile]{Przykład}
+\begin{exampleblock}{Przykład naszych efektów}
 \begin{semiverbatim}
+# Poniższe należy włożyć do środka Appearance
+# z poprzednich przykładów
 effects Effect \{
   language "GLSL"
   parts EffectPart \{
@@ -278,6 +286,7 @@ effects Effect \{
   \}
 \}
 \end{semiverbatim}
+\end{exampleblock}
 \end{frame}
 
 \begin{frame}{Szczegóły}
