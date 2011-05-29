@@ -25,8 +25,7 @@
 \usepackage{times}
 \usepackage[T1]{fontenc}
 
-\title{Compositing shaders in X3D\\
-Komponowanie shaderów w X3D}
+\title{Komponowanie shaderów w X3D}
 
 \author[Michalis Kamburelis]{Michalis Kamburelis \\ \texttt{michalis.kambi@gmail.com}}
 
@@ -49,58 +48,156 @@ Komponowanie shaderów w X3D}
 \section{Wstęp}
 
 \begin{frame}{Wstęp}
-Moja praca jest prosta:
-  - rozszerzenie 2 zintegrowanych ze sobą języków
-  - implementowalne (zrobiona w miesiąc 100% implementacja, z przykładami, dla GLSL)
-  Ale nikt inny tego jeszcze nie zrobił :)
-  - przynajmniej nie bez wymyślania zupełnie nowego języka; a w tej dziedzinie, nowy język specjalnie do tego problemu -> oznacza że zapewne niewiele osób tego użyje; idea musi być prosta i rozszerzać istniejące języki które *już* są zaimplementowane w rendererach. Dodawanie nowego języka mija się z celem, historia pokazuje że takie języki nie zyskują popularności --- zbyt wąskie zastosowanie, a język w GPU (jak GLSL) zawsze będzie istniał.
-  - wyniki bardzo ładne. Będą ładne obrazki.
-    Istotnie pozwalam na programowanie i łączenie efektów za pomocą shaderów w bardzo wygodny sposób.
-    IMHO dopiero teraz GLSL jest użyteczny dla autorów.
+Pokazaliśmy jak elegancko i łatwo tworzyć i łączyć efekty graficzne
+oparte na shaderach.
+
+\begin{itemize}
+  \item Rozszerzenie dwóch zintegrowanych ze sobą języków (X3D i GLSL).
+  \item Faktycznie wykonalne (działająca implementacja i przykłady w ~miesiąc).
+\end{itemize}
+
+Proste, ale nikt inny tego jeszcze nie zrobił :)
+
+\begin{itemize}
+  \item Przynajmniej nie bez wymyślania zupełnie nowego języka pisania shaderów
+    (AnySL, Spark, Sh). Ale nowe języki nie zdobywają popularności,
+    bo zazwyczaj wymagają przepisania całego renderowania.
+    Nasz pomysł to eleganckie rozszerzenie GLSL  i X3D.
+    % glsl - (który jest podstawą OpenGL, więc znają go wszyscy
+  \item Wyniki bardzo obiecujące. Będą ładne obrazki.
+    Różne (poprzednio nietrywialnych) algorytmy na shaderach stają się
+    trywialne.
+    % Istotnie pozwalam na programowanie i łączenie efektów
+    % za pomocą shaderów w bardzo wygodny sposób.
+    %  IMHO dopiero teraz GLSL jest użyteczny dla autorów.
+\end{itemize}
 \end{frame}
 
-\section{Co to są shadery, co to jest X3D}
+\section{Co to jest X3D, co to są shadery}
 
 \begin{frame}{X3D}
-  VRML/X3D: język do opisu światów 3D.
-  TODO: Węzły, pola, przykład.
+
+\begin{itemize}
+  \item X3D to język do opisu światów 3D.
+  \item Otwarty, popularny standard.
+  \item Proste rzeczy są proste.
+  \item Drzewo węzłów w prostych przypadkach (de facto, skierowany graf
+    --- mogą być cykle).
+  \item Każdy węzeł ma pola i dzieci.
+\end{itemize}
+
+Przykład:
+
+\begin{semiverbatim}
+\#X3D V3.2 utf8
+PROFILE Interchange
+Shape \{
+  geometry Sphere \{ radius 2 \}
+\}
+\end{semiverbatim}
+
+Albo (pomijam XMLowe deklaracje):
+
+\begin{semiverbatim}
+...
+<X3D version="3.2" profile="Interchange" ...>
+  <Scene>
+    <Shape>
+      <Sphere radius="2" />
+    </Shape>
+  </Scene>
+</X3D>
+\end{semiverbatim}
+
 \end{frame}
 
-\begin{frame}{X3D - język programowania}
-Wcale nie taki prosty:
-- Jest elegancki mechanizm zdarzeń, za pomocą których można wysyłać i reagować na zdarzenia. Coś jak deklaratywny odpowiednik wywołania metody obiektu. Np. otwórz drzwi kiedy user kliknie na klamkę.
-- Są prototypy/external prototypy, za pomocą których można wyrazić nowe węzły. Można zdefiniować część węzłów za pomocą innych węzłów.
-Ogólnie "format modeli 3D" to prosta definicja dla użytkowników. Definicja dla nas to "całkiem ładny deklaratywny język programowania".
-- Są węzły Script do integracji z innymi językami, np. JavaScript. U mnie --- z własnym prostym językiem skryptowym oraz ze skompilowanym kodem w ObjectPascalu.
-TODO:Więcej nowinek z vrml\_engine\_doc, sekcja "advanced features"?
+\begin{frame}{X3D jako język programowania}
+
+Kilka ciekawostek które czynią X3D bardziej interesującym:
+
+\begin{itemize}
+  \item DEF/USE: referencje, dla wszystkich węzłów.
+  \item Mechanizm zdarzeń: wysyłanie i reagowane na zdarzenia.
+    Deklaratywny odpowiednik wywołania metody obiektu.
+    Np. otwórz drzwi kiedy user kliknie na klamkę.
+  \item Prototypy: można definiować nowe, pełnowartościowe,
+    węzły jako kombinację istniejących.
+  \item Ogólnie "format modeli 3D" to prosta definicja dla użytkowników.
+    Definicja dla nas to "całkiem ładny deklaratywny język programowania",
+    który akurat ma mnóstwo wbudowanych węzłów na grafiki 3D.
+  \item Script: integracja z innymi językami (np. JavaScript) naturalnie łatwa.
+     %  np. JavaScript. U mnie --- z własnym prostym językiem skryptowym
+     % oraz ze skompilowanym kodem w ObjectPascalu.
+     % Więcej nowinek w vrml\_engine\_doc, sekcja "advanced features".
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Shadery}
-Shadery: języki programowania na GPU. GLSL, Cg, HLSL. To są języki specjalnie do programowania grafiki 3D. Chociaż przy pomocy pewnych sztuczek (tekstury oparte na float, render to textury) można je wykorzystać do ogólnych obliczeń, obecnie do ogólnych obliczeń wygodniejsze są CUDA/OpenCL (google.com/q=gpgpu).
-
-Naturalnie, X3D posiada węzły do definiowania shaderów.
-
-Przykład.
+Shadery:
+\begin{itemize}
+  \item Języki do cieniowania obiektów 3D. Uproszczenie: zrób coś per-vertex,
+    rasteryzuj, zrób coś per-pixel.
+    % Chociaż przy pomocy pewnych sztuczek (tekstury oparte na float,
+    % render to textury) można je wykorzystać do ogólnych obliczeń,
+    % obecnie do ogólnych obliczeń wygodniejsze są CUDA/OpenCL
+    % (google.com/q=gpgpu).
+    % Można próbować
+    % geom shader
+  \item Nas interesują shadery na GPU, czyli do renderowania w czasie
+    rzeczywistym. GLSL (OpenGL), Cg (NVidia -> OpenGL lub Direct 3D),
+    HLSL (Direct 3D).
+  \item Naturalnie, X3D posiada węzły do definiowania shaderów.
+\end{itemize}
 \end{frame}
 
-\begin{frame}{Shadery w X3D}
+\begin{frame}{Shadery w X3D - przykład}
+\begin{semiverbatim}
+\#X3D V3.2 utf8
+PROFILE Interchange
+Shape \{
+  appearance Appearance \{ shaders ComposedShader \{
+    language "GLSL"
+    parts [
+      ShaderPart \{ type "FRAGMENT"
+        url "data:text/plain,
+        void main(void)
+        \{
+          gl\_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        \}" \}
+    ]
+  \} \}
+  geometry Sphere \{ radius 2 \}
+\}
+\end{semiverbatim}
 \end{frame}
 
 \begin{frame}{O shaderach w X3D}
-  Existing shader nodes (ComposedShader and such):
-    - use the first matching shader
-      Good, allows to use various shading languages.
-    - can have uniform and attributes values from X3D fields
-      Very good (e.g. passing TimeSensor.time to shader is trivial)
-    - replace the normal shading
-      Good? This directly exposes the GPU (OpenGL, etc.)
-        functionality. So --- easy implementation, and following the idea
-        of having a specially crafted, optimized shaders for specific
-        situations.
-      Bad: Unless you are prepared to roll out your own shader generator
-        system, this isn't really usable. Before implementing the least
-        trivial GLSL effect, you usually want to replicate all the standard
-        X3D functionality. Huge task.
+
+Co złego, co dobrego w shaderach w X3D?
+
+\begin{itemize}
+  \item + Wybierz pierwszy obsługiwany shader.
+  \item + Można łatwo przekazać do shadera wartości uniform (per-object)
+    albo attribute (per-vertex).\\
+    Np. przekaż aktualny czas (\texttt{TimeSensor.time} w X3D) to shadera trywialnie.
+  \item Shader zastępuje domyślne obliczenia:
+    \begin{itemize}
+      \item + Łatwe do implementacji, bo właśnie tak działa GPU, na to pozwala
+        OpenGL etc.
+      \item - \textbf{Trudne} implementowanie własnych shaderów.
+        Zanim zaczniesz pisać swój efekt, najpierw odtwórz algorytm
+        standardowego renderowania. Głupie, bo renderer umie go wygenerować.
+        Możesz go skopiować i zorientować się gdzie dodać kod, ale...
+      \item - \textbf{Powstają shadery 1-razowego użytku}.
+        Konkretny kod shadera przywiązuje Cię do wielu ustawień sceny
+        (ile, jakie tekstury, światła etc.).
+        Ogólny shader (uwzględniający wszystkie możliwości) nie jest możliwy,
+        bo nie ma szans działać w rozsądnycm czasie.
+      \item - \textbf{Wszystkie efekty w jednym worku}.
+        Usuwanie / dodawanie efektu oznacza wstawianie kodu do istniejącego
+        dużego shadera.
+    \end{itemize}
+\end{itemize}
 \end{frame}
 
 \section{Nasz pomysł}
@@ -112,7 +209,6 @@ być programowalna --- po to stworzono shadery.
 Ale tradycyjne podejscie, ,,napisz shader który robi wszystko'',
 uniemożliwia to. Zaprogramowanie najmniejszej zmiany (np. przefiltruj
 światło przez szablon) wymaga reimplementacji skomplikowanego algorytmu naokoło.
-% (chociażby równania oświetlenia, ale
 \end{frame}
 
 \begin{frame}{Rozwiązanie}
@@ -182,6 +278,12 @@ dodać kod.
   Effects at grouping nodes:
 \end{frame}
 
+\begin{frame}{Popularne efekty stają się łatwe}
+W podobny sposób można zaimplementować typowo wewnętrzne efekty
+renderera: shadow maps (filtruj odpowiednie źródło światła),
+bump mapping (zmien wektor normalny na podstawie tekstury).
+\end{frame}
+
 \begin{frame}{Definiuj własne plugs}
   Defining plugs:
   - Effect code may define plugs for following effects to use.
@@ -190,6 +292,34 @@ dodać kod.
     and if you define standard plug names there --- it will work
     with effects. And you can define more of your own plugs,
     for your effects.
+\end{frame}
+
+\section{Pytania?}
+
+\begin{frame}[t]
+
+\begin{center}
+{\small
+Wszystko jest już zaimplementowane, open-source (LGPL), w moim silniku:\\
+{\color{blue} \textbf{\texttt{http://vrmlengine.sourceforge.net/}}}\\
+Instrukcje jak pobrać i oglądać przykładowe modele dotyczące komponowania
+shaderów:\\
+{\color{blue} \textbf{\texttt{http://vrmlengine.sourceforge.net/\\
+compositing\_shaders.php}}}}
+\end{center}
+
+\vspace{0.25in}
+
+\begin{center}
+{\Large Dziękuję za uwagę!}
+\end{center}
+
+%\vspace{0.1in}
+
+\begin{center}
+{\Huge \alert{Pytania?}}
+\end{center}
+
 \end{frame}
 
 \end{document}
