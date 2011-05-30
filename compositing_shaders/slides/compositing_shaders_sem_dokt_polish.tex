@@ -49,7 +49,7 @@
   \end{frame}
 }
 
-\begin{frame}{Outline}
+\begin{frame}{Plan}
   \tableofcontents
   % You might wish to add the option [pausesections]
 \end{frame}
@@ -139,7 +139,7 @@ jako ,,deklaratywny język programowania'':
 
 \begin{itemize}
   \item DEF/USE: referencje, dla~wszystkich węzłów.
-  \item Mechanizm zdarzeń: wysyłanie i~reagowane na~zdarzenia.
+  \item Mechanizm zdarzeń: wysyłanie i~reagowanie na~zdarzenia.
     Deklaratywny odpowiednik wywołania metody obiektu.
     Np.~otwórz drzwi kiedy user kliknie na~klamkę.
   \item Prototypy: można definiować nowe, pełnowartościowe,
@@ -222,10 +222,10 @@ Shape \{
 
 \begin{frame}{Dlaczego}
 \begin{itemize}
-  \item Chcelibyśmy intensywnie używać shaderów. Każda właściwość 3D powinna
+  \item Chcielibyśmy intensywnie używać shaderów. Każda właściwość 3D powinna
     być programowalna --- po to stworzono shadery.
 
-  \item Ale tradycyjne podejscie, ,,napisz shader który robi wszystko'',
+  \item Ale tradycyjne podejście, ,,napisz shader który robi wszystko'',
     uniemożliwia to. Zaprogramowanie najmniejszej zmiany (np. przefiltruj
     światło przez szablon) wymaga zatroszczenia się o~algorytm naokoło.
 
@@ -282,23 +282,6 @@ effects Effect \{
 
 \renewcommand*{\figurename}{Obraz}
 
-\begin{frame}{Wewnętrzne efekty}
-
-Możemy zaimplementować wewnętrzne efekty w~podobny sposób.
-
-\begin{itemize}
-  \item Shadow maps: filtruj odpowiednie źródło światła,
-  \item Klasyczny Bump mapping: zmień wektor normalny na~podstawie tekstury,
-  \item Mgła: wymieszaj końcowy kolor pixela z~kolorem mgły.
-\end{itemize}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=2in]{../rhan_shrine_5_everything}
-  \caption{Połączenie dwóch shadow maps i~bump mapping}
-\end{figure}
-\end{frame}
-
 \begin{frame}{Szczegóły}
 \begin{itemize}
   \item Nowy węzeł \texttt{Effect}: wybierz język shaderów.
@@ -327,6 +310,22 @@ Kod: \texttt{demo\_models/compositing\_shaders/\\fresnel\_and\_toon.x3dv}
   %%   I~can just say: "this is a list of effects you should use:
   %%   this one, and this one. Now make it happen."
   %%   And both effects are applied.
+\end{frame}
+
+\begin{frame}{Wewnętrzne efekty}
+Możemy zaimplementować wewnętrzne efekty w~podobny sposób.
+
+\begin{itemize}
+  \item Shadow maps: filtruj odpowiednie źródło światła,
+  \item Klasyczny Bump mapping: zmień wektor normalny na~podstawie tekstury,
+  \item Mgła: wymieszaj końcowy kolor pixela z~kolorem mgły.
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=2in]{../rhan_shrine_5_everything}
+  \caption{Połączenie dwóch shadow maps i~bump mapping}
+\end{figure}
 \end{frame}
 
 \begin{frame}{Efekty dla~źródeł światła}
@@ -398,8 +397,21 @@ Kod: \texttt{demo\_models/compositing\_shaders/\\volumetric\_animated\_fog.x3dv}
 \end{frame}
 
 \begin{frame}{Definiuj własne gniazda}
-Efekt może definiować gniazda do~użycia przez inne efekty.
-Trywialne: magiczny komentarz \texttt{/* PLUG: ... */}.
+Cały system polega na tym że własne gniazda można definiować łatwo:
+\begin{itemize}
+  \item Bazowy shader, i \textbf{każdy efekt}, może definiować gniazda
+    do~użycia przez następne efekty.\\
+    Trywialne: magiczny komentarz \texttt{/* PLUG: ... */}.
+  \item Magicznego komentarza można użyć wielokrotnie (żeby pozwolić
+    na loop unrolling w shaderach).
+  \item Magiczny komentarz \texttt{/* PLUG-DECLARATION */}
+    (przydatny żeby można było zadeklarować wyższą wersję GLSL).
+  \item Elegancko korzystamy z \textit{separate compilation units} GLSL.
+  \item Pomysł przenośny do innych języków shaderów.
+  \item Dobrze dobrany domyślny zestaw gniazd, see linki na końcu i przykłady.
+    Wbrew pozorom, nie trzeba 100 gniazd --- istnieje kilka uniwersalnych
+    gniazd które zaspokajają 90\% potrzeb.
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Przykłady końcowe - woda}
