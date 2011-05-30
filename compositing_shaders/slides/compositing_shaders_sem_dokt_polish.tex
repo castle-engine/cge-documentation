@@ -245,17 +245,17 @@ w~nowym węźle \texttt{Effect}.
 \end{block}
 
 \begin{itemize}
-  \item + Zachowujemy pełną siłę języka shaderów (GLSL w~naszej implementacji).
+  \item Zachowujemy pełną siłę języka shaderów (GLSL).
     %% - You still have the full power of shading language like GLSL
     %%   (we do~not hide it from you, we do~not invent any new language
     %%   for writing shaders, and implementation doesn't have to do~any
     %%   difficult operations to process your shading language code).
-  \item + Implementacja w~rendererze łatwa: rozszerzamy istniejący język.
-  \item + Implementacja efektów łatwa: zaczynamy od razu pisać nasz algorytm,
-    wskazujemy tylko gdzie go wstawić.
-  \item + Efekty reusable: wstawiane w~wewnętrzny shader, wygenerowany
+  \item Implementacja w~rendererze łatwa: rozszerzamy istniejący język.
+  \item Implementacja efektów łatwa: zaczynamy od razu pisać nasz algorytm,
+    wskazujemy tylko gdzie wstawić odpowiednie elementy.
+  \item Efekty reusable: wstawiane w~wewnętrzny shader, wygenerowany
     znając tekstury, oświetlenie etc.
-  \item + Efekty można łączyć: wiele efektów może używać tych samych gniazd.
+  \item Efekty można łączyć: wiele efektów może używać tych samych gniazd.
 \end{itemize}
 \end{frame}
 
@@ -314,14 +314,14 @@ Możemy zaimplementować wewnętrzne efekty w~podobny sposób.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Przykład łączenia: fresnel\_and\_toon}
+\begin{frame}{Przykład - łączenie prostych efektów}
 \begin{figure}
   \centering
-  \includegraphics[width=1.8in]{../fresnel_and_toon}
+  \includegraphics[width=3.0in]{../fresnel_and_toon}
   \caption{Połączenie dwóch prostych efektów Fresnela i~cieniowania kreskówkowego}
 \end{figure}
 
-(Kod: \texttt{demo\_models/compositing\_shaders/fresnel\_and\_toon.x3dv})
+Kod: \texttt{demo\_models/compositing\_shaders/\\fresnel\_and\_toon.x3dv}
 
   %% : show the X3D source:
   %%   I~can just say: "this is a list of effects you should use:
@@ -331,85 +331,90 @@ Możemy zaimplementować wewnętrzne efekty w~podobny sposób.
 
 \begin{frame}{Efekty dla~źródeł światła}
 \begin{block}{Pomysł 2}
-Efekty można dodawać nie tylko do~widocznych obiektów 3D,
-także do~innych elementów sceny. W~ten sposob można zdefiniować
-światło które ma specyficzny kształt, specyficznie równanie etc.
+Efekty można dodawać nie tylko do~widocznych obiektów 3D.
+Można zdefiniować światło które ma specyficzny kształt, równanie itp.,
+i używać go wielokrotnie jako pełnowartościowe światło w~X3D.
 \end{block}
-
-Takie światło automatycznie współpracuje z~cieniami, bump mapping etc.!
 
 \begin{figure}
   \centering
   \includegraphics[width=1.8in]{../fancy_light_spot_shape}
-  \caption{Światło filtrowane przez teksturę. Istotne jest że światło ciągle rzuca poprawny cień.}
+  \caption{Światło filtrowane przez teksturę. Rzuca poprawny cień, współpracuje z~bump mapping (czego nie mamy przy prostym rzutowaniu tekstury na~ścianę).}
 \end{figure}
 \end{frame}
 
-\begin{frame}{Efekty tekstur}
+\begin{frame}[fragile]{Efekty tekstur}
 Tekstury można modyfikować przy użyciu efektów. Tekstury mają mnóstwo
 zastosowań (to po prostu macierz, zazwyczaj 2D lub~3D), więc wiele nowych
 możliwości.
+
+\vspace{0.1in}
+
+Np.~zaburz istniejącą teksturę losowym szumem, albo wybierz slice tekstury 3D.
 \end{frame}
 
-\begin{frame}{Proceduralne tekstury na~GPU}
-Proceduralne tekstury to po prostu funkcje 2D lub~3D ->
-kolor, wektor normalny, etc.
+\begin{frame}[fragile]{Proceduralne tekstury na~GPU}
+Proceduralna tekstura to po prostu funkcja 2D lub~3D $\rightarrow$
+kolor, wektor normalny, i~inne.
 
-Tworzenie ich zawsze było łatwe, ale stare metody miały wadę:
-ponieważ nie jest to tekstura dla~renderera, znikają możliwości wygodnego
-generowania i~przypisywania współrzędnch. Rozwiązujemy to przez
+\vspace{0.1in}
+
+Tworzenie ich zawsze było łatwe, ale tradycyjne metody miały wadę:
+ponieważ nie jest to tekstura dla~renderera, znikały możliwości wygodnego
+generowania i~przypisywania współrzędnych tekstury. Rozwiązujemy to przez
 \texttt{ShaderTexture}.
 
+\begin{center}
 \begin{columns}[T]
   \begin{column}{1in}
-    \includegraphics[width=1.5in]{../terrain}
+    \includegraphics[width=1.3in]{../shader_texture_edge_detection}
   \end{column}
   \begin{column}{1in}
-    \includegraphics[width=1.5in]{../shader_texture_edge_detection}
+    \includegraphics[width=1.3in]{../terrain}
   \end{column}
   \begin{column}{1in}
-    \includegraphics[width=1.5in]{../noise}
+    \includegraphics[width=1.3in]{../noise}
   \end{column}
 \end{columns}
+\end{center}
 
 \end{frame}
 
 \begin{frame}{Efekty działające na~grupę}
-Naturalne rozszerzenie. Przykładowo, ciekawa mgła.
+%Naturalne rozszerzenie.
 
 \begin{figure}
   \centering
-  \includegraphics[width=1.8in]{../volumetric_animated_fog_all}
+  \includegraphics[width=3in]{../volumetric_animated_fog_all}
   \caption{Kłębiasta, ruchoma mgła (sauna).}
 \end{figure}
 
-(Kod: \texttt{demo\_models/compositing\_shaders/volumetric\_animated\_fog.x3dv}.\\
-\textbf{Krótki i~działa na~dowolnym modelu 3D!}\\
-Unline other implementation.)
+Kod: \texttt{demo\_models/compositing\_shaders/\\volumetric\_animated\_fog.x3dv}\\
+\textbf{Krótki i~działa na~dowolnym modelu 3D!}
+
+% Unline other implementation.)
 % Turn on/off fog.
 
 \end{frame}
 
 \begin{frame}{Definiuj własne gniazda}
-Twój efekt może definiować gniazda do~użycia przez inne efekty.
+Efekt może definiować gniazda do~użycia przez inne efekty.
 Trywialne: magiczny komentarz \texttt{/* PLUG: ... */}.
 \end{frame}
 
-\begin{frame}{Przykłady na~koniec}
-Woda:
-
+\begin{frame}{Przykłady końcowe - woda}
 \begin{figure}
   \centering
-  \includegraphics[width=1.8in]{../water_shaders_3}
+  \includegraphics[width=3.5in]{../water_shaders_3}
   \caption{Woda, połączenie kilku efektów: generuj wektory normalne, transformuj je do~eye space, połącz z~reflection + refraction}
 \end{figure}
+\end{frame}
 
-Kwiatki:
-
+\begin{frame}
 \begin{figure}
   \centering
-  \includegraphics[width=1.8in]{../flowers}
-  \caption{Kwiatki: transformacja zmieniana przez shader.}
+  \includegraphics[width=3.5in]{../flowers}
+  \caption{Animowane kwiatki: transformacja w~object space zmieniana przez shader.}
 \end{figure}
 \end{frame}
 
@@ -419,7 +424,7 @@ Kwiatki:
 
 \begin{center}
 {\small
-Wszystko jest już zaimplementowane, open-source (LGPL), w~moim silniku:\\
+Wszystko jest zaimplementowane, open-source (LGPL), w~moim silniku:\\
 {\color{blue} \textbf{\texttt{http://vrmlengine.sourceforge.net/}}}\\
 Instrukcje jak pobrać i~oglądać przykładowe modele dotyczące komponowania
 shaderów:\\
