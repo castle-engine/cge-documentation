@@ -33,7 +33,7 @@
 
 \AtBeginSection[]
 {
-  \begin{frame}<beamer>{Outline}
+  \begin{frame}<beamer>{Plan}
     \tableofcontents[currentsection,currentsubsection]
   \end{frame}
 }
@@ -57,29 +57,36 @@
 \section{Wstęp}
 
 \begin{frame}{Wstęp}
-Pokazaliśmy jak elegancko i łatwo tworzyć i łączyć efekty graficzne
-oparte na shaderach.
+Jak tworzyć i łączyć efekty graficzne oparte na shaderach.
 
 \begin{itemize}
   \item Rozszerzenie dwóch zintegrowanych ze sobą języków (X3D i GLSL).
-  \item Faktycznie wykonalne (działająca implementacja i przykłady w ~miesiąc).
+  \item Praktyczne, implementowalne (100\% skończona
+    i przetestowana implementacja open-source).
 \end{itemize}
+\end{frame}
+
+\begin{frame}{Proste i działa}
 
 Proste, ale nikt inny tego jeszcze nie zrobił :)
 
 \begin{itemize}
   \item Przynajmniej nie bez wymyślania zupełnie nowego języka pisania shaderów
-    (AnySL, Spark, Sh). Ale nowe języki nie zdobywają popularności,
+    (Spark, Sh). Ale nowe języki nie zdobywają popularności,
     bo zazwyczaj wymagają przepisania całego renderowania.
-    Nasz pomysł to eleganckie rozszerzenie GLSL  i X3D.
+    Nasz pomysł to eleganckie rozszerzenie GLSL i X3D.
     % glsl - (który jest podstawą OpenGL, więc znają go wszyscy
-  \item Wyniki bardzo obiecujące. Będą ładne obrazki.
-    Różne (poprzednio nietrywialnych) algorytmy na shaderach stają się
-    trywialne.
+\end{itemize}
+
+Działa świetnie :) Istotnie różne algorytmy na shaderach stają się łatwe,
+i to do ,,prawdziwej'' implementacji (która, raz zrobiona,
+musi być użyteczna na różnych modelach).
+Będą ładne obrazki.
+
     % Istotnie pozwalam na programowanie i łączenie efektów
     % za pomocą shaderów w bardzo wygodny sposób.
     %  IMHO dopiero teraz GLSL jest użyteczny dla autorów.
-\end{itemize}
+
 \end{frame}
 
 \section{Co to jest X3D, co to są shadery}
@@ -87,12 +94,12 @@ Proste, ale nikt inny tego jeszcze nie zrobił :)
 \begin{frame}[fragile]{X3D}
 
 \begin{itemize}
-  \item X3D to język do opisu światów 3D.
-  \item Otwarty, popularny standard.
-  \item Proste rzeczy są proste.
-  \item Drzewo węzłów w prostych przypadkach (de facto, skierowany graf
-    --- mogą być cykle).
-  \item Każdy węzeł ma pola i dzieci.
+  \item \textbf{Extensible 3D}: język do opisu światów 3D.
+  \item Otwarty (pełne specyfikacje na \texttt{http://www.web3d.org/}), popularny standard.
+  \item Łatwo wyrazić wszystkie typowe elementy świata 3D.
+  \item Drzewo węzłów w wielu prostych przypadkach.
+    Ale ogólnie skierowany graf węzłów, z możliwymi cyklami.
+  \item Każdy węzeł ma pola, niektóre pola mogą zawierać węzły-dzieci.
 \end{itemize}
 
 \begin{exampleblock}{Przykład}
@@ -106,9 +113,11 @@ Shape \{
 \end{exampleblock}
 \end{frame}
 
-\begin{frame}[fragile]{X3D - przykład XML}
+\begin{frame}[fragile]{X3D - XML}
 
-\begin{exampleblock}{Alternatywna wersja poprzedniego przykładu}
+Alternatywna wersja:
+
+\begin{exampleblock}{Przykład kodowania XML}
 \begin{semiverbatim}
 ...
 <X3D version="3.2" profile="Interchange" ...>
@@ -125,7 +134,8 @@ Shape \{
 
 \begin{frame}{X3D jako język programowania}
 
-Kilka ciekawostek które czynią X3D bardziej interesującym:
+Kilka elementów które czynią X3D bardziej interesującym,
+jako ,,deklaratywny język programowania'':
 
 \begin{itemize}
   \item DEF/USE: referencje, dla wszystkich węzłów.
@@ -134,10 +144,9 @@ Kilka ciekawostek które czynią X3D bardziej interesującym:
     Np. otwórz drzwi kiedy user kliknie na klamkę.
   \item Prototypy: można definiować nowe, pełnowartościowe,
     węzły jako kombinację istniejących.
-  \item Ogólnie "format modeli 3D" to prosta definicja dla użytkowników.
-    Definicja dla nas to "całkiem ładny deklaratywny język programowania",
-    który akurat ma mnóstwo wbudowanych węzłów na grafiki 3D.
-  \item Script: integracja z innymi językami (np. JavaScript) naturalnie łatwa.
+  \item Skrypty: integracja z innymi językami (np. JavaScript) łatwa.
+    Skrypt pozostaje ,,black boxem'' dla X3D, jednocześnie w samym
+    X3D definiujemy precyzyjnie do czego skrypt ma a do czego nie ma dostępu.
      %  np. JavaScript. U mnie --- z własnym prostym językiem skryptowym
      % oraz ze skompilowanym kodem w ObjectPascalu.
      % Więcej nowinek w vrml\_engine\_doc, sekcja "advanced features".
@@ -147,8 +156,8 @@ Kilka ciekawostek które czynią X3D bardziej interesującym:
 \begin{frame}{Shadery}
 Shadery:
 \begin{itemize}
-  \item Języki do cieniowania obiektów 3D. Uproszczenie: zrób coś per-vertex,
-    rasteryzuj, zrób coś per-pixel.
+  \item Języki do cieniowania obiektów 3D. Zaprogramuj pracę per-vertex,
+    pozwól na rasteryzację, zaprogramuj pracę per-pixel.
     % Chociaż przy pomocy pewnych sztuczek (tekstury oparte na float,
     % render to textury) można je wykorzystać do ogólnych obliczeń,
     % obecnie do ogólnych obliczeń wygodniejsze są CUDA/OpenCL
@@ -156,84 +165,84 @@ Shadery:
     % Można próbować
     % geom shader
   \item Nas interesują shadery na GPU, czyli do renderowania w czasie
-    rzeczywistym. GLSL (OpenGL), Cg (NVidia -> OpenGL lub Direct 3D),
+    rzeczywistym. GLSL (OpenGL), Cg (NVidia: dla OpenGL lub Direct 3D),
     HLSL (Direct 3D).
   \item Naturalnie, X3D posiada węzły do definiowania shaderów.
 \end{itemize}
 \end{frame}
 
-\begin{frame}[fragile]{Shadery w X3D - przykład}
+\begin{frame}[fragile]
 \begin{exampleblock}{Przykład X3D + GLSL}
 \begin{semiverbatim}
 \#X3D V3.2 utf8
 PROFILE Interchange
 Shape \{
-  appearance Appearance \{ shaders ComposedShader \{
-    language "GLSL"
-    parts [
-      ShaderPart \{ type "FRAGMENT"
+  appearance Appearance \{
+    shaders ComposedShader \{
+      language "GLSL"
+      parts ShaderPart \{
+        type "FRAGMENT"
         url "data:text/plain,
         \textbf{void main(void)}
         \textbf{\{}
-          \textbf{gl\_FragColor = vec4(1.0, 0.0, 0.0, 1.0);}
-        \textbf{\}}" \}
-    ]
-  \} \}
+          \textbf{gl\_FragColor = vec4(1.0,0.0,0.0,1.0);}
+        \textbf{\}}" \} \} \}
   geometry Sphere \{ radius 2 \}
 \}
 \end{semiverbatim}
 \end{exampleblock}
 \end{frame}
 
-\begin{frame}{O shaderach w X3D}
-
-Co złego, co dobrego w shaderach w X3D?
+\begin{frame}{Shader zastępuje domyślne obliczenia}
 
 \begin{itemize}
-  \item + Wybierz pierwszy obsługiwany shader.
-  \item + Można łatwo przekazać do shadera wartości uniform (per-object)
-    albo attribute (per-vertex).\\
-    Np. przekaż aktualny czas (\texttt{TimeSensor.time} w X3D) to shadera trywialnie.
-  \item Shader zastępuje domyślne obliczenia:
-    \begin{itemize}
-      \item + Łatwe do implementacji, bo właśnie tak działa GPU, na to pozwala
-        OpenGL etc.
-      \item - \textbf{Trudne} implementowanie własnych shaderów.
-        Zanim zaczniesz pisać swój efekt, najpierw odtwórz algorytm
-        standardowego renderowania. Głupie, bo renderer umie go wygenerować.
-        Możesz go skopiować i zorientować się gdzie dodać kod, ale...
-      \item - \textbf{Powstają shadery 1-razowego użytku}.
-        Konkretny kod shadera przywiązuje Cię do wielu ustawień sceny
-        (ile, jakie tekstury, światła etc.).
-        Ogólny shader (uwzględniający wszystkie możliwości) nie jest możliwy,
-        bo nie ma szans działać w rozsądnycm czasie.
-      \item - \textbf{Wszystkie efekty w jednym worku}.
-        Usuwanie / dodawanie efektu oznacza wstawianie kodu do istniejącego
-        dużego shadera.
-    \end{itemize}
+  %  \item + Wybiera pierwszy obsługiwany shader.
+  %% \item + Można łatwo przekazać do shadera wartości uniform (per-object)
+  %%   albo attribute (per-vertex). Np. przekaż aktualny czas
+  %%    to shadera.
+  \item + Łatwa implementacja dla renderera, bo właśnie tak działają GPU,
+    na to pozwala OpenGL etc.
+  \item - \textbf{Trudne implementowanie własnych shaderów}.
+    Zanim zaczniesz pisać swój efekt, najpierw odtwórz algorytm
+    standardowego renderowania.
+    Możesz skopiować kod wygenerowany przez renderer,
+    i zorientować się gdzie dodać swoje modyfikacje, ale...
+  \item - \textbf{Powstają shadery 1-razowego użytku}.
+    Konkretny kod shadera przywiązuje Cię do wielu ustawień sceny
+    (ile, jakie tekstury, światła etc.).
+    Ogólny shader (uwzględniający wszystkie możliwości) nie jest możliwy,
+    chociażby dlatego że nie ma będzie działał szybko.
+  \item - \textbf{Wszystkie efekty w jednym worku}.
+    Usuwanie / dodawanie efektu oznacza ostrożne wstawianie logiki
+    do istniejącego (dużego) kodu.
 \end{itemize}
 \end{frame}
 
 \section{Nasz pomysł}
 
 \begin{frame}{Dlaczego}
-Chcelibyśmy intensywnie używać shaderów. Każda właściwość 3D powinna
-być programowalna --- po to stworzono shadery.
+\begin{itemize}
+  \item Chcelibyśmy intensywnie używać shaderów. Każda właściwość 3D powinna
+    być programowalna --- po to stworzono shadery.
 
-Ale tradycyjne podejscie, ,,napisz shader który robi wszystko'',
-uniemożliwia to. Zaprogramowanie najmniejszej zmiany (np. przefiltruj
-światło przez szablon) wymaga reimplementacji skomplikowanego algorytmu naokoło.
+  \item Ale tradycyjne podejscie, ,,napisz shader który robi wszystko'',
+    uniemożliwia to. Zaprogramowanie najmniejszej zmiany (np. przefiltruj
+    światło przez szablon) wymaga zatroszczenia się o algorytm naokoło.
+
+  \item Wolimy programować efekty które rozszerzają/modyfikują
+    istniejące zachowanie.
+\end{itemize}
 \end{frame}
 
 \begin{frame}{Rozwiązanie}
-Pozwól programować efekty które modyfikują istniejące zachowanie.
 
-% TODO: ramka, cos jak do twierdzenia
-\textbf{Idea 1}: bardzo prosty w użyciu mechanizm do definiowania nowych,
-i używania istniejących, ,,gniazd'' (plugs) --- miejsc gdzie można
-dodać własne obliczenia. Żeby użyć gniazda o nazwie \texttt{texture\_apply},
-po prostu zdefiniuj funkcję o magicznej nazwie \texttt{PLUG\_texture\_apply},
-i użyj nowego węzła \texttt{Effect}.
+\begin{block}{Pomysł 1}
+Prosty w użyciu mechanizm do definiowania i używania
+,,gniazd'' (plugs) --- miejsc gdzie można dodać własne obliczenia.
+Żeby użyć gniazda o nazwie \texttt{texture\_apply},
+zdefiniuj funkcję o magicznej nazwie \texttt{PLUG\_texture\_apply}
+w nowym węźle \texttt{Effect}.
+\end{block}
 
 \begin{itemize}
   \item + Zachowujemy pełną siłę języka shaderów (GLSL w naszej implementacji).
@@ -241,7 +250,7 @@ i użyj nowego węzła \texttt{Effect}.
     %%   (we do not hide it from you, we do not invent any new language
     %%   for writing shaders, and implementation doesn't have to do any
     %%   difficult operations to process your shading language code).
-  \item + Implementacja w rendererze łatwa: rozszerzamy istniejący język).
+  \item + Implementacja w rendererze łatwa: rozszerzamy istniejący język.
   \item + Implementacja efektów łatwa: zaczynamy od razu pisać nasz algorytm,
     wskazujemy tylko gdzie go wstawić.
   \item + Efekty reusable: wstawiane w wewnętrzny shader, wygenerowany
@@ -250,28 +259,10 @@ i użyj nowego węzła \texttt{Effect}.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Wewnętrzne efekty}
-
-Rozwiązanie przydatne także do wewnętrznych efektów.
-
-\begin{itemize}
-  \item Shadow maps: filtruj odpowiednie źródło światła,
-  \item Bump mapping klasyczny: zmien wektor normalny na podstawie tekstury,
-  \item Mgła: wymieszaj końcowy kolor pixela z kolorem mgły.
-\end{itemize}
-
-\begin{figure}
-  \centering
-  \includegraphics[width=1.8in]{../rhan_shrine_5_everything}
-  \caption{Połączenie dwóch shadow maps i bump mapping}
-\end{figure}
-\end{frame}
-
-\begin{frame}[fragile]{Przykład}
-\begin{exampleblock}{Przykład naszych efektów}
+\begin{frame}[fragile]
+\begin{exampleblock}{Przykład naszego efektu}
 \begin{semiverbatim}
-# Poniższe należy włożyć do środka Appearance
-# z poprzednich przykładów
+# w środku Appearance z poprzedniego przykładu:
 effects Effect \{
   language "GLSL"
   parts EffectPart \{
@@ -289,12 +280,31 @@ effects Effect \{
 \end{exampleblock}
 \end{frame}
 
+\renewcommand*{\figurename}{Obraz}
+
+\begin{frame}{Wewnętrzne efekty}
+
+Możemy zaimplementować wewnętrzne efekty w podobny sposób.
+
+\begin{itemize}
+  \item Shadow maps: filtruj odpowiednie źródło światła,
+  \item Klasyczny Bump mapping: zmień wektor normalny na podstawie tekstury,
+  \item Mgła: wymieszaj końcowy kolor pixela z kolorem mgły.
+\end{itemize}
+
+\begin{figure}
+  \centering
+  \includegraphics[width=2in]{../rhan_shrine_5_everything}
+  \caption{Połączenie dwóch shadow maps i bump mapping}
+\end{figure}
+\end{frame}
+
 \begin{frame}{Szczegóły}
 \begin{itemize}
   \item Nowy węzeł \texttt{Effect}: wybierz język shaderów.
   \item Nowy węzeł \texttt{EffectPart}: wybierz typ (vertex, pixel, etc.).
   \item Można definiować własne uniform w \texttt{Effect}, np. przekazać
-    teksturę albo czas do efektu.
+    teksturę albo czas (\texttt{TimeSensor.time} z X3D) do efektu.
     % jak ComposedShader
   \item Wszystkie efekty będą dodane do bazowego shadera. (Upraszczając.)
   \item Stary \texttt{ComposedShader} modyfikuje bazowy shader.
@@ -320,9 +330,11 @@ effects Effect \{
 \end{frame}
 
 \begin{frame}{Efekty dla źródeł światła}
-Idea 2: efekty można dodawać nie tylko do widocznych obiektów 3D,
+\begin{block}{Pomysł 2}
+Efekty można dodawać nie tylko do widocznych obiektów 3D,
 także do innych elementów sceny. W ten sposob można zdefiniować
 światło które ma specyficzny kształt, specyficznie równanie etc.
+\end{block}
 
 Takie światło automatycznie współpracuje z cieniami, bump mapping etc.!
 
