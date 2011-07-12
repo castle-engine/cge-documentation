@@ -61,9 +61,9 @@
 
 \title{Compositing Shaders in X3D}
 
-\author{paper1013} % TODO: submission id
-%\author[M. Kamburelis]{M. Kamburelis$^{1}$\\
-%  $^1$Institute of Computer Science, University of Wroc{\l}aw, Poland}
+%\author{paper1013} % submission id for anon sending
+\author[M. Kamburelis]{M. Kamburelis$^{1}$\\
+  $^1$Institute of Computer Science, University of Wroc{\l}aw, Poland}
 %\author{(Author identification removed.)\thanks{e-mail: xxx@xxx.xxx}\\Xxx\\Xxx}
 
 % For Web3D conf:
@@ -127,7 +127,7 @@ and mixing the texture colors. The authors
 can create and assign shaders to shapes, which makes
 a myriad of interesting graphic effects possible in X3D models.
 
-However, the shaders designed using the standard nodes
+The shaders designed using the standard nodes
 \textit{replace} the normal rendering functionality, not \textit{enhance} it.
 This reflects the underlying API, like OpenGL or Direct3D.
 The 3D libraries, in turn, follow the hardware idea that shader code
@@ -290,13 +290,23 @@ the C++ code.
 In our approach, we allow the authors to write direct shading
 language code quickly and the integration is built inside appropriate X3D nodes.
 
-AnySL \cite{anysl} allows to integrate renderer
-shaders with user shaders. We strive to do something more and allow effortless
-integration between many user shaders. We also try to be simpler as we do not
-introduce any new shading language. On the other hand, the disadvantage
-of our approach is that we do not hide the differences between various shading languages.
-User effects have to be implemented in the same GPU shading language
-that is used by the renderer.
+AnySL \cite{anysl} allows to integrate internal renderer shaders
+with user shaders, by introducing a new shader language.
+%% This has
+%% advantages (hides the differences between GPU shading languages like
+%% \texttt{GLSL} and \texttt{HLSL}), but also
+%% On the other hand, we do not introduce
+%% a new shader language, which is both an advantage (easy implementation,
+%% easier to learn) and disadvantage (we do not hide differences e.g. between
+%% ).
+%% We strive to do something more and allow effortless
+%% integration between many user shaders.
+%%
+%% We also try to be simpler as we do not
+%% introduce any new shading language. On the other hand, the disadvantage
+%% of our approach is that we do not hide the differences between various shading languages.
+%% User effects have to be implemented in the same GPU shading language
+%% that is used by the renderer.
 
 Spark \cite{spark} is a recent work presenting a new language to develop
 composable shaders for GPU.
