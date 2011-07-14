@@ -28,3 +28,13 @@ clean:
 screenshots_targz:
 	rm -f compositing_shaders_screenshots.tar.gz
 	tar czvf compositing_shaders_screenshots.tar.gz *.png
+
+# make zip for submission of the "Final LaTeX sources"
+.PHONY: zip
+zip:
+	rm -f compositing_shaders_src.zip
+	zip compositing_shaders_src.zip \
+	   $(shell find -maxdepth 1 -name '*.png') \
+	   compositing_shaders.bib \
+	   compositing_shaders.tex \
+	   Makefile README.txt
