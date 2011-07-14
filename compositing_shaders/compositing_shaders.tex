@@ -227,7 +227,7 @@ this component is still an important base for our work. It defines
 how to comfortably keep shader code inside X3D nodes. It also shows
 how to pass uniform values (including textures) to the shaders.
 
-An oldest solution to combine effects, used even before the shading languages,
+An old solution to combine effects, used even before the shading languages,
 is a multi-pass rendering. Each rendering pass adds or multiplies
 to the buffer contents, adding a layer with desired effect.
 However, this is expensive --- in each pass we usually have to repeat
@@ -457,8 +457,8 @@ When you place a standard shader node
 \texttt{Appearance.shaders} list,
 then it replaces the internal renderer shaders.
 If you define the same (or compatible) plugging points inside your shader,
-then the internal renderer effects will be even added to your own
-shader. And of course user effects are added to your shader too.
+then the internal renderer effects are even added to your own
+shader. Of course user effects are added to your shader too.
 This way we have made even the standard X3D shader nodes much more flexible.
 Note that if you do not define any plugs inside your \texttt{ComposedShader} node,
 it continues to function as before --- no effects
@@ -900,30 +900,40 @@ complete custom shaders (like \texttt{ComposedShader}) code.
 In the first case, the plug points
 are only available for the following effects of the same node.
 
-\subsection{Where the forward declarations are placed}
+\subsection{Forward declarations}
 
-Special comment \texttt{/* PLUG-DECLARATIONS */} may be used
-near the beginning of your shader source code. It is only useful
-if your shader code defines any new plugging points, that is if you
-have any magic \texttt{/* PLUG: ... */} comments inside.
-When some other effect uses your plugging point, the renderer adds
-an appropriate call to a function in that effect.
-Additionally, the renderer has to declare the function,
-because it may be in a separate compilation unit (in case of GLSL),
-or just defined later in the code.
-These (forward or external) declarations are inserted at
-the point of special \texttt{/* PLUG-DECLARATIONS */}
-comment, or (when it is missing) simply at the beginning of your shader source.
+Suppose we have an effect~$X$ that defines a new plugging point.
+%, by includes a magic \texttt{/* PLUG: ... */} comment.
+When this plugging point is used by another effect~$Y$,
+then an appropriate function call is automatically inserted into the generated shader.
+In the middle of the source code of effect~$X$,
+a function defined in effect~$Y$ has to be called. This is the simplest
+implementation of our plugs.
+% Would be nice to have here a space for paragraph break...
+Additionally, a forward or external declaration of the called function
+may need to be inserted into the effect~$X$. That is because~$Y$
+may be in a separate compilation unit (in case of GLSL),
+or just defined lower in the code. In simple cases, such forward or external
+declarations can be inserted right at the beginning of effect~$X$ code.
+
+Some shading language directives are required to be placed before
+all normal declarations. For example, in case of the \emph{OpenGL shading language},
+the \texttt{\#version} as well as some \texttt{\#extension} directives
+must occur at the beginning of the shader code.
+To handle such cases, we define another magic comment \texttt{/* PLUG-DECLARATIONS */}.
+If present, it signifies a place where forward or external declarations
+should be inserted.
+
+%% because it may
+%% These (forward or external) declarations are inserted at
+%% the point of special \texttt{/* PLUG-DECLARATIONS */}
+%% comment, or (when it is missing) simply at the beginning of your shader source.
 %% This applies in the same way to shader code inside an \texttt{EffectPart},
 %% or inside standard X3D node like \texttt{ShaderPart}.
 
-Using \texttt{/* PLUG-DECLARATIONS */} may be necessary
-as some shading language directives are required to be placed before
-all normal declarations. For example, in case of the \emph{OpenGL shading language},
-the \texttt{\#version} as well as some \texttt{\#extension} directives
-must occur at the beginning of the shader code. You should place
-\texttt{/* PLUG-DECLARATIONS */} after such directives
-and before any \texttt{/* PLUG: ... */} declarations.
+%% You should place
+%% \texttt{/* PLUG-DECLARATIONS */} after such directives
+%% and before any \texttt{/* PLUG: ... */} declarations.
 
 \subsection{Invalid shader code}
 
@@ -956,12 +966,12 @@ The \textbf{application does not need to parse the shader code} at any point.
 %% and be familiar with internals about how the shader is generated,
 %% to achieve some particular weird behavior.
 %% It does not happen by accident in our experience.
-%% %% And you may need to use the internal knowledge
+%% %% Moreover, you may need to use the internal knowledge
 %% %% how the other effects are implemented (maybe how they are implemented
 %% %% inside the browser).
 
 %% Note that this isn't a security problem --- bad shader code only breaks
-%% rendering of a particular shape. And X3D \texttt{ComposedShader} node allows users
+%% rendering of a particular shape. Besides, X3D \texttt{ComposedShader} node allows users
 %% to execute any shading language code anyway. So if there's anything dangerous
 %% (for example a buggy OpenGL may cause the browser process to exit with
 %% segmentation fault on some special shader code snippets),
@@ -1073,7 +1083,7 @@ and texturing conditions, is to write a shader generator program.
 Which is actually exactly what our effects already do for you ---
 the implementation of our effects constructs and links
 the appropriate shader code, gathering the information from all the nodes
-that affect the given shape. And all the information is nicely integrated
+that affect the given shape. The information is nicely integrated
 with X3D nodes, effects are specified at suitable nodes, and their
 uniform values and attributes are integrated with X3D fields.
 
