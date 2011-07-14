@@ -21,7 +21,8 @@ clean:
 	      compositing_shaders.bbl \
 	      compositing_shaders.blg \
 	      compositing_shaders.dvi \
-	      compositing_shaders.ps
+	      compositing_shaders.ps \
+	      compositing_shaders.zip
 
 # make screenshots_targz, to submit screenshots as PNG
 .PHONY: screenshots_targz
