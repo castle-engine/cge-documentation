@@ -25,11 +25,12 @@ Michalis checklist to do at the end:
 - Remember to add a couple of references, in particular to scientific papers.
   It looks like I assume too often that people are familiar with some stuff
   / can google them for themselves.
-- One from my thousand English mistakes:
+- Some straightforward English hints:
   check "it's" is always used as "it is".
   avoid long notes in parenthesis inside sentences.
   avoid ", and", unless in enumeration.
   avoid "don't / doesn't" --- usually "do not / does not" sounds better?
+  don't start sentences with "however" or "and".
 - Recheck to not repeat the same mistakes as
   http://vrmlengine.svn.sourceforge.net/viewvc/vrmlengine/trunk/papers/compositing_shaders/compositing_shaders.tex?r1=8831&r2=8830&pathrev=8831
 - Recheck layout:
