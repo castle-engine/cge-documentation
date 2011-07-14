@@ -313,7 +313,7 @@ composable shaders for GPU.
 
 %% \cite{web3d2010:declarativeshader} presents a declarative approach
 %% to an advanced shader in X3D. However, it only allows a fixed set
-%% of functionality, kind od ,,advanced and exhanced material''.
+%% of functionality, kind od ``advanced and exhanced material''.
 %% It does not expose any shader functionality to the authors.
 %% It merely allows the authors to use some advanced algorithms that in practice
 %% will be usually implemented by shaders inside the application.
@@ -335,7 +335,7 @@ Many modules can implement the same hook and cooperate without any problems.
 %% and call function by its name.
 Drupal approach is quite similar to our
 core idea of combining effects. Our effects are similar to
-Drupal's modules and our ,,plugging points'' are analogous to Drupal hooks.
+Drupal's modules and our ``plugging points'' are analogous to Drupal hooks.
 
 %% Our effects can define functions with special names to enhance
 %% the standard shader behavior, just like Drupal modules can define functions
@@ -401,7 +401,7 @@ within an \texttt{EffectPart} node. The call to this function will
 be automatically inserted at the \texttt{texture\_apply} plug point in
 the renderer internal shader. This particular plug,
 the \texttt{PLUG\_texture\_apply}, is called after the normal texture colors
-are applied, but before the alpha test and is a usual place to ,,just modify the pixel color''.
+are applied, but before the alpha test and is a usual place to ``just modify the pixel color''.
 \texttt{fragment\_color} is an \texttt{inout} parameter, by modifying it
 we modify the color that will be displayed on the screen.
 
@@ -423,7 +423,7 @@ It allows the authors to extend or override a particular shading parameter.
 
 \item The \texttt{Effect} nodes may also use the plug names defined
 in the previous \texttt{Effect} nodes on the same shape.
-It is trivially easy (you just add a ,,magic'' comment) to define
+It is trivially easy (you just add a ``magic'' comment) to define
 plugging points in your own shader code. This way your own effects
 can be customized.
 
@@ -431,7 +431,7 @@ can be customized.
 to implement some internal effects.
 We have reimplemented many internal effects of our engine,
 like the fog, shadow maps (see \cite{vrmleng:shadowmaps})
-and the bump mapping to use our ,,plugs'' approach.
+and the bump mapping to use our ``plugs'' approach.
 This made their implementation very clean, short
 and nicely separated from each other.
 %% It also proves that
@@ -439,7 +439,7 @@ and nicely separated from each other.
 
 %% without any traditional hassles. For example, bump mapping can be
 %% achieved using standard \texttt{ComposedShader} as well,
-%% but then you have to write all this ,,boilerplate'' code to also deal
+%% but then you have to write all this ``boilerplate'' code to also deal
 %% with all the possible lighting and textures configurations.
 %% Well, the renderer is still useful to calculate nice tangent vectors,
 %% although an authoring program could generate GLSL attributes for them as well.
@@ -450,7 +450,7 @@ and nicely separated from each other.
 \end{enumerate}
 
 Actually, there are even more possibilities.
-We have been talking above about the ,,renderer internal shaders'',
+We have been talking above about the ``renderer internal shaders'',
 but the truth is a little more flexible.
 When you place a standard shader node
 (like a \texttt{ComposedShader} node for GLSL shaders) on the
@@ -494,7 +494,7 @@ fieldType [in,out] fieldName
 %% , just like
 %% # for ComposedShader node
 
-% Comments for ,,enabled'':
+% Comments for ``enabled'':
 %% # You could also remove/add the node
 %% # from the scene, but often toggling
 %% # this field is easier for scripts.
@@ -886,7 +886,7 @@ may be simply inserted, while in case of function it will have to replace
 some previous code. This also means that using a procedural plug
 \textit{never} replaces or removes some existing code, which is a very nice
 concept to keep. We want the effects to cooperate with each other,
-not to ,,hijack'' from each other some parts of the functionality.
+not to ``hijack'' from each other some parts of the functionality.
 
 The nice feature of our magic \texttt{/* PLUG ... */} comments is that a shader source
 is still valid even if you completely ignore the plugs. For example,
@@ -929,7 +929,7 @@ and before any \texttt{/* PLUG: ... */} declarations.
 
 We guarantee the behavior only if the provided shading language code
 is a correct, self-contained code. The errors (like unterminated block)
-%%  (,,\texttt{\{}'' without matching ,,\texttt{\}}'')
+%%  (``\texttt{\{}'' without matching ``\texttt{\}}'')
 %% ,
 %% or an unterminated comment)
 may only be detected after the complete shader
@@ -1132,8 +1132,8 @@ of our effects.
 %% find other opportunities for plugging points.
 %% In particular, we have tested that the \emph{separate compilation units}
 %% of GLSL are not necessary for a correct implementation of our effects.
-%% We also believe that most of our plug points (like ,,do something in object space'',
-%% ,,do something in eye space'') are generic enough to be usable
+%% We also believe that most of our plug points (like ``do something in object space'',
+%% ``do something in eye space'') are generic enough to be usable
 %% with all shading languages.
 
 \section{Conclusion}
@@ -1151,7 +1151,7 @@ content authors. We have implemented our approach for the GLSL shading language.
 %% \section*{Acknowledgements}
 
 %% A lot of people helped and encouraged the development of our VRML/X3D engine,
-%% with it's rendering features and extensions. A big ,,thank you''
+%% with it's rendering features and extensions. A big ``thank you''
 %% goes to all of you.
 
 \bibliographystyle{eg-alpha}
