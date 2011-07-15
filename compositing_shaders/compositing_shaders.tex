@@ -399,8 +399,8 @@ Shape \{ appearance Appearance \{
 \} geometry Sphere \{ \} \}
 \end{Verbatim}
 
-The bold part of the above example indicates our extensions to X3D.
-The italic part indicates GLSL code inside our extensions.
+Our extensions to X3D are marked with the bold font in the example above.
+The GLSL code inside our extensions is marked with the italic font.
 %% GLSL function names starting with \texttt{PLUG_} are special,
 %% they will be automatically called at the appropriate place with appropriate
 %% parameters from the final (automatically generated and used) shader.
@@ -416,7 +416,7 @@ and is the simplest way to ``just modify the pixel color''.
 we modify the color that will be displayed on the screen.
 
 A reference of all the plugs available in our implementation
-is available on \URL{http://vrmlengine.sourceforge.net/compositing_shaders.php}.
+is on \URL{http://vrmlengine.sourceforge.net/compositing_shaders.php}.
 For each plug, like this \texttt{PLUG\_texture\_apply},
 we define a list of parameters
 %(they have to be declared exactly the same in an effect),
@@ -478,8 +478,8 @@ will be added.
 
 New \texttt{Effect} node holds information about
 the source code and uniform values specific to a given effect.
-The node specification below is presented in the same style
-as in the X3D specification \cite{x3d:spec}.
+The node specification below follows the style of
+the X3D specification \cite{x3d:spec}.
 
 \begin{mycode}
 \underline{Effect : X3DChildNode}
@@ -501,7 +501,7 @@ MFNode [] \codeem{parts} [] # EffectPart
 
 Inside the \texttt{Effect} node a number of uniform values may be defined,
 passing any X3D value to the shader. Examples include passing
-current world time or a texture to the shader.
+current world time or a particular texture to the shader.
 Uniform values are declared exactly like described in the standard
 X3D \textit{Programmable shaders} component \cite{x3d:shaders}.
 
@@ -667,7 +667,7 @@ so it simply works for all shapes. See figure \ref{fig_fog}.
 The nice feature of our system is that effects can be attached to various
 types of objects, not just shapes. For example a particular light source
 may have a shader effect assigned.
-This allows to modify the contribution of a particular light.
+This allows to modify the contribution of a given light.
 For example the spot light shape can be modified, possibly
 based on some texture information (see figure \ref{fig_fancy_spot}).
 Or a different lighting model may be implemented, like anisotropic Ward
@@ -705,14 +705,14 @@ MFNode [] \codeem{effects} [] # Effect
 \end{mycode}
 
 \texttt{X3DTextureNode} is an ancestor for all the standard texture nodes,
-like the \texttt{ImageTexture}. This allows to to modify any X3D texture
+like the \texttt{ImageTexture}. This allows to modify any X3D texture
 by shader effects.
 A plug \texttt{texture\_color} may be used to change the texture color,
 taking into account the current texture coordinates and other information.
 
 \subsubsection{Procedural textures}
 
-A new X3D node \texttt{ShaderTexture} is added for generating
+A new X3D node \texttt{ShaderTexture} is available for creating
 procedural textures using the GPU shading languages.
 %% This is suitable
 %% if the texture is defined completely using the shading language.
@@ -880,9 +880,9 @@ repeatedly (like adding or modulating the fragment color),
 so one or more of the parameters are often allowed to be handled
 as \texttt{inout} values.
 
-The same plug name may be declared many times in the source shader.
+The same plug name may be defined many times in the source shader.
 This means that a single \texttt{PLUG\_xxx} function will be called
-many times. For example, this is useful when desired calculation is naturally
+many times. For example, this is useful when the algorithm is naturally
 expressed as a loop, but it had to be unrolled for shader source
 (for example, to slightly tweak some loop iterations).
 The plug names that are available per-light source and per-texture
