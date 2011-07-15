@@ -916,10 +916,10 @@ In the first case, the plugs
 are only available for the following effects of the same shape.
 
 The advantage of using magic comments to define plugs is that
-they can be ignored, and a shader source remains valid.
+they can be ignored and a shader source remains valid.
 This means that \texttt{ComposedShader} nodes can define custom plugs
 and still work (although with no extra effects) even in X3D browsers
-that don't support our extensions.
+that do not support our extensions.
 
 \subsection{Forward declarations}
 
@@ -1134,11 +1134,6 @@ like \texttt{view3dscene}.
 %% how our shaders implement the whole X3D lighting and texturing model.
 %% It also forces all the lighting calculation to be done per-pixel, resulting
 %% in perfect specular highlights and spot light shapes.
-
-%% Development notes: only the SVN demo\_models contain
-%% compositing\_shaders subdirectory.
-%% You also have to use view3dscene from SVN or nightly builds,
-%% see \URL{http://michalis.ii.uni.wroc.pl/vrmlengine-snapshots/}.
 
 \section{Implementation notes}
 
