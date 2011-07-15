@@ -550,15 +550,14 @@ cleaner, as you cannot use undeclared functions and variables from other parts.
 It also allows for cleaner error detection (parsing errors will be detected
 inside the given unit).
 
-We have also considered and rejected a different approach to define
-\texttt{PLUG\_} functions. In that rejected approach,
-we did not look at any special function names
-in a shader code, instead the plug name was defined in the separate field of
-the \texttt{EffectPart}
-node. However, the renderer may need to know the full declaration
+We have also considered and rejected a different approach to use plugs.
+In that approach, the plug name was indicated by a new field of
+the \texttt{EffectPart} node, not by a special \texttt{PLUG\_} function name
+inside the shader code.
+However, the implementation may need to know the full declaration
 of a plug function, to make a forward or external declaration of it.
 One way to overcome this problem was to require repeating this declaration
-in another field. Another idea was to split shader code into much more
+in another field. Another solution was to split shader code into much more
 parts (for example, one part declares the uniform variables, one part declares
 the plug function, one part defines the function body and so on).
 Both approaches seemed uncomfortable for authors
