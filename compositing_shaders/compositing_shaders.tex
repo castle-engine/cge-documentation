@@ -376,7 +376,7 @@ and followed by the plug name. These declarations will be found
 and the renderer will insert appropriate calls to them from the base shader.
 
 A trivial example of an effect that makes colors two times brighter
-is below. This is a complete X3D file. You can save
+is below. This is a complete X3D file, so you can save
 it as \texttt{test.x3dv} and open with any tool supporting our
 extensions, like \texttt{view3dscene}.
 
@@ -404,8 +404,8 @@ The italic part indicates GLSL code inside our extensions.
 %% GLSL function names starting with \texttt{PLUG_} are special,
 %% they will be automatically called at the appropriate place with appropriate
 %% parameters from the final (automatically generated and used) shader.
-The GLSL function name \texttt{PLUG\_texture\_apply} is special,
-it indicates that we use the \texttt{texture\_apply} plug.
+The special GLSL function name \texttt{PLUG\_texture\_apply}
+indicates that we use the \texttt{texture\_apply} plug.
 This particular plug is called right after applying the textures,
 and is the simplest way to ``just modify the pixel color''.
 %% The \texttt{texture\_apply} plug point in
@@ -415,9 +415,10 @@ and is the simplest way to ``just modify the pixel color''.
 \texttt{fragment\_color} is an \texttt{inout} parameter, by modifying it
 we modify the color that will be displayed on the screen.
 
-We have a reference of all the plugs available in our implementation
-on \URL{http://vrmlengine.sourceforge.net/compositing_shaders.php}.
-For each plug, like this \texttt{PLUG\_texture\_apply}, we define a list of parameters
+A reference of all the plugs available in our implementation
+is available on \URL{http://vrmlengine.sourceforge.net/compositing_shaders.php}.
+For each plug, like this \texttt{PLUG\_texture\_apply},
+we define a list of parameters
 %(they have to be declared exactly the same in an effect),
 and when it is called.
 
@@ -432,7 +433,7 @@ It allows the authors to extend or override a particular shading parameter.
 
 \item The \texttt{Effect} nodes may also use the plug names defined
 in the previous \texttt{Effect} nodes on the same shape.
-It is trivially easy (you just add a ``magic'' comment) to define
+It is trivially easy (just add a ``magic'' comment) to define
 plugs in your own shader code. This way your own effects
 can be customized.
 
@@ -468,14 +469,14 @@ then it replaces the internal renderer shaders.
 If you define the same (or compatible) plugs inside your shader,
 then the internal renderer effects are even added to your own
 shader. Of course user effects are added to your shader too.
-This way we have made even the standard X3D shader nodes much more flexible.
+This way even the standard X3D shader nodes become more flexible.
 Note that if you do not define any plugs inside your \texttt{ComposedShader} node,
 it continues to function as before --- no effects
 will be added.
 
 \subsection{Effect node}
 
-We define new \texttt{Effect} node that holds information about
+New \texttt{Effect} node holds information about
 the source code and uniform values specific to a given effect.
 The node specification below is presented in the same style
 as in the X3D specification \cite{x3d:spec}.
@@ -533,18 +534,18 @@ MFString [] \codeem{url} []
 
 Inside the effect part source code, the functions that enhance
 standard shaders behavior are recognized by names starting with \texttt{PLUG\_}.
-Of course you can also define and use other functions.
-You can pass uniform variables to the effect,
-you can also pass varying variables between the vertex and fragment
+Of course other functions can also be defined and used.
+Uniform variables can be passed to the effect,
+also varying variables can be passed between the vertex and fragment
 parts, just like with standard shader nodes.
 
-In a single \texttt{EffectPart} node, you can define many \texttt{PLUG\_}
-functions. However, your plug functions must be defined in the appropriate
-effect type. For example, you cannot use the \texttt{texture\_apply} plug within
-a \texttt{VERTEX} shader.
-If your effect requires some processing per-vertex and some per-fragment,
-you have to use two \texttt{EffectPart} nodes, with different types.
-This is necessary to enable implementation of our system for
+In a single \texttt{EffectPart} node, many \texttt{PLUG\_}
+functions may be declared. However, all plug functions must be declared in the appropriate
+effect type. For example, the \texttt{texture\_apply} plug cannot be used
+within a \texttt{VERTEX} shader.
+If the effect requires some processing per-vertex and some per-fragment,
+it is necessary to use two \texttt{EffectPart} nodes, with different types.
+This allows to implement our system for
 %% While this may seem like an arbitrary limitation,
 %% this reflects how shader parts are declared in
 shading languages with
@@ -624,8 +625,8 @@ by reference (the \texttt{DEF} / \texttt{USE} keywords). Reusing the
 is most natural and allows to combine existing effects in any desired way.
 Reusing the \texttt{EffectPart} nodes is also useful, when some effects
 would like to share a particular piece of code. For example,
-you can create an \texttt{EffectPart} with a library of useful
-shading language functions and reuse if for various effects.
+the same \texttt{EffectPart} node, with a library of useful
+shading language functions, may be used for many effects.
 
 \begin{figure*}[t]
   \centering
@@ -671,7 +672,7 @@ For example the spot light shape can be modified, possibly
 based on some texture information (see figure \ref{fig_fancy_spot}).
 Or a different lighting model may be implemented, like anisotropic Ward
 or Cook-Torrance.
-To make this possible, we add the \texttt{effects} field to every light node:
+To make this possible, the \texttt{effects} field is added to every light node:
 
 \begin{mycode}
 \underline{X3DLightNode}
@@ -723,9 +724,9 @@ From a GPU point of view, there is no texture.
 There is only a shader function that generates colors
 based on some vectors. By wrapping such function inside
 the \texttt{ShaderTexture} node, it can be treated exactly like other textures
-in the scene.
-In particular, you can comfortably provide texture coordinates
-(explicit or generated) for the procedural texture.
+in the scene. In particular, texture coordinates
+(explicit or generated) can be comfortably provided
+for the procedural texture.
 Effectively, it behaves like a normal texture node, with all the related
 X3D features.
 
@@ -741,7 +742,7 @@ SFString [] \codeem{defaultTexCoord} "BOUNDS2D"
 \end{mycode}
 
 %% Actually, the \texttt{effects} field is already defined at
-%% the \texttt{X3DTextureNode} class (see above). We just mention it here
+%% the \texttt{X3DTextureNode} class (see above).  It is mentioned here
 %% for completeness.
 
 An effect overriding the \texttt{texture\_color} plug
@@ -753,7 +754,7 @@ reminding author to override it.
 The texture coordinates, or the algorithm to generate them,
 can be explicitly specified, just like for any other texture in X3D.
 %% . This follows the usual rules for all
-%% when you place a \texttt{X3DTextureCoordinateNode} node
+%% when a \texttt{X3DTextureCoordinateNode} node is placed
 %% inside the geometry \texttt{texCoord} field.
 %% Both explicit texture coordinate lists (\texttt{TextureCoordinate}
 %% \texttt{TextureCoordinate3D}, \texttt{TextureCoordinate4D})
@@ -778,9 +779,9 @@ the \textit{Texturing3D} component of the X3D specification.
 %%  (section \textit{"Texture coordinate generation for primitive objects"})
 %%   is used.
 %%   This adapts 3D texture coordinates to the bounding box sizes.
-%%   It's most suitable for 3D textures (you can ignore the 4th texture coordinate
-%%   component, or treat it as homogeneous, as \texttt{"BOUNDS3D"} will always
-%%   set it to 1).
+%%   It's most suitable for 3D textures (the 4th texture coordinate
+%%   component can be ignored; or the 4D vector may be treated as homogeneous, as \texttt{"BOUNDS3D"} will always
+%%   set the 4th component to 1).
 
 %% \end{enumerate}
 
@@ -851,8 +852,7 @@ to the first \texttt{texture\_color} plug.
 
 \section{Defining custom plug points}
 
-In your shader code, you can define new plug points by a
-magic comment:
+In a shader code, new plug points may be defined by a magic comment:
 
 \begin{mycode}
 \begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
@@ -864,9 +864,9 @@ This defines a point where calls to user functions declared as
 \texttt{PLUG\_name} will be inserted. They will be called with given
 parameters.
 
-Many effects may use the same \texttt{PLUG\_name},
-you can even use the same \texttt{PLUG\_name} many times within a single
-effect. All the \texttt{PLUG\_name} functions
+Many effects may use the same \texttt{PLUG\_name}.
+Even within a single effect, the same \texttt{PLUG\_name} may be used
+many times. All the \texttt{PLUG\_name} functions
 will be uniquely renamed to not collide with each other.
 
 The calls will be added in the order they are specified on the
@@ -892,10 +892,10 @@ are an example of this.
 %% the textures (even shader textures).
 %% Not really available, as params to texture\_color differ.
 Using the \texttt{PLUG\_light\_scale}
-inside \texttt{Appearance.effects}, you change the intensity
-of all the light sources on the given shape. Contrast this with using
+inside \texttt{Appearance.effects}, the intensity
+of all the light sources on the given shape can be changed. Contrast this with using
 the same \texttt{PLUG\_light\_scale} inside a \texttt{X3DLightNode.effects},
-where you only change the given light node contribution.
+where only the given light node contribution is changed.
 
 Currently all the plugs must be procedures, that is their result type
 must be declared as \texttt{void}. We have been considering
@@ -941,19 +941,19 @@ Some shading language directives are required to be placed before
 all normal declarations. For example, in case of the \emph{OpenGL shading language},
 the \texttt{\#version} as well as some \texttt{\#extension} directives
 must occur at the beginning of the shader code.
-To handle such cases, we define another magic comment \texttt{/* PLUG-DECLARATIONS */}.
+To handle such cases, another magic comment \texttt{/* PLUG-DECLARATIONS */}
+is available.
 If present, it signifies a place where forward or external declarations
 should be inserted.
 
 %% because it may
 %% These (forward or external) declarations are inserted at
 %% the point of special \texttt{/* PLUG-DECLARATIONS */}
-%% comment, or (when it is missing) simply at the beginning of your shader source.
+%% comment, or (when it is missing) simply at the beginning of shader source.
 %% This applies in the same way to shader code inside an \texttt{EffectPart},
 %% or inside standard X3D node like \texttt{ShaderPart}.
 
-%% You should place
-%% \texttt{/* PLUG-DECLARATIONS */} after such directives
+%% \texttt{/* PLUG-DECLARATIONS */} should be placed after such directives
 %% and before any \texttt{/* PLUG: ... */} declarations.
 
 \subsection{Invalid shader code}
@@ -972,12 +972,10 @@ the parsing errors can be at least reported always for the correct code piece
 The \textbf{application does not need to parse the shader code} at any point.
 Only a trivial text search in the code is necessary to detect the magic
 plug function names and comments.
-%% Still, by writing incorrect code,
-%% you can cause the whole shader to malfunction.
-%% is actually better, and
+%% Still, an incorrect effect code may cause the whole shader to malfunction.
 
 %% In all our practical tests, this approach didn't cause any problems.
-%% Since you can implement each effect separately, you can also test them separately,
+%% Since each effect can be implemented separately, it can also be tested separately,
 %% and in practice it's usually obvious where to look for the parsing error.
 
 %% It should be noted however that in particularly nasty cases,
