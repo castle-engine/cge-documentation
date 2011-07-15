@@ -690,11 +690,12 @@ standard texture node, like \texttt{ImageTexture}.
 You can use a plug \texttt{texture\_color} to change the texture color,
 knowing the current texture coordinates and other information.
 
-\subsubsection{ShaderTexture effects}
+\subsubsection{Procedural textures}
 
-We introduce a new X3D node designed specifically for generating
-textures using the shaders. This is suitable
-if your texture is defined completely using the shading language.
+A new X3D node \texttt{ShaderTexture} is added for generating
+procedural textures using the GPU shading languages.
+%% This is suitable
+%% if the texture is defined completely using the shading language.
 The texture contents are not stored anywhere (not even on GPU)
 and the renderer does not manage any texture resources.
 From a GPU point of view, there is no texture.
@@ -702,9 +703,10 @@ From a GPU point of view, there is no texture.
 %we swear.}.
 There is only a shader function that generates colors
 based on some vectors. By wrapping such function inside
-the new \texttt{ShaderTexture} node, you can treat it much like other X3D textures.
-In particular, you can provide texture coordinates (explicit or generated)
-for the texture.
+the \texttt{ShaderTexture} node, it can be treated exactly like other textures
+in the scene.
+In particular, you can comfortably provide texture coordinates
+(explicit or generated) for the procedural texture.
 Effectively, it behaves like a normal texture node, with all the related
 X3D features.
 
@@ -723,10 +725,11 @@ SFString [] \codeem{defaultTexCoord} "BOUNDS2D"
 %% the \texttt{X3DTextureNode} class (see above). We just mention it here
 %% for completeness.
 
-You should include an effect overriding at least the \texttt{texture\_color}
-plug, otherwise texture contents are undefined. Our implementation actually
+An effect overriding the \texttt{texture\_color} plug
+should be included, otherwise texture colors are undefined.
+Our implementation
 sets the default texture color to pink (RGB(1,~0,~1)), so it stands out,
-reminding you to override it.
+reminding author to override it.
 
 The texture coordinates, or the algorithm to generate them,
 can be explicitly specified, just like for any other texture in X3D.
