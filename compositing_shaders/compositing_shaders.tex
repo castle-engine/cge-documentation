@@ -1149,6 +1149,17 @@ of our effects.
 %% ``do something in eye space'') are generic enough to be usable
 %% with all shading languages.
 
+%% for ph.d. uncomment:
+%% Our approach does not cause any speed loss. Effects code is just
+%% combined into the final shader code, without any transformations that
+%% could make it slower. Our process of ``combining'' effects is essentially
+%% adding function calls around. Fortunately, a function call has no speed
+%% penalty. Existing shading languages are defined
+%% such that functions can always be inlined (there is no recursion allowed,
+%% and parameter qualifiers have simple interpretation),
+%% and as far as we know they are actually always inlined by existing
+%% shading language compilers.
+
 \section{Conclusion}
 
 We show a new approach for developing effects using the GPU shading languages.
