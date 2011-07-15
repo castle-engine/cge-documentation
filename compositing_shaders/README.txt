@@ -30,7 +30,7 @@ Michalis checklist to do at the end:
   avoid long notes in parenthesis inside sentences.
   avoid ", and", unless in enumeration.
   avoid "don't / doesn't" --- usually "do not / does not" sounds better?
-  don't start sentences with "however" or "and".
+  don't start sentences with "and" (it's informal).
   use ``'' in English (not ,,'' as in Polish).
 - Recheck to not repeat the same mistakes as
   http://vrmlengine.svn.sourceforge.net/viewvc/vrmlengine/trunk/papers/compositing_shaders/compositing_shaders.tex?r1=8831&r2=8830&pathrev=8831
