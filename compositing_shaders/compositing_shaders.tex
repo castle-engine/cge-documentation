@@ -426,7 +426,7 @@ Many usage scenarios are possible:
 
 \begin{enumerate}
 
-\item The \texttt{Effect} nodes may refer to plug names
+\item The \texttt{Effect} nodes may use plug names
 defined inside the renderer internal shaders. This is the most usual case.
 It allows the authors to extend or override a particular shading parameter.
 
@@ -590,8 +590,8 @@ inside the given unit).
 \subsection{Effects for particular shapes}
 
 There are various places where an \texttt{Effect} node may be used.
-If it's specific to a given shape appearance, you can place it
-on the \texttt{Appearance.effects} list:
+To apply an effect for a given shape appearance, it can be placed
+on the new \texttt{Appearance.effects} list:
 
 \begin{mycode}
 \underline{Appearance}
@@ -618,7 +618,7 @@ makes them cooperate correctly.
   \caption{Toon and Fresnel effects combined.}
 \end{figure}
 
-Note that all our nodes benefit from X3D mechanism to reuse the nodes
+Note that all introduced nodes benefit from X3D mechanism to reuse the nodes
 by reference (the \texttt{DEF} / \texttt{USE} keywords). Reusing the
 \texttt{Effect} nodes
 is most natural and allows to combine existing effects in any desired way.
@@ -640,7 +640,7 @@ so it colors the image even in the 2) case.}
 
 \subsection{Effects for a group of nodes}
 
-Our \texttt{Effect} node is a descendant of the abstract \texttt{X3DChildNode}.
+The \texttt{Effect} node is a descendant of the abstract \texttt{X3DChildNode}.
 As such it can be placed directly within X3D grouping nodes like
 \texttt{Group}, \texttt{Transform} and at the top level of the X3D file.
 Such effect will apply to all the shapes within the given group.
@@ -703,11 +703,11 @@ MFNode [] \codeem{effects} [] # Effect
 \end{Verbatim}
 \end{mycode}
 
-You can use the \texttt{effects} field
-inside any \texttt{X3DTextureNode} to enhance and modify the look of any
-standard texture node, like \texttt{ImageTexture}.
-You can use a plug \texttt{texture\_color} to change the texture color,
-knowing the current texture coordinates and other information.
+\texttt{X3DTextureNode} is an ancestor for all the standard texture nodes,
+like the \texttt{ImageTexture}. This allows to to modify any X3D texture
+by shader effects.
+A plug \texttt{texture\_color} may be used to change the texture color,
+taking into account the current texture coordinates and other information.
 
 \subsubsection{Procedural textures}
 
@@ -882,8 +882,8 @@ as \texttt{inout} values.
 
 The same plug name may be declared many times in the source shader.
 This means that a single \texttt{PLUG\_xxx} function will be called
-many times. For example, this is useful when your shader calculation is naturally
-expressed as a loop, but you had to unroll this loop for shader source
+many times. For example, this is useful when desired calculation is naturally
+expressed as a loop, but it had to be unrolled for shader source
 (for example, to slightly tweak some loop iterations).
 The plug names that are available per-light source and per-texture
 are an example of this.
@@ -891,7 +891,7 @@ are an example of this.
 %% inside \texttt{Appearance.effects}, you change the color of all
 %% the textures (even shader textures).
 %% Not really available, as params to texture\_color differ.
-If you use the \texttt{PLUG\_light\_scale}
+Using the \texttt{PLUG\_light\_scale}
 inside \texttt{Appearance.effects}, you change the intensity
 of all the light sources on the given shape. Contrast this with using
 the same \texttt{PLUG\_light\_scale} inside a \texttt{X3DLightNode.effects},
