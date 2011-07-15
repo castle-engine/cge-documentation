@@ -408,7 +408,7 @@ The special GLSL function name \texttt{PLUG\_texture\_apply}
 indicates that we use the \texttt{texture\_apply} plug.
 This particular plug is called right after applying the textures,
 and is the simplest way to ``just modify the pixel color''.
-%% The \texttt{texture\_apply} plug point in
+%% The \texttt{texture\_apply} plug in
 %% the renderer internal shader. This particular plug,
 %% the \texttt{PLUG\_texture\_apply}, is called after the normal texture colors
 %% are applied, but before the alpha test and is a usual place
@@ -850,9 +850,9 @@ to the first \texttt{texture\_color} plug.
 \end{figure*}
 \setcounter{figure}{5}
 
-\section{Defining custom plug points}
+\section{Defining custom plugs}
 
-In a shader code, new plug points may be defined by a magic comment:
+In a shader code, new plug may be defined by a magic comment:
 
 \begin{mycode}
 \begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
@@ -909,10 +909,10 @@ some previous code. This also means that using a procedural plug
 concept to keep. We want the effects to cooperate with each other,
 not to ``hijack'' from each other some parts of the functionality.
 
-New plug points can be defined inside the \texttt{Effect} nodes,
+New plugs can be defined inside the \texttt{Effect} nodes,
 as well as inside the complete shaders (like standard
 \texttt{ComposedShader} nodes).
-In the first case, the plug points
+In the first case, the plugs
 are only available for the following effects of the same shape.
 
 The advantage of using magic comments to define plugs is that
@@ -1163,7 +1163,7 @@ of our effects.
 %% find other opportunities for plugs.
 %% In particular, we have tested that the \emph{separate compilation units}
 %% of GLSL are not necessary for a correct implementation of our effects.
-%% We also believe that most of our plug points (like ``do something in object space'',
+%% We also believe that most of our plugs (like ``do something in object space'',
 %% ``do something in eye space'') are generic enough to be usable
 %% with all shading languages.
 
