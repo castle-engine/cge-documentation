@@ -334,7 +334,7 @@ Many modules can implement the same hook and cooperate without any problems.
 %% and call function by its name.
 Drupal approach is quite similar to our
 core idea of combining effects. Our effects are similar to
-Drupal's modules and our ``plugging points'' are analogous to Drupal hooks.
+Drupal's modules and our ``plugs'' are analogous to Drupal hooks.
 
 %% Our effects can define functions with special names to enhance
 %% the standard shader behavior, just like Drupal modules can define functions
@@ -376,38 +376,48 @@ and followed by the plug name. These declarations will be found
 and the renderer will insert appropriate calls to them from the base shader.
 
 A trivial example of an effect that makes colors two times brighter
-is below. This example is presented in the X3D classic VRML encoding.
-We can add this inside any \texttt{Appearance} node in the X3D file:
+is below. This is a complete X3D file. You can save
+it as \texttt{test.x3dv} and open with any tool supporting our
+extensions, like \texttt{view3dscene}.
 
 \begin{Verbatim}[commandchars=\\\{\},frame=single,fontsize=\small]
-effects Effect \{
-  language "GLSL"
-  parts EffectPart \{
-    type "FRAGMENT"
-    url "data:text/plain,
-\textbf{    void PLUG_texture_apply(}
-\textbf{      inout vec4 fragment_color,}
-\textbf{      const in vec3 normal)}
-\textbf{    \{}
-\textbf{      fragment_color.rgb *= 2.0;}
-\textbf{    \}}"
-  \}
-\}
+#X3D V3.2 utf8
+PROFILE Interchange
+Shape \{ appearance Appearance \{
+  material Material \{ \}
+\textbf{  effects Effect \{}
+\textbf{    language "GLSL"}
+\textbf{    parts EffectPart \{}
+\textbf{      type "FRAGMENT"}
+\textbf{      url "data:text/plain,}
+\textbf{      \textit{void PLUG_texture_apply(}}
+\textbf{      \textit{  inout vec4 fragment_color,}}
+\textbf{      \textit{  const in vec3 normal)}}
+\textbf{      \textit{\{}}
+\textbf{      \textit{  fragment_color.rgb *= 2.0;}}
+\textbf{      \textit{\}}" \} \}}
+\} geometry Sphere \{ \} \}
 \end{Verbatim}
 
-This defines a GLSL function named \texttt{PLUG\_texture\_apply}
-within an \texttt{EffectPart} node. The call to this function will
-be automatically inserted at the \texttt{texture\_apply} plug point in
-the renderer internal shader. This particular plug,
-the \texttt{PLUG\_texture\_apply}, is called after the normal texture colors
-are applied, but before the alpha test and is a usual place to ``just modify the pixel color''.
+The bold part of the above example indicates our extensions to X3D.
+The italic part indicates GLSL code inside our extensions.
+%% GLSL function names starting with \texttt{PLUG_} are special,
+%% they will be automatically called at the appropriate place with appropriate
+%% parameters from the final (automatically generated and used) shader.
+The GLSL function name \texttt{PLUG\_texture\_apply} is special,
+it indicates that we use the \texttt{texture\_apply} plug.
+This particular plug is called right after applying the textures,
+and is the simplest way to ``just modify the pixel color''.
+%% The \texttt{texture\_apply} plug point in
+%% the renderer internal shader. This particular plug,
+%% the \texttt{PLUG\_texture\_apply}, is called after the normal texture colors
+%% are applied, but before the alpha test and is a usual place
 \texttt{fragment\_color} is an \texttt{inout} parameter, by modifying it
 we modify the color that will be displayed on the screen.
 
-We have a reference of all the plugging points available in our implementation
+We have a reference of all the plugs available in our implementation
 on \URL{http://vrmlengine.sourceforge.net/compositing_shaders.php}.
-For each plugging point,
-like this \texttt{PLUG\_texture\_apply}, we define a list of parameters
+For each plug, like this \texttt{PLUG\_texture\_apply}, we define a list of parameters
 %(they have to be declared exactly the same in an effect),
 and when it is called.
 
@@ -423,7 +433,7 @@ It allows the authors to extend or override a particular shading parameter.
 \item The \texttt{Effect} nodes may also use the plug names defined
 in the previous \texttt{Effect} nodes on the same shape.
 It is trivially easy (you just add a ``magic'' comment) to define
-plugging points in your own shader code. This way your own effects
+plugs in your own shader code. This way your own effects
 can be customized.
 
 \item Inside the renderer implementation, the same approach can be used
@@ -455,7 +465,7 @@ When you place a standard shader node
 (like a \texttt{ComposedShader} node for GLSL shaders) on the
 \texttt{Appearance.shaders} list,
 then it replaces the internal renderer shaders.
-If you define the same (or compatible) plugging points inside your shader,
+If you define the same (or compatible) plugs inside your shader,
 then the internal renderer effects are even added to your own
 shader. Of course user effects are added to your shader too.
 This way we have made even the standard X3D shader nodes much more flexible.
@@ -467,6 +477,8 @@ will be added.
 
 We define new \texttt{Effect} node that holds information about
 the source code and uniform values specific to a given effect.
+The node specification below is presented in the same style
+as in the X3D specification \cite{x3d:spec}.
 
 \begin{mycode}
 \underline{Effect : X3DChildNode}
@@ -481,14 +493,16 @@ SFBool [in,out] \codeem{enabled} TRUE
 MFNode [] \codeem{parts} [] # EffectPart
   # Source code of the effect.
 
-# A number of uniform values may also
-# be passed to the shader:
-fieldType []       fieldName
-fieldType [in]     fieldName
-fieldType [out]    fieldName
-fieldType [in,out] fieldName
+# A number of uniform values may also be
+# declared inside this node.
 \end{Verbatim}
 \end{mycode}
+
+Inside the \texttt{Effect} node a number of uniform values may be defined,
+passing any X3D value to the shader. Examples include passing
+current world time or a texture to the shader.
+Uniform values are declared exactly like described in the standard
+X3D \textit{Programmable shaders} component \cite{x3d:shaders}.
 
 %% , just like
 %% # for ComposedShader node
@@ -550,22 +564,28 @@ cleaner, as you cannot use undeclared functions and variables from other parts.
 It also allows for cleaner error detection (parsing errors will be detected
 inside the given unit).
 
-We have also considered and rejected a different approach to use plugs.
-In that approach, the plug name was indicated by a new field of
-the \texttt{EffectPart} node, not by a special \texttt{PLUG\_} function name
-inside the shader code.
-However, the implementation may need to know the full declaration
-of a plug function, to make a forward or external declaration of it.
-One way to overcome this problem was to require repeating this declaration
-in another field. Another solution was to split shader code into more
-parts (for example, one part declares the uniform variables, one part declares
-the plug function, one part defines the function body and so on).
-Both approaches seemed uncomfortable for authors
-and they didn't really offer a simpler implementation, so we dropped this idea.
-The current approach, to find the declarations of \texttt{PLUG\_xxx} functions
-inside a complete shader code, is easy to implement and results in clean
-shader code of the effects. It also allows us to naturally use
-the separate compilation units in case of GLSL.
+%% We have also considered and rejected a different approach to use plugs.
+%% In that approach, the plug name was indicated by a new field of
+%% the \texttt{EffectPart} node, not by a special \texttt{PLUG\_} function name
+%% inside the shader code.
+%% However, the implementation may need to know the full declaration
+%% of a plug function, to make a forward or external declaration of it.
+%% One way to overcome this problem was to require repeating this declaration
+%% in another field. Another solution was to split shader code into more
+%% parts (for example, one part declares the uniform variables, one part declares
+%% the plug function, one part defines the function body and so on).
+%% Both approaches seemed uncomfortable for authors
+%% and they didn't really offer a simpler implementation, so we dropped this idea.
+%% The current approach, to find the declarations of \texttt{PLUG\_xxx} functions
+%% inside a complete shader code, is easy to implement and results in clean
+%% shader code of the effects. It also allows us to naturally use
+%% the separate compilation units in case of GLSL.
+
+%% Detecting special \texttt{PLUG\_} function names inside the shader code
+%% is trivial, and it turned out to be the best approach to design our effects.
+%% This means that each effect code is clean, and can be compiled separately
+%% from others. It allows us to naturally use
+%% the \textit{separate compilation units} in case of GLSL implementation.
 
 \subsection{Effects for particular shapes}
 
@@ -903,9 +923,9 @@ that don't support our extensions.
 
 \subsection{Forward declarations}
 
-Suppose we have an effect~$X$ that defines a new plugging point.
+Suppose we have an effect~$X$ that defines a new plug.
 %, by includes a magic \texttt{/* PLUG: ... */} comment.
-When this plugging point is used by another effect~$Y$,
+When this plug is used by another effect~$Y$,
 then an appropriate function call is automatically inserted into the generated shader.
 In the middle of the source code of effect~$X$,
 a function defined in effect~$Y$ has to be called. This is the simplest
@@ -1142,7 +1162,7 @@ of our effects.
 
 %% and we think that the same set of plugs will be useful for them --- but it's just a theory.
 %% An implementation of our effects for other shading languages may
-%% find other opportunities for plugging points.
+%% find other opportunities for plugs.
 %% In particular, we have tested that the \emph{separate compilation units}
 %% of GLSL are not necessary for a correct implementation of our effects.
 %% We also believe that most of our plug points (like ``do something in object space'',
