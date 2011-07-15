@@ -889,17 +889,17 @@ some previous code. This also means that using a procedural plug
 concept to keep. We want the effects to cooperate with each other,
 not to ``hijack'' from each other some parts of the functionality.
 
-The nice feature of our magic \texttt{/* PLUG ... */} comments is that a shader source
-is still valid even if you completely ignore the plugs. For example,
-you can write a custom \texttt{ComposedShader} node, defining some plugs,
-and for X3D browsers that understand them --- the plugs can be used,
-for other browsers --- plugs will be gracefully ignored (but still
-the shader will run, although without any effects).
-
-You can define new plug points in your own effects code, as well as in your
-complete custom shaders (like \texttt{ComposedShader}) code.
+New plug points can be defined inside the \texttt{Effect} nodes,
+as well as inside the complete shaders (like standard
+\texttt{ComposedShader} nodes).
 In the first case, the plug points
-are only available for the following effects of the same node.
+are only available for the following effects of the same shape.
+
+The advantage of using magic comments to define plugs is that
+they can be ignored, and a shader source remains valid.
+This means that \texttt{ComposedShader} nodes can define custom plugs
+and still work (although with no extra effects) even in X3D browsers
+that don't support our extensions.
 
 \subsection{Forward declarations}
 
@@ -938,7 +938,7 @@ should be inserted.
 
 \subsection{Invalid shader code}
 
-We guarantee the behavior only if the provided shading language code
+The behavior is defined only if the provided shading language code
 is a correct, self-contained code. The errors (like unterminated block)
 %%  (``\texttt{\{}'' without matching ``\texttt{\}}'')
 %% ,
@@ -950,6 +950,8 @@ the parsing errors can be at least reported always for the correct code piece
 (effect part).
 
 The \textbf{application does not need to parse the shader code} at any point.
+Only a trivial text search in the code is necessary to detect the magic
+plug function names and comments.
 %% Still, by writing incorrect code,
 %% you can cause the whole shader to malfunction.
 %% is actually better, and
