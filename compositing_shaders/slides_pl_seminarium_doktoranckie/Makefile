@@ -1,4 +1,4 @@
-DOCUMENT := compositing_shaders_slides
+DOCUMENT := compositing_shaders_sem_dokt_polish
 
 $(DOCUMENT).pdf: $(DOCUMENT).tex
 	pdflatex -file-line-error -interaction=nonstopmode $(DOCUMENT).tex
