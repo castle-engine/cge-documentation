@@ -21,7 +21,7 @@
   \setbeamercovered{transparent}
 }
 
-\usepackage[polish]{babel}
+% \usepackage[polish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage{times}
 \usepackage[T1]{fontenc}
@@ -64,7 +64,7 @@
 How to create and composite powerful graphic effects using shaders.
 
 \begin{itemize}
-  \item Extension of two existing languages (X3D and~GLSL).
+  \item Extend two existing languages (X3D and~GLSL).
   \item Practical, implemented (100\% finished open-source
     implementation).
 \end{itemize}
@@ -72,18 +72,24 @@ How to create and composite powerful graphic effects using shaders.
 
 \begin{frame}{Easy and~works}
 
-Easy, but no-one else did it before :)
+Easy, and new.
 
 \begin{itemize}
-  \item Actually there are other systems trying to achieve this by inventing
-    completely new languages (Spark, Sh). They necessarily sit on top
-    of existing languages like GLSL. Using them is quite involved,
-    as you don't want to implement a new shader language yourself.
-    So practically you have to make a renderer specifically targeted
-    at a given language and it's single implementation (like libsh).
+  \item Actually there are other approaches that do this by inventing
+    new languages (Sh, Spark).
+    %% They necessarily sit on top
+    %% of existing languages like GLSL.
+    But using them means that your renderer is designed, from the start,
+    for the (only one) implementation of this language (like libsh).
+    (As you don't want to implement new language yourself in
+    an already complicated renderer.)
 
-  \item  We propose much simpler approach, no new language, just a natural
-    extension for X3D and GLSL (or other shading language, actually, like Cg).
+  \item We propose much simpler approach, no new language, just a natural
+    extension for X3D and GLSL.
+    % (or other shading language, actually, like Cg).
+    And you probably already use GLSL together OpenGL.
+%    And you should use X3D, because it's good :)
+
     % Should be easy to implement if you already have X3D browser.
 \end{itemize}
 
@@ -95,6 +101,23 @@ No need to reimplement your shaders for each scene/configuration.
     % za~pomocą shaderów w~bardzo wygodny sposób.
     %  IMHO dopiero teraz GLSL jest użyteczny dla~autorów.
 
+\end{frame}
+
+\begin{frame}{Example - water}
+
+Water is naturally a combination of a couple of effects: waves smoothly change normal vectors and vertex positions, also water is a little transparent and a little reflective.
+
+\begin{figure}
+  \centering
+  \includegraphics[width=3.5in]{water_shaders_1}
+\end{figure}
+\end{frame}
+
+\begin{frame}{Example - water - wider view}
+\begin{figure}
+  \centering
+  \includegraphics[width=3.5in]{water_shaders_0}
+\end{figure}
 \end{frame}
 
 \section{What is X3D, what are shaders}
@@ -144,12 +167,12 @@ Alternative example:
 \begin{frame}{X3D as a programming language}
 
 There are some aspects of X3D that make it more interesting,
-more like ``(declarative) programming language'' than just ``3D model format'':
+more like ``(declarative) programming language'' than just ``3D~model format'':
 
 \begin{itemize}
   \item DEF/USE: references, for all nodes.
-  \item Events: sending and receiving events,
-    declarative analogy to calling a method in imperative programming.
+  \item Events: sending and receiving events.
+%    declarative analogy to calling a method in imperative programming.
     E.g.~open a door when user presses a handled.
   \item Prototypes: define new nodes,
   %pełnowartościowe,
@@ -164,18 +187,19 @@ more like ``(declarative) programming language'' than just ``3D model format'':
 \end{frame}
 
 \begin{frame}{Shaders}
-Shaders:
+
 \begin{itemize}
-  \item Languages to calculate color of 3D shapes. Implement per-vertex work,
-    let GPU rasterize, implement per-pixel (fragment) work.
+  \item Languages to calculate shading color of 3D stuff.
+    Implement per-vertex work,
+    let GPU rasterize, implement per-pixel work.
     % Chociaż przy pomocy pewnych sztuczek (tekstury oparte na~float,
     % render to textury) można je wykorzystać do~ogólnych obliczeń,
     % obecnie do~ogólnych obliczeń wygodniejsze są CUDA/OpenCL
     % (google.com/q=gpgpu).
     % Można próbować
     % geom shader
-  \item We focus on real-time GPU shaders here.
-    Popular choices: GLSL (OpenGL), Cg (NVidia: OpenGL or Direct 3D),
+  \item For real-time (implemented on GPU) shaders, there are three
+    popular choices: GLSL (OpenGL), Cg (NVidia: OpenGL or Direct 3D),
     HLSL (Direct 3D).
   \item Of course, you can use shaders in X3D.
 \end{itemize}
@@ -218,12 +242,13 @@ Shape \{
     Sure, you can let some renderer auto-generate a large shader for you,
     and only modify it, but...
   \item - \textbf{You create one-time shaders, not reusable}.
-    Particular shader is tied to scene configuration (lights and textures
-    counts, types etc.). General shader implementing everything
-    would be awfully slow, unless you use \texttt{\#ifdefs} --- in which case
-    it's awfully large.
+    Particular shader is tied to a scene configuration (lights and textures
+    counts, types etc.).
+    %% General shader implementing everything
+    %% would be awfully slow, unless you use \texttt{\#ifdefs} --- in which case
+    %% it's awfully large.
   \item - \textbf{All the effects in one huge shader}.
-    Ultimately, following this means you create a large shader,
+    Ultimately, this means that you create a large shader with \texttt{\#ifdefs},
     that is not maintainable. Adding / removing an effect means carefully
     inserting logic into a large code.
 \end{itemize}
@@ -236,7 +261,8 @@ Shape \{
   \item We would like to intensively use shaders. Every 3D property
     should be programmable --- that's the reason why shaders were created.
 
-  \item Traditional approach, ``write shader that does everything'',
+  \item Traditional approach
+  %, ``write shader that does everything'',
     makes it difficult to actually harness that power.
     Implementing a simplest change (like ``filter light through a stencil'')
     requires understanding and taking care of the algorithm around.
@@ -263,7 +289,7 @@ in a new node \texttt{Effect}.
     %%   difficult operations to process your shading language code).
   \item Implementation in~renderer easy: we extend existing language.
   \item Implementation of new effects easy: implement
-    your desired effect, only point our how it is tied to the existing
+    your desired effect, and specify how it is tied to the existing
     calculations.
   \item Effects are reusable: inserted into an internal shader,
     optimized for particular textures, lights etc.
@@ -274,7 +300,7 @@ in a new node \texttt{Effect}.
 \begin{frame}[fragile]
 \begin{exampleblock}{Example of our effect}
 \begin{semiverbatim}
-# inside an Appearance node from previous example:
+\# inside an Appearance from previous example:
 effects Effect \{
   language "GLSL"
   parts EffectPart \{
@@ -292,7 +318,7 @@ effects Effect \{
 \end{exampleblock}
 \end{frame}
 
-%\renewcommand*{\figurename}{Obraz}
+% \renewcommand*{\figurename}{Image}
 
 \begin{frame}{Details}
 \begin{itemize}
@@ -302,9 +328,10 @@ effects Effect \{
     for example pass a texture or current time (\texttt{TimeSensor.time} in~X3D)
     to the effect.
     % jak ComposedShader
-  \item All effects are added to the base internal shader. (Oversimplifying a little.)
-  \item Old \texttt{ComposedShader} node modifies the base shader.
-    This way old, standard \texttt{ComposedShader} node becomes more powerful too:
+  \item Effects are added to the base internal shader.
+    % (Oversimplifying a little.)
+  \item Standard X3D \texttt{ComposedShader} node modifies the base shader.
+    This way the \texttt{ComposedShader} node becomes more powerful too:
     it can cooperate with internal effects (like shadow maps),
     and~user effects (from \texttt{Effect} nodes).
 \end{itemize}
@@ -327,12 +354,12 @@ Code: \texttt{demo\_models/compositing\_shaders/\\fresnel\_and\_toon.x3dv}
 
 \begin{frame}{Internal effects}
 Renderer can implement internal effects in a similar way.
-This is invisible to user, and allows for really nice orthogonal implementation
+This allows for really nice orthogonal implementation
 of some features:
 
 \begin{itemize}
   \item Shadow maps: filter particular light source,
-  \item Classic Bump mapping: change normal vector based on texture value.
+  \item Classic bump mapping: change normal based on a texture,
   \item Fog: mix final color with a fog color.
 \end{itemize}
 
@@ -345,16 +372,15 @@ of some features:
 
 \begin{frame}{Light sources effects}
 \begin{block}{Idea 2}
-Effects may be added not only to visible 3D shapes.
-Also lights can have their own effects, that gives that a specific
-shape, equation etc. Such light becomes a fully-fledged, reusable X3D
-light source.
+Not only visible 3D shapes have effects.
+Light sources also have their own effects, that may change light
+shape, equation etc. Such light becomes a fully-fledged, reusable X3D light.
 \end{block}
 
 \begin{figure}
   \centering
   \includegraphics[width=1.8in]{../fancy_light_spot_shape}
-  \caption{Light filtered through a texture. Casts a proper shape, cooperates with~bump mapping (which doesn't occur with simple texture projection), without any work from author.}
+  \caption{Light filtered through a texture. Automatically casts a proper shadow, and cooperates with~bump mapping.}
 \end{figure}
 \end{frame}
 
@@ -365,7 +391,7 @@ in many algorithms.
 
 \vspace{0.1in}
 
-E.g.~add noise to existing texture, or choose a 2D slice of 3D texture.
+E.g.~add noise to an existing texture, or choose a 2D slice of 3D texture.
 \end{frame}
 
 \begin{frame}[fragile]{Procedural textures on GPU}
@@ -415,7 +441,7 @@ Code: \texttt{demo\_models/compositing\_shaders/\\volumetric\_animated\_fog.x3dv
 \end{frame}
 
 \begin{frame}{Defining custom plugs}
-You can easily define your own plugs (sockets) trivially easy:
+You can easily define your own plugs (sockets):
 \begin{itemize}
   \item Base shader, and \textbf{every effect}, can define plugs
     to be available for following effects.\\
@@ -428,19 +454,19 @@ You can easily define your own plugs (sockets) trivially easy:
   \item Idea portable to other shading languages.
   \item Good choice of default plugs, see links at the end.
     Despite our fear, it turns our that we don't need 100 plugs
-    --- a couple of plugs fills the needs of 90\% of use cases.
+    and 1 more. A couple of plugs fill the needs of 90\% of use cases.
 \end{itemize}
 \end{frame}
 
-\begin{frame}{Final examples - water}
-\begin{figure}
-  \centering
-  \includegraphics[width=3.5in]{../water_shaders_3}
-  \caption{Water, combination of a couple of effects: generate normal vectors in tangent space, transform to eye space, mix with color from reflection and refraction.}
-\end{figure}
-\end{frame}
+%% \begin{frame}{Final examples - water}
+%% \begin{figure}
+%%   \centering
+%%   \includegraphics[width=3.5in]{../water_shaders_3}
+%%   \caption{Water, combination of a couple of effects: generate normal vectors in tangent space, transform to eye space, mix with color from reflection and refraction.}
+%% \end{figure}
+%% \end{frame}
 
-\begin{frame}
+\begin{frame}{Final examples - flowers}
 \begin{figure}
   \centering
   \includegraphics[width=3.5in]{../flowers}
