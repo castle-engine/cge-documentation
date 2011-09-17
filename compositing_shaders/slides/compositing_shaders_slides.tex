@@ -65,14 +65,14 @@ How to create and composite powerful graphic effects using shaders.
 
 \begin{itemize}
   \item Extend two existing languages (X3D and~GLSL).
-  \item Practical, implemented (100\% finished open-source
-    implementation).
+  \item Practical, implemented. 100\% finished open-source
+    implementation.
 \end{itemize}
 \end{frame}
 
 \begin{frame}{Easy and~works}
 
-Easy, and new.
+Easy and new.
 
 \begin{itemize}
   \item Actually there are other approaches that do this by inventing
@@ -81,8 +81,8 @@ Easy, and new.
     %% of existing languages like GLSL.
     But using them means that your renderer is designed, from the start,
     for the (only one) implementation of this language (like libsh).
-    (As you don't want to implement new language yourself in
-    an already complicated renderer.)
+    As you don't want to implement new language yourself in
+    an already complicated renderer.
 
   \item We propose much simpler approach, no new language, just a natural
     extension for X3D and GLSL.
@@ -163,6 +163,23 @@ Alternative example:
 
 \end{frame}
 
+\begin{frame}{X3D has a lot features}
+
+That's why we chose to integrate our concept with X3D.
+
+Besides standard rendering features (indexed geometries with materials
+and animations), the X3D specification includes many
+advanced 3D visualization stuff. For example:
+
+\begin{itemize}
+  \item NURBS,
+  \item advanced texturing (cube maps, 2D and 3D textures, multi-texturing),
+  \item particle effects,
+  \item physics,
+  \item skinned humanoid animation.
+\end{itemize}
+\end{frame}
+
 % TODO- remove, instead more slides about our invention?
 \begin{frame}{X3D as a programming language}
 
@@ -178,8 +195,8 @@ more like ``(declarative) programming language'' than just ``3D~model format'':
   %pełnowartościowe,
     by combining existing ones.
   \item Scripts: integration with script languages (like JavaScript) easy.
-    Script remains a ,,black box'' for~X3D, and at the same time
-    in X3D we define exactly what parts of the scene are accessed.
+    %% Script remains a ``black box'' for~X3D. At the same time
+    %% in X3D we define exactly what parts of the scene are accessed.
      %  np.~JavaScript. U mnie --- z~własnym prostym językiem skryptowym
      % oraz ze skompilowanym kodem w~ObjectPascalu.
      % Więcej nowinek w~vrml\_engine\_doc, sekcja "advanced features".
@@ -242,8 +259,8 @@ Shape \{
     Sure, you can let some renderer auto-generate a large shader for you,
     and only modify it, but...
   \item - \textbf{You create one-time shaders, not reusable}.
-    Particular shader is tied to a scene configuration (lights and textures
-    counts, types etc.).
+    Particular shader is tied to a scene configuration,
+    like the number and type of lights and textures.
     %% General shader implementing everything
     %% would be awfully slow, unless you use \texttt{\#ifdefs} --- in which case
     %% it's awfully large.
@@ -323,7 +340,7 @@ effects Effect \{
 \begin{frame}{Details}
 \begin{itemize}
   \item New node \texttt{Effect}: choose shading language, like GLSL.
-  \item New node \texttt{EffectPart}: choose type (vertex, pixel, etc.).
+  \item New node \texttt{EffectPart}: choose type, like vertex, pixel (fragment), etc.
   \item You can define new uniform values in an~\texttt{Effect} node,
     for example pass a texture or current time (\texttt{TimeSensor.time} in~X3D)
     to the effect.
@@ -397,15 +414,19 @@ E.g.~add noise to an existing texture, or choose a 2D slice of 3D texture.
 \begin{frame}[fragile]{Procedural textures on GPU}
 Procedural texture is just a function 2D or~3D $\rightarrow$
 color, normal vector, and~such.
+There is no related storage on GPU, only a function
+in a shading language.
 
 \vspace{0.1in}
 
-Using procedural textures in shading languages was always possible,
-but usual approaches have some quirks: since a procedural isn't a texture
-in a usual sense (there is no related storage on GPU), usually it wasn't
-easy to generate texture coordinates in a comfortable way for procedural
-textures. We invent here \texttt{ShaderTexture} node, that is a really
-nice way of expressing procedural textures calculated by GPU.
+%% Using procedural textures in shading languages was always possible,
+%% but usual approaches have some quirks.
+In standard X3D there is no way to treat a procedural texture
+like a regular texture. This means that it's uncomfortable
+to automatically generate tex coords for it or mix with other textures.
+We introduce new \texttt{ShaderTexture} node, that nicely
+encapsulates a procedural texture and makes it behave like a normal texture
+for the rest of the scene graph.
 
 \begin{center}
 \begin{columns}[T]
@@ -446,10 +467,10 @@ You can easily define your own plugs (sockets):
   \item Base shader, and \textbf{every effect}, can define plugs
     to be available for following effects.\\
     Just add a magic comment \texttt{/* PLUG: ... */} inside.
-  \item Magic comment may be used multiple times (to enable loop
-    unrolling in shaders, sometimes necessary).
-  \item Magic comment \texttt{/* PLUG-DECLARATION */}
-    (useful to declare GLSL version etc.).
+  \item Magic comment may be used multiple times. This enables loop
+    unrolling in shaders.
+  \item Magic comment \texttt{/* PLUG-DECLARATION */}.
+    Useful to declare version and such in GLSL.
   \item We nicely use the \textit{separate compilation units} of the GLSL.
   \item Idea portable to other shading languages.
   \item Good choice of default plugs, see links at the end.
