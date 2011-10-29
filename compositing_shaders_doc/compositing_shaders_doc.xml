@@ -95,7 +95,7 @@ to do the common job.
 </para>
 
 <para>As an example, consider this simplified lighting equation:
-$$ \sum_{l\in Lights} shadow(l) * light\_color(l, material, normal(point)) $$
+$$ \sum_{l\in Lights} shadow(l) * light_color(l, material, normal(point)) $$
 %% The \textit{shadow} function returns values in the [0..1] range,
 %% scaling the light color. If the object is not in the shadow, it returns 1.
 %% The \textit{normal} function returns a normal vector at given point.
@@ -106,7 +106,7 @@ or (when shadow map is not available) always return 1.
 The \textit{normal} function may take the vector straight from
 the geometry description, or calculate it using a texture value (classic bump mapping).
 See figure \ref{figure.bump_mapping_shadows}.
-The \textit{light\_color} function may be replaced to use different
+The \textit{light_color} function may be replaced to use different
 lighting models.
 % (Phong, Ward, Cook-Torrance and so on).
 Sometimes it makes sense to change these functions
@@ -356,7 +356,7 @@ Drupal's modules and our ``plugs'' are analogous to Drupal hooks.</para>
 points where calls to user-defined functions may be inserted. We call
 these places \textit{plugs}, as they act like sockets where logic
 may be added. Each plug has a name and a given set of parameters.
-The effects can use special function names, starting with <literal>PLUG\_</literal>
+The effects can use special function names, starting with <literal>PLUG_</literal>
 and followed by the plug name. These declarations will be found
 and the renderer will insert appropriate calls to them from the base shader.</para>
 
@@ -390,20 +390,20 @@ The GLSL code inside our extensions is marked with the italic font.
 %% GLSL function names starting with <literal>PLUG_</literal> are special,
 %% they will be automatically called at the appropriate place with appropriate
 %% parameters from the final (automatically generated and used) shader.
-The special GLSL function name <literal>PLUG\_texture\_apply</literal>
-indicates that we use the <literal>texture\_apply</literal> plug.
+The special GLSL function name <literal>PLUG_texture_apply</literal>
+indicates that we use the <literal>texture_apply</literal> plug.
 This particular plug is called right after applying the textures,
 and is the simplest way to ``just modify the pixel color''.
-%% The <literal>texture\_apply</literal> plug in
+%% The <literal>texture_apply</literal> plug in
 %% the renderer internal shader. This particular plug,
-%% the <literal>PLUG\_texture\_apply</literal>, is called after the normal texture colors
+%% the <literal>PLUG_texture_apply</literal>, is called after the normal texture colors
 %% are applied, but before the alpha test and is a usual place
-<literal>fragment\_color</literal> is an <literal>inout</literal> parameter, by modifying it
+<literal>fragment_color</literal> is an <literal>inout</literal> parameter, by modifying it
 we modify the color that will be displayed on the screen.</para>
 
 <para>A reference of all the plugs available in our implementation
 is on \URL{http://castle-engine.sourceforge.net/compositing_shaders.php}.
-For each plug, like this <literal>PLUG\_texture\_apply</literal>,
+For each plug, like this <literal>PLUG_texture_apply</literal>,
 we define a list of parameters
 %(they have to be declared exactly the same in an effect),
 and when it is called.</para>
@@ -440,7 +440,7 @@ and nicely separated from each other.
 %% Well, the renderer is still useful to calculate nice tangent vectors,
 %% although an authoring program could generate GLSL attributes for them as well.</para>
 
-<para>%% Same thing with shadow maps, they only plug to the <literal>light\_scale</literal>
+<para>%% Same thing with shadow maps, they only plug to the <literal>light_scale</literal>
 %% calculation of appropriate light.</para>
 
 <!-- \end{enumerate} -->
@@ -525,7 +525,7 @@ MFString [] \codeem{url} []
 </para>
 
 <para>Inside the effect part source code, the functions that enhance
-standard shaders behavior are recognized by names starting with <literal>PLUG\_</literal>.
+standard shaders behavior are recognized by names starting with <literal>PLUG_</literal>.
 Of course other functions can also be defined and used.
 Uniform variables can be passed to the effect,
 also varying variables can be passed between the vertex and fragment
@@ -533,9 +533,9 @@ parts, just like with standard shader nodes.
 </para>
 
 <para>
-In a single <literal>EffectPart</literal> node, many <literal>PLUG\_</literal>
+In a single <literal>EffectPart</literal> node, many <literal>PLUG_</literal>
 functions may be declared. However, all plug functions must be declared in the appropriate
-effect type. For example, the <literal>texture\_apply</literal> plug cannot be used
+effect type. For example, the <literal>texture_apply</literal> plug cannot be used
 within a <literal>VERTEX</literal> shader.
 If the effect requires some processing per-vertex and some per-fragment,
 it is necessary to use two <literal>EffectPart</literal> nodes, with different types.
@@ -549,7 +549,7 @@ but it must be completely contained within a given shader type.
 </para>
 
 <para>Note that it is completely reasonable to have an <literal>EffectPart</literal> node
-with source code that does not define any <literal>PLUG\_xxx</literal> functions.
+with source code that does not define any <literal>PLUG_xxx</literal> functions.
 Such <literal>EffectPart</literal> node may be useful for defining shading language
 utility functions, used by other effect parts.
 </para>
@@ -564,7 +564,7 @@ inside the given unit).
 
 <para>%% We have also considered and rejected a different approach to use plugs.
 %% In that approach, the plug name was indicated by a new field of
-%% the <literal>EffectPart</literal> node, not by a special <literal>PLUG\_</literal> function name
+%% the <literal>EffectPart</literal> node, not by a special <literal>PLUG_</literal> function name
 %% inside the shader code.
 %% However, the implementation may need to know the full declaration
 %% of a plug function, to make a forward or external declaration of it.
@@ -574,12 +574,12 @@ inside the given unit).
 %% the plug function, one part defines the function body and so on).
 %% Both approaches seemed uncomfortable for authors
 %% and they didn't really offer a simpler implementation, so we dropped this idea.
-%% The current approach, to find the declarations of <literal>PLUG\_xxx</literal> functions
+%% The current approach, to find the declarations of <literal>PLUG_xxx</literal> functions
 %% inside a complete shader code, is easy to implement and results in clean
 %% shader code of the effects. It also allows us to naturally use
 %% the separate compilation units in case of GLSL.</para>
 
-<para>%% Detecting special <literal>PLUG\_</literal> function names inside the shader code
+<para>%% Detecting special <literal>PLUG_</literal> function names inside the shader code
 %% is trivial, and it turned out to be the best approach to design our effects.
 %% This means that each effect code is clean, and can be compiled separately
 %% from others. It allows us to naturally use
@@ -726,7 +726,7 @@ MFNode [] \codeem{effects} [] # Effect
 <para><literal>X3DTextureNode</literal> is an ancestor for all the standard texture nodes,
 like the <literal>ImageTexture</literal>. This allows to modify any X3D texture
 by shader effects.
-A plug <literal>texture\_color</literal> may be used to change the texture color,
+A plug <literal>texture_color</literal> may be used to change the texture color,
 taking into account the current texture coordinates and other information.</para>
 
 <section id="section.procedural_textures">
@@ -765,7 +765,7 @@ SFString [] \codeem{defaultTexCoord} "BOUNDS2D"
 %% the <literal>X3DTextureNode</literal> class (see above).  It is mentioned here
 %% for completeness.</para>
 
-<para>An effect overriding the <literal>texture\_color</literal> plug
+<para>An effect overriding the <literal>texture_color</literal> plug
 should be included, otherwise texture colors are undefined.
 Our implementation
 sets the default texture color to pink (RGB(1,~0,~1)), so it stands out,
@@ -816,7 +816,7 @@ the \textit{Texturing3D} component of the X3D specification.</para>
 <title>When to use the ShaderTexture</title>
 
 <para>For textures other than the <literal>ShaderTexture</literal>,
-when the <literal>texture\_color</literal> plugs are called,
+when the <literal>texture_color</literal> plugs are called,
 the internal shaders have already calculated the initial texture
 color by actually sampling the texture image. This is useful if you
 want to modify this color. If you'd rather ignore the normal
@@ -836,7 +836,7 @@ This allows to combine any number of textures inside an effect.
 The only difference
 between <literal>ShaderTexture</literal> and other textures is what the system
 does automatically for you, that is what color is passed
-to the first <literal>texture\_color</literal> plug.</para>
+to the first <literal>texture_color</literal> plug.</para>
 
 <figure id="figure.shader_texture_edge_detection">
   <title>ShaderTexture doing an edge detection operation on a normal ImageTexture.</title>
@@ -854,7 +854,7 @@ to the first <literal>texture\_color</literal> plug.</para>
 <para>Note that the shader effects for textures are calculated at each screen fragment
 (not at each texel). So the effects are not concerned about the texture size
 or texture filtering options. We can just use the interpolated texture
-coordinates in the <literal>texture\_color</literal> plug.</para>
+coordinates in the <literal>texture_color</literal> plug.</para>
 
 <figure id="figure.shader_texture_no_filtering_problems">
   <title>Yellowish arc is done by a texture effect, and so is not
@@ -883,12 +883,12 @@ coordinates in the <literal>texture\_color</literal> plug.</para>
 \end{mycode}</para>
 
 <para>This defines a point where calls to user functions declared as
-<literal>PLUG\_name</literal> will be inserted. They will be called with given
+<literal>PLUG_name</literal> will be inserted. They will be called with given
 parameters.</para>
 
-<para>Many effects may use the same <literal>PLUG\_name</literal>.
-Even within a single effect, the same <literal>PLUG\_name</literal> may be used
-many times. All the <literal>PLUG\_name</literal> functions
+<para>Many effects may use the same <literal>PLUG_name</literal>.
+Even within a single effect, the same <literal>PLUG_name</literal> may be used
+many times. All the <literal>PLUG_name</literal> functions
 will be uniquely renamed to not collide with each other.</para>
 
 <para>The calls will be added in the order they are specified on the
@@ -903,20 +903,20 @@ so one or more of the parameters are often allowed to be handled
 as <literal>inout</literal> values.</para>
 
 <para>The same plug name may be defined many times in the source shader.
-This means that a single <literal>PLUG\_xxx</literal> function will be called
+This means that a single <literal>PLUG_xxx</literal> function will be called
 many times. For example, this is useful when the algorithm is naturally
 expressed as a loop, but it had to be unrolled for shader source
 (for example, to slightly tweak some loop iterations).
 The plug names that are available per-light source and per-texture
 are an example of this.
-%% If you use the <literal>PLUG\_texture\_color</literal>
+%% If you use the <literal>PLUG_texture_color</literal>
 %% inside <literal>Appearance.effects</literal>, you change the color of all
 %% the textures (even shader textures).
-%% Not really available, as params to texture\_color differ.
-Using the <literal>PLUG\_light\_scale</literal>
+%% Not really available, as params to texture_color differ.
+Using the <literal>PLUG_light_scale</literal>
 inside <literal>Appearance.effects</literal>, the intensity
 of all the light sources on the given shape can be changed. Contrast this with using
-the same <literal>PLUG\_light\_scale</literal> inside a <literal>X3DLightNode.effects</literal>,
+the same <literal>PLUG_light_scale</literal> inside a <literal>X3DLightNode.effects</literal>,
 where only the given light node contribution is changed.</para>
 
 <para>Currently all the plugs must be procedures, that is their result type
@@ -1173,7 +1173,7 @@ uniform values and attributes are integrated with X3D fields.</para>
 <para>Many complete example models using our effects
 are referenced from our page on
 \URL{http://castle-engine.sourceforge.net/compositing_shaders.php}.
-%% The relevant demos are mostly inside the <literal>compositing\_shaders</literal>
+%% The relevant demos are mostly inside the <literal>compositing_shaders</literal>
 %% subdirectory, also the <literal>water</literal> subdirectory contains
 %% the mentioned water effects.
 You can open these examples using any of our engine tools,
