@@ -290,7 +290,7 @@ composable shaders for GPU.</para>
 
 <para>%% \cite{web3d2010:declarativeshader} presents a declarative approach
 %% to an advanced shader in X3D. However, it only allows a fixed set
-%% of functionality, kind od ``advanced and exhanced material''.
+%% of functionality, kind od <quote>advanced and exhanced material</quote>.
 %% It does not expose any shader functionality to the authors.
 %% It merely allows the authors to use some advanced algorithms that in practice
 %% will be usually implemented by shaders inside the application.
@@ -313,7 +313,7 @@ Many modules can implement the same hook and cooperate without any problems.
 %% and call function by its name.
 Drupal approach is quite similar to our
 core idea of combining effects. Our effects are similar to
-Drupal's modules and our ``plugs'' are analogous to Drupal hooks.</para>
+Drupal's modules and our <quote>plugs</quote> are analogous to Drupal hooks.</para>
 
 <para>%% Our effects can define functions with special names to enhance
 %% the standard shader behavior, just like Drupal modules can define functions
@@ -395,7 +395,7 @@ The GLSL code inside our extensions is marked with the italic font.
 The special GLSL function name <literal>PLUG_texture_apply</literal>
 indicates that we use the <literal>texture_apply</literal> plug.
 This particular plug is called right after applying the textures,
-and is the simplest way to ``just modify the pixel color''.
+and is the simplest way to <quote>just modify the pixel color</quote>.
 %% The <literal>texture_apply</literal> plug in
 %% the renderer internal shader. This particular plug,
 %% the <literal>PLUG_texture_apply</literal>, is called after the normal texture colors
@@ -419,7 +419,7 @@ and when it is called.</para>
 
   <listitem><para>The <literal>Effect</literal> nodes may also use the plug names defined
     in the previous <literal>Effect</literal> nodes on the same shape.
-    It is trivially easy (just add a ``magic'' comment) to define
+    It is trivially easy (just add a <quote>magic</quote> comment) to define
     plugs in your own shader code. This way your own effects
     can be customized.</para></listitem>
 
@@ -427,7 +427,7 @@ and when it is called.</para>
     to implement some internal effects.
     We have reimplemented many internal effects of our engine,
     like the fog, shadow maps (see \cite{vrmleng:shadowmaps})
-    and the bump mapping to use our ``plugs'' approach.
+    and the bump mapping to use our <quote>plugs</quote> approach.
     This made their implementation very clean, short
     and nicely separated from each other.
     %% It also proves that
@@ -436,7 +436,7 @@ and when it is called.</para>
 
     <para>%% without any traditional hassles. For example, bump mapping can be
     %% achieved using standard <literal>ComposedShader</literal> as well,
-    %% but then you have to write all this ``boilerplate'' code to also deal
+    %% but then you have to write all this <quote>boilerplate</quote> code to also deal
     %% with all the possible lighting and textures configurations.
     %% Well, the renderer is still useful to calculate nice tangent vectors,
     %% although an authoring program could generate GLSL attributes for them as well.</para>
@@ -447,7 +447,7 @@ and when it is called.</para>
 </orderedlist>
 
 <para>Actually, there are even more possibilities.
-We have been talking above about the ``renderer internal shaders'',
+We have been talking above about the <quote>renderer internal shaders</quote>,
 but the truth is a little more flexible.
 When you place a standard shader node
 (like a <literal>ComposedShader</literal> node for GLSL shaders) on the
@@ -495,7 +495,7 @@ X3D <emphasis>Programmable shaders</emphasis> component \cite{x3d:shaders}.</par
 %% , just like
 %% # for ComposedShader node
 
-% Comments for ``enabled'':
+% Comments for <quote>enabled</quote>:
 %% # You could also remove/add the node
 %% # from the scene, but often toggling
 %% # this field is easier for scripts.
@@ -910,7 +910,7 @@ may be simply inserted, while in case of function it will have to replace
 some previous code. This also means that using a procedural plug
 <emphasis>never</emphasis> replaces or removes some existing code, which is a very nice
 concept to keep. We want the effects to cooperate with each other,
-not to ``hijack'' from each other some parts of the functionality.</para>
+not to <quote>hijack</quote> from each other some parts of the functionality.</para>
 
 <para>New plugs can be defined inside the <literal>Effect</literal> nodes,
 as well as inside the complete shaders (like standard
@@ -969,7 +969,7 @@ should be inserted.</para>
 
 <para>The behavior is defined only if the provided shading language code
 is a correct, self-contained code. The errors (like unterminated block)
-%%  (``<literal>{</literal>'' without matching ``<literal>\</literal>}'')
+%%  (<quote><literal>{</literal></quote> without matching <quote><literal>\</literal>}</quote>)
 %% ,
 %% or an unterminated comment)
 may only be detected after the complete shader
@@ -1210,14 +1210,14 @@ of our effects.
 %% find other opportunities for plugs.
 %% In particular, we have tested that the <emphasis>separate compilation units</emphasis>
 %% of GLSL are not necessary for a correct implementation of our effects.
-%% We also believe that most of our plugs (like ``do something in object space'',
-%% ``do something in eye space'') are generic enough to be usable
+%% We also believe that most of our plugs (like <quote>do something in object space</quote>,
+%% <quote>do something in eye space</quote>) are generic enough to be usable
 %% with all shading languages.
 
 %% for ph.d. uncomment:
 %% Our approach does not cause any speed loss. Effects code is just
 %% combined into the final shader code, without any transformations that
-%% could make it slower. Our process of ``combining'' effects is essentially
+%% could make it slower. Our process of <quote>combining</quote> effects is essentially
 %% adding function calls around. Fortunately, a function call has no speed
 %% penalty. Existing shading languages are defined
 %% such that functions can always be inlined (there is no recursion allowed,
@@ -1249,7 +1249,7 @@ content authors. We have implemented our approach for the GLSL shading language.
 
 <para>
 %% A lot of people helped and encouraged the development of our VRML/X3D engine,
-%% with it's rendering features and extensions. A big ``thank you''
+%% with it's rendering features and extensions. A big <quote>thank you</quote>
 %% goes to all of you.
 </para>
 
