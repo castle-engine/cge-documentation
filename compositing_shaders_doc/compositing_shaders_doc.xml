@@ -699,8 +699,8 @@ MFNode [] \codeem{effects} [] # Effect
 <figure id="figure.fancy_spot">
   <title>Textured spot light with shadow.</title>
   <mediaobject>
-  <imageobject role="html"> <imagedata format="PNG" fileref="images/fancy_light_spot_shape-cropped.png" /> </imageobject>
-  <imageobject role="fo">   <imagedata format="PNG" fileref="images/fancy_light_spot_shape-cropped.png" width="3in" contentwidth="3in" /> </imageobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/fancy_light_spot_shape.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/fancy_light_spot_shape.png" width="3in" contentwidth="3in" /> </imageobject>
   </mediaobject>
 </figure>
 
@@ -860,8 +860,8 @@ coordinates in the \texttt{texture\_color} plug.</para>
   <title>Yellowish arc is done by a texture effect, and so is not
     affected by the pixelated look of the base image texture.</title>
   <mediaobject>
-  <imageobject role="html"> <imagedata format="PNG" fileref="images/shader_texture_no_filtering_problems-cropped.png" /> </imageobject>
-  <imageobject role="fo">   <imagedata format="PNG" fileref="images/shader_texture_no_filtering_problems-cropped.png" width="3in" contentwidth="3in" /> </imageobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/shader_texture_no_filtering_problems.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/shader_texture_no_filtering_problems.png" width="3in" contentwidth="3in" /> </imageobject>
   </mediaobject>
 </figure>
 
@@ -1060,8 +1060,8 @@ may be implemented on GPU by a simple prototype using the \texttt{ShaderTexture}
 <figure id="figure.noise">
   <title>3D and 2D smooth noise on GPU, wrapped in a ShaderTexture.</title>
   <mediaobject>
-  <imageobject role="html"> <imagedata format="PNG" fileref="images/noise-cropped.png" /> </imageobject>
-  <imageobject role="fo">   <imagedata format="PNG" fileref="images/noise-cropped.png" width="3in" contentwidth="3in" /> </imageobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/noise.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/noise.png" width="3in" contentwidth="3in" /> </imageobject>
   </mediaobject>
 </figure>
 
@@ -1146,8 +1146,8 @@ See figure \ref{figure.flowers}.
 <figure id="figure.flowers">
   <title>Flowers bending under the wind, transformed on GPU in object space.</title>
   <mediaobject>
-  <imageobject role="html"> <imagedata format="PNG" fileref="images/flowers-cropped.png" /> </imageobject>
-  <imageobject role="fo">   <imagedata format="PNG" fileref="images/flowers-cropped.png" width="3in" contentwidth="3in" /> </imageobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/flowers.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/flowers.png" width="3in" contentwidth="3in" /> </imageobject>
   </mediaobject>
 </figure>
 
