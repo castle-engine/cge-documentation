@@ -105,7 +105,7 @@ For example, the \textit{shadow} function may check a shadow map pixel,
 or (when shadow map is not available) always return 1.
 The \textit{normal} function may take the vector straight from
 the geometry description, or calculate it using a texture value (classic bump mapping).
-See figure \ref{fig_bump_mapping_shadows}.
+See figure \ref{figure.bump_mapping_shadows}.
 The \textit{light\_color} function may be replaced to use different
 lighting models.
 % (Phong, Ward, Cook-Torrance and so on).
@@ -118,21 +118,36 @@ Our approach allows you to do everything mentioned here.
 %on a particular object.
 </para>
 
-<para>
-\begin{figure*}[t]
-  \centering
-  %% \includegraphics[width=2.0in]{rhan_shrine_0}
-  \includegraphics[width=2.0in]{rhan_shrine_1_per_pixel_lighting}
-  \includegraphics[width=2.0in]{rhan_shrine_2_bump_mapping}
-  %% \includegraphics[width=2.0in]{rhan_shrine_3_shadow_1st}
-  %% \includegraphics[width=2.0in]{rhan_shrine_4_shadow_2nd}
-  \includegraphics[width=2.0in]{rhan_shrine_5_everything}
-  \caption{Japanese shrine model with more and more effects applied:
+<figure id="figure.bump_mapping_shadows">
+  <title>Japanese shrine model with more and more effects applied:
 Phong shading (per-pixel lighting), bump mapping, shadows from two lights.
-The model is based on \texttt{http://opengameart.org/content/shrine-shinto-japan}.}
-  \label{fig_bump_mapping_shadows}
-\end{figure*}
-</para>
+The model is based on \texttt{http://opengameart.org/content/shrine-shinto-japan}.
+</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_0.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_0.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_1_per_pixel_lighting_mini.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_1_per_pixel_lighting.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_2_bump_mapping_mini.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_2_bump_mapping.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_3_shadow_1st_mini.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_3_shadow_1st.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_4_shadow_2nd_mini.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_4_shadow_2nd.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_5_everything_mini.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_5_everything.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+</figure>
 
 <para>We present a system for creating effects by essentially compositing
 pieces of a shader code. All the effects defined this way effortlessly
@@ -598,11 +613,13 @@ makes them cooperate correctly.
 %% define a library of effects, that can be composited without any work
 %% needed by user.</para>
 
-<para>\begin{figure}[H]
-  \centering
-  \includegraphics[width=3in]{fresnel_and_toon}
-  \caption{Toon and Fresnel effects combined.}
-\end{figure}</para>
+<figure>
+  <title>Toon and Fresnel effects combined.</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/fresnel_and_toon.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/fresnel_and_toon.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+</figure>
 
 <para>Note that all introduced nodes benefit from X3D mechanism to reuse the nodes
 by reference (the \texttt{DEF} / \texttt{USE} keywords). Reusing the
@@ -613,16 +630,23 @@ would like to share a particular piece of code. For example,
 the same \texttt{EffectPart} node, with a library of useful
 shading language functions, may be used for many effects.</para>
 
-<para>\begin{figure*}[t]
-  \centering
-  \includegraphics[width=2.0in]{volumetric_animated_fog_no_fog}
-  \includegraphics[width=2.0in]{volumetric_animated_fog_no_light}
-  \includegraphics[width=2.0in]{volumetric_animated_fog_all}
-  \caption{Volumetric fog scene: 1) No fog; 2) No lighting; 3) Lights and fog.
+<figure id="figure.fog">
+  <title>Volumetric fog scene: 1) No fog; 2) No lighting; 3) Lights and fog.
 Note that the fog is assumed to have its own ambient lighting,
-so it colors the image even in the 2) case.}
-  \label{fig_fog}
-\end{figure*}</para>
+so it colors the image even in the 2) case.</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_fog.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_fog.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_light.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_light.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/volumetric_animated_fog_all.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/volumetric_animated_fog_all.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+</figure>
 
 </section>
 
@@ -648,7 +672,7 @@ In a fragment shader, the 3D~texture is sampled
 along the line between the camera and pixel position in the 3D~space. This makes a very
 convincing effect of a dense fog. The \texttt{Effect} node with
 appropriate shader code is placed at the top level of the X3D file,
-so it simply works for all shapes. See figure \ref{fig_fog}.</para>
+so it simply works for all shapes. See figure \ref{figure.fog}.</para>
 
 </section>
 
@@ -660,7 +684,7 @@ types of objects, not just shapes. For example a particular light source
 may have a shader effect assigned.
 This allows to modify the contribution of a given light.
 For example the spot light shape can be modified, possibly
-based on some texture information (see figure \ref{fig_fancy_spot}).
+based on some texture information (see figure \ref{figure.fancy_spot}).
 Or a different lighting model may be implemented, like anisotropic Ward
 or Cook-Torrance.
 To make this possible, the \texttt{effects} field is added to every light node:</para>
@@ -672,12 +696,13 @@ MFNode [] \codeem{effects} [] # Effect
 \end{Verbatim}
 \end{mycode}</para>
 
-<para>\begin{figure}[H]
-  \centering
-  \includegraphics[width=2.9in]{fancy_light_spot_shape-cropped}
-  \caption{Textured spot light with shadow.}
-  \label{fig_fancy_spot}
-\end{figure}</para>
+<figure id="figure.fancy_spot">
+  <title>Textured spot light with shadow.</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/fancy_light_spot_shape-cropped.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/fancy_light_spot_shape-cropped.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+</figure>
 
 <para>%% , or even replace the default
 %% calculation of the light source contribution. In the second case,
@@ -813,43 +838,34 @@ between \texttt{ShaderTexture} and other textures is what the system
 does automatically for you, that is what color is passed
 to the first \texttt{texture\_color} plug.</para>
 
-<para>\begin{figure}[H]
-  \centering
-  \includegraphics[width=3in]{shader_texture_edge_detection}
-  \caption{ShaderTexture doing an edge detection operation on a normal ImageTexture.}
-\end{figure}</para>
+<figure>
+  <title>ShaderTexture doing an edge detection operation on a normal ImageTexture.</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/shader_texture_edge_detection.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/shader_texture_edge_detection.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+</figure>
 
 </section>
 
-<!--
-%% \subsubsection{Independence from texture filtering}
+<section id="section.filtering">
+<title>Independence from texture filtering</title>
 
-%% Note that the shader effects for textures are calculated at each screen fragment
-%% (not at each texel). So your effects are not concerned about the texture size
-%% or texture filtering options. You just use the interpolated texture
-%% coordinates in the \texttt{texture\_color} plug.
+<para>Note that the shader effects for textures are calculated at each screen fragment
+(not at each texel). So the effects are not concerned about the texture size
+or texture filtering options. We can just use the interpolated texture
+coordinates in the \texttt{texture\_color} plug.</para>
 
-%% \begin{figure}[H]
-%%   \centering
-%%   \includegraphics[width=3in]{shader_texture_no_filtering_problems-cropped}
-%%   \caption{Yellowish arc is done by a texture effect, and so is not
-%%     affected by the pixelated look of the base image texture.}
-%% \end{figure}
+<figure id="figure.shader_texture_no_filtering_problems">
+  <title>Yellowish arc is done by a texture effect, and so is not
+    affected by the pixelated look of the base image texture.</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/shader_texture_no_filtering_problems-cropped.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/shader_texture_no_filtering_problems-cropped.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+</figure>
 
-\setcounter{figure}{7}
-\begin{figure*}[b]
-  \centering
-%  \includegraphics[width=2.3in]{water_shaders_0}
-  \includegraphics[width=2.0in]{water_shaders_1}
-  \includegraphics[width=2.0in]{water_shaders_2}
-  \includegraphics[width=2.0in]{water_shaders_3}
-  \caption{Water using our effects: 1) Per-pixel lighting and bump mapping.
-2) Per-pixel lighting and reflections and refractions (by a single environment cube map texture).
-3) All effects.}
-  \label{fig_water}
-\end{figure*}
-\setcounter{figure}{5}
--->
+</section>
 
 </section>
 
@@ -1021,32 +1037,33 @@ plug function names and comments.
 <para>Effects may define and use their own uniform variables, including textures,
 just like the standard shader nodes. So we can combine any number of textures
 inside an effect. As an example we wrote a simple effect that mixes a couple of
-textures based on a terrain height (see figure \ref{fig_terrain}).
+textures based on a terrain height (see figure \ref{figure.terrain}).
 We could also pass any other uniform value to the effect, for example
 passing the current time from an X3D \texttt{TimeSensor} allows to make
 animated effects.</para>
 
-<para>\begin{figure}[H]
-  \centering
-  \includegraphics[width=2.9in]{terrain}
-  \caption{ElevationGrid with 3 textures mixed inside the shader.}
-  \label{fig_terrain}
-%%based on the point height.}
-\end{figure}</para>
+<figure id="figure.terrain">
+  <title>ElevationGrid with 3 textures mixed (based on the point height) inside the shader.</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/terrain.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/terrain.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+</figure>
 
 <para>We can wrap 2D or 3D noise inside a \texttt{ShaderTexture}
-(see figure \ref{fig_noise}).
+(see figure \ref{figure.noise}).
 A texture node like \texttt{NoiseTexture} from InstantReality
 \cite{instant:noisetex}
 may be implemented on GPU by a simple prototype using the \texttt{ShaderTexture}.
 </para>
 
-<para>\begin{figure}[H]
-  \centering
-  \includegraphics[width=2.9in]{noise-cropped}
-  \caption{3D and 2D smooth noise on GPU, wrapped in a ShaderTexture.}
-  \label{fig_noise}
-\end{figure}</para>
+<figure id="figure.noise">
+  <title>3D and 2D smooth noise on GPU, wrapped in a ShaderTexture.</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/noise-cropped.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/noise-cropped.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+</figure>
 
 <para>\emph{Water} is very nice to implement with the help of our effects,
 as a proper water simulation
@@ -1056,7 +1073,7 @@ heights, or vary per-fragment normal vectors (for best results,
 we want to do both things).
 We also want to simulate the fact that water has reflections and
 is transparent. We have implemented a nice water using this approach,
-with (initially) two independent effect nodes. See figure \ref{fig_water}.
+with (initially) two independent effect nodes. See figure \ref{figure.water}.
 Then we have tested two alternative
 approaches for normal generation (take from pre-recorded series of normal-maps,
 or calculate from a smooth 3D noise). They both generate normal
@@ -1093,6 +1110,28 @@ and what they have in common.</para>
 %% in real-time.)
 -->
 
+<figure id="figure.water">
+  <title>Water using our effects: 1) Per-pixel lighting and bump mapping.
+2) Per-pixel lighting and reflections and refractions (by a single environment cube map texture).
+3) All effects.</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/water_shaders_0.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/water_shaders_0.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/water_shaders_1.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/water_shaders_1.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/water_shaders_2.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/water_shaders_2.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/water_shaders_3.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/water_shaders_3.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+</figure>
+
 <para>
 We also have plugs to change the geometry in object space.
 %% Again, since the effect is integrated with all the browser shaders,
@@ -1101,18 +1140,16 @@ We also have plugs to change the geometry in object space.
 %% conditions.
 Since the transformation is done on GPU, there's practically
 no speed penalty for animating thousands of flowers in our test scene.
-See figure \ref{fig_flowers}.
+See figure \ref{figure.flowers}.
 </para>
 
-<para>
-\setcounter{figure}{8}
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=2.9in]{flowers-cropped}
-  \caption{Flowers bending under the wind, transformed on GPU in object space.}
-  \label{fig_flowers}
-\end{figure}
-</para>
+<figure id="figure.flowers">
+  <title>Flowers bending under the wind, transformed on GPU in object space.</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/flowers-cropped.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/flowers-cropped.png" width="3in" contentwidth="3in" /> </imageobject>
+  </mediaobject>
+</figure>
 
 <para>We would like to emphasize that all the effects demonstrated here
 are theoretically already possible to implement using the standard

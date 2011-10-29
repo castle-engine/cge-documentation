@@ -5,11 +5,13 @@ HTML_NOCHUNKS_XSL := xsl/html_nochunks.xsl
 FO_XSL := xsl/fo.xsl
 FOP_JAVA_MAX_HEAP_SIZE := 512M
 
-html_post = mkdir -p $(1)admonitions/ ; \
+html_post = mkdir -p $(1)admonitions/ && \
   cp -f /usr/share/xml/docbook/stylesheet/nwalsh/images/*.png \
         /usr/share/xml/docbook/stylesheet/nwalsh/images/*.gif \
-        $(1)admonitions/ ; \
-  cp -f $(BASE_DOCUMENT_NAME).css $(1)
+        $(1)admonitions/ && \
+  cp -f $(BASE_DOCUMENT_NAME).css $(1) && \
+  rm -Rf $(1)images/ && \
+  cp -Rf images/html $(1)images
 
 .PHONY: default
 default: validate-xmllint html pdf
