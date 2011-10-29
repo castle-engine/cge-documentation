@@ -476,8 +476,13 @@ SFString [] <emphasis role="bold">language</emphasis> ""
   # This effect will be used
   # only when the base renderer shader
   # uses the same language.
+
 SFBool [in,out] <emphasis role="bold">enabled</emphasis> TRUE
   # Easily turn on/off the effect.
+  # You could also remove/add the node
+  # from the scene, but often toggling
+  # this field is easier for scripts.
+
 MFNode [] <emphasis role="bold">parts</emphasis> [] # EffectPart
   # Source code of the effect.
 
@@ -491,16 +496,6 @@ current world time or a particular texture to the shader.
 Uniform values are declared exactly like described in the standard
 X3D <emphasis>Programmable shaders</emphasis> component \cite{x3d:shaders}.</para>
 
-<para>
-%% , just like
-%% # for ComposedShader node
-
-% Comments for <quote>enabled</quote>:
-%% # You could also remove/add the node
-%% # from the scene, but often toggling
-%% # this field is easier for scripts.
-</para>
-
 <para>The effect source code is split into a number of parts:</para>
 
 <screen><phrase role="underline">EffectPart : X3DNode, X3DUrlObject</phrase>
@@ -509,6 +504,7 @@ SFString [] <emphasis role="bold">type</emphasis> "VERTEX"
   # Like ShaderPart.type:
   # allowed values are
   # FRAGMENT | VERTEX | GEOMETRY.
+
 MFString [] <emphasis role="bold">url</emphasis> []
   # The source code, like ShaderPart.url.
   # May come from an external file (url),
@@ -741,6 +737,7 @@ X3D features.</para>
 <screen><phrase role="underline">ShaderTexture : X3DTextureNode</phrase>
 
 MFNode [] <emphasis role="bold">effects</emphasis> [] # Effect
+
 SFString [] <emphasis role="bold">defaultTexCoord</emphasis> "BOUNDS2D"
   # ["BOUNDS2D"|"BOUNDS3D"]
 </screen>
