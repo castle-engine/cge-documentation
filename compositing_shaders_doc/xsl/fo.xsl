@@ -97,4 +97,10 @@
 <!--   </fo:inline> -->
 <!-- </xsl:template> -->
 
+<xsl:template match="phrase[@role='underline']">
+  <fo:inline text-decoration="underline">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+
 </xsl:stylesheet>

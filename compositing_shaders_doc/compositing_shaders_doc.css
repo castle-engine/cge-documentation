@@ -1,2 +1,10 @@
 body { font-family: sans-serif; }
 code.literal { background-color: #f0f0f0; }
+
+pre.screen {
+  border: 1px solid #aaaaaa;
+  background-color: #f9f9f9;
+  padding: 0.3em;
+}
+
+span.underline {text-decoration: underline;}

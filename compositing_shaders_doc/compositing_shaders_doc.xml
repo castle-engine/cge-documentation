@@ -364,25 +364,28 @@ is below. This is a complete X3D file, so you can save
 it as <literal>test.x3dv</literal> and open with any tool supporting our
 extensions, like <literal>view3dscene</literal>.</para>
 
-<para>
-\begin{Verbatim}[commandchars=\\\{\},frame=single,fontsize=\small]
-#X3D V3.2 utf8
+<screen>#X3D V3.2 utf8
 PROFILE Interchange
-Shape \{ appearance Appearance \{
-  material Material \{ \}
-<emphasis role="bold">  effects Effect \{</emphasis>
-<emphasis role="bold">    language "GLSL"</emphasis>
-<emphasis role="bold">    parts EffectPart \{</emphasis>
-<emphasis role="bold">      type "FRAGMENT"</emphasis>
-<emphasis role="bold">      url "data:text/plain,</emphasis>
-<emphasis role="bold">      <emphasis>void PLUG_texture_apply(</emphasis></emphasis>
-<emphasis role="bold">      <emphasis>  inout vec4 fragment_color,</emphasis></emphasis>
-<emphasis role="bold">      <emphasis>  const in vec3 normal)</emphasis></emphasis>
-<emphasis role="bold">      <emphasis>\{</emphasis></emphasis>
-<emphasis role="bold">      <emphasis>  fragment_color.rgb *= 2.0;</emphasis></emphasis>
-<emphasis role="bold">      <emphasis>\</emphasis></emphasis>" \} \}}
-\} geometry Sphere \{ \} \}
-\end{Verbatim}</para>
+Shape {
+  appearance Appearance {
+    material Material { }
+<emphasis role="bold">    effects Effect {</emphasis>
+<emphasis role="bold">      language "GLSL"</emphasis>
+<emphasis role="bold">      parts EffectPart {</emphasis>
+<emphasis role="bold">        type "FRAGMENT"</emphasis>
+<emphasis role="bold">        url "data:text/plain,</emphasis>
+<emphasis role="bold">        <emphasis>void PLUG_texture_apply(</emphasis></emphasis>
+<emphasis role="bold">        <emphasis>  inout vec4 fragment_color,</emphasis></emphasis>
+<emphasis role="bold">        <emphasis>  const in vec3 normal)</emphasis></emphasis>
+<emphasis role="bold">        <emphasis>{</emphasis></emphasis>
+<emphasis role="bold">        <emphasis>  fragment_color.rgb *= 2.0;</emphasis></emphasis>
+<emphasis role="bold">        <emphasis>}</emphasis></emphasis>"
+<emphasis role="bold">      }</emphasis>
+<emphasis role="bold">    }</emphasis>
+  }
+  geometry Sphere { }
+}
+</screen>
 
 <para>Our extensions to X3D are marked with the bold font in the example above.
 The GLSL code inside our extensions is marked with the italic font.
@@ -466,25 +469,21 @@ the source code and uniform values specific to a given effect.
 The node specification below follows the style of
 the X3D specification \cite{x3d:spec}.</para>
 
-<para>
-\begin{mycode}
-\underline{Effect : X3DChildNode}
-\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
-SFString [] \codeem{language} ""
+<screen><phrase role="underline">Effect : X3DChildNode</phrase>
+
+SFString [] <emphasis role="bold">language</emphasis> ""
   # Language like "GLSL", "CG", "HLSL".
   # This effect will be used
   # only when the base renderer shader
   # uses the same language.
-SFBool [in,out] \codeem{enabled} TRUE
+SFBool [in,out] <emphasis role="bold">enabled</emphasis> TRUE
   # Easily turn on/off the effect.
-MFNode [] \codeem{parts} [] # EffectPart
+MFNode [] <emphasis role="bold">parts</emphasis> [] # EffectPart
   # Source code of the effect.
 
 # A number of uniform values may also be
 # declared inside this node.
-\end{Verbatim}
-\end{mycode}
-</para>
+</screen>
 
 <para>Inside the <literal>Effect</literal> node a number of uniform values may be defined,
 passing any X3D value to the shader. Examples include passing
@@ -504,23 +503,18 @@ X3D <emphasis>Programmable shaders</emphasis> component \cite{x3d:shaders}.</par
 
 <para>The effect source code is split into a number of parts:</para>
 
-<para>
-\begin{mycode}
-\underline{EffectPart : X3DNode, X3DUrlObject}
-\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
-SFString [] \codeem{type} "VERTEX"
+<screen><phrase role="underline">EffectPart : X3DNode, X3DUrlObject</phrase>
+
+SFString [] <emphasis role="bold">type</emphasis> "VERTEX"
   # Like ShaderPart.type:
   # allowed values are
   # FRAGMENT | VERTEX | GEOMETRY.
-MFString [] \codeem{url} []
+MFString [] <emphasis role="bold">url</emphasis> []
   # The source code, like ShaderPart.url.
-\end{Verbatim}
-\end{mycode}
-
-  %% # May come from an external file (url),
-  %% # or inline (following "data:text/plain,").
-  %% # In XML encoding, may also be inlined in CDATA.
-</para>
+  # May come from an external file (url),
+  # or inline (following "data:text/plain,").
+  # In XML encoding, may also be inlined in CDATA.
+</screen>
 
 <para>Inside the effect part source code, the functions that enhance
 standard shaders behavior are recognized by names starting with <literal>PLUG_</literal>.
@@ -592,12 +586,10 @@ inside the given unit).
 To apply an effect for a given shape appearance, it can be placed
 on the new <literal>Appearance.effects</literal> list:</para>
 
-<para>\begin{mycode}
-\underline{Appearance}
-\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
-MFNode [] \codeem{effects} [] # Effect
-\end{Verbatim}
-\end{mycode}</para>
+<screen><phrase role="underline">Appearance</phrase>
+
+MFNode [] <emphasis role="bold">effects</emphasis> [] # Effect
+</screen>
 
 <para>All the effects on this list (with suitable language) will be used.
 %% Note that this is different
@@ -687,12 +679,10 @@ Or a different lighting model may be implemented, like anisotropic Ward
 or Cook-Torrance.
 To make this possible, the <literal>effects</literal> field is added to every light node:</para>
 
-<para>\begin{mycode}
-\underline{X3DLightNode}
-\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
-MFNode [] \codeem{effects} [] # Effect
-\end{Verbatim}
-\end{mycode}</para>
+<screen><phrase role="underline">X3DLightNode</phrase>
+
+MFNode [] <emphasis role="bold">effects</emphasis> [] # Effect
+</screen>
 
 <figure id="figure.fancy_spot">
   <title>Textured spot light with shadow.</title>
@@ -714,12 +704,10 @@ MFNode [] \codeem{effects} [] # Effect
 <para>Just like the light sources, also each texture node may define its own effects:
 </para>
 
-<para>\begin{mycode}
-\underline{X3DTextureNode}
-\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
-MFNode [] \codeem{effects} [] # Effect
-\end{Verbatim}
-\end{mycode}</para>
+<screen><phrase role="underline">X3DTextureNode</phrase>
+
+MFNode [] <emphasis role="bold">effects</emphasis> [] # Effect
+</screen>
 
 <para><literal>X3DTextureNode</literal> is an ancestor for all the standard texture nodes,
 like the <literal>ImageTexture</literal>. This allows to modify any X3D texture
@@ -750,14 +738,12 @@ X3D features.</para>
 
 <para>The new texture node specification:</para>
 
-<para>\begin{mycode}
-\underline{ShaderTexture : X3DTextureNode}
-\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
-MFNode [] \codeem{effects} [] # Effect
-SFString [] \codeem{defaultTexCoord} "BOUNDS2D"
+<screen><phrase role="underline">ShaderTexture : X3DTextureNode</phrase>
+
+MFNode [] <emphasis role="bold">effects</emphasis> [] # Effect
+SFString [] <emphasis role="bold">defaultTexCoord</emphasis> "BOUNDS2D"
   # ["BOUNDS2D"|"BOUNDS3D"]
-\end{Verbatim}
-\end{mycode}</para>
+</screen>
 
 <para>%% Actually, the <literal>effects</literal> field is already defined at
 %% the <literal>X3DTextureNode</literal> class (see above).  It is mentioned here
@@ -874,11 +860,8 @@ coordinates in the <literal>texture_color</literal> plug.</para>
 
 <para>In a shader code, new plug may be defined by a magic comment:</para>
 
-<para>\begin{mycode}
-\begin{Verbatim}[commandchars=\\\{\},fontsize=\small]
-/* PLUG: name (param1, param2, ...) */
-\end{Verbatim}
-\end{mycode}</para>
+<screen>/* PLUG: name (param1, param2, ...) */
+</screen>
 
 <para>This defines a point where calls to user functions declared as
 <literal>PLUG_name</literal> will be inserted. They will be called with given
@@ -986,7 +969,7 @@ should be inserted.</para>
 
 <para>The behavior is defined only if the provided shading language code
 is a correct, self-contained code. The errors (like unterminated block)
-%%  (``<literal>\{</literal>'' without matching ``<literal>\</literal>}'')
+%%  (``<literal>{</literal>'' without matching ``<literal>\</literal>}'')
 %% ,
 %% or an unterminated comment)
 may only be detected after the complete shader
