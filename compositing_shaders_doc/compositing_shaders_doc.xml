@@ -654,8 +654,8 @@ and easy implementation of the standard <literal>LocalFog</literal> node.</para>
 <para>As one of the demos, we have implemented a realistic
 animated volumetric fog, where the fog density is stored in
 a 3D smooth noise texture (idea from \cite{humus:volumetricfog}).
-In a fragment shader, the 3D~texture is sampled
-along the line between the camera and pixel position in the 3D~space. This makes a very
+In a fragment shader, the 3D&nbsp;texture is sampled
+along the line between the camera and pixel position in the 3D&nbsp;space. This makes a very
 convincing effect of a dense fog. The <literal>Effect</literal> node with
 appropriate shader code is placed at the top level of the X3D file,
 so it simply works for all shapes. See figure \ref{figure.fog}.</para>
@@ -749,7 +749,7 @@ SFString [] <emphasis role="bold">defaultTexCoord</emphasis> "BOUNDS2D"
 <para>An effect overriding the <literal>texture_color</literal> plug
 should be included, otherwise texture colors are undefined.
 Our implementation
-sets the default texture color to pink (RGB(1,~0,~1)), so it stands out,
+sets the default texture color to pink (RGB(1,&nbsp;0,&nbsp;1)), so it stands out,
 reminding author to override it.</para>
 
 <para>The texture coordinates, or the algorithm to generate them,
@@ -924,19 +924,19 @@ that do not support our extensions.</para>
 <section id="section.forward_declarations">
 <title>Forward declarations</title>
 
-<para>Suppose we have an effect~$X$ that defines a new plug.
+<para>Suppose we have an effect&nbsp;$X$ that defines a new plug.
 %, by includes a magic <literal>/* PLUG: ... */</literal> comment.
-When this plug is used by another effect~$Y$,
+When this plug is used by another effect&nbsp;$Y$,
 then an appropriate function call is automatically inserted into the generated shader.
-In the middle of the source code of effect~$X$,
-a function defined in effect~$Y$ has to be called. This is the simplest
+In the middle of the source code of effect&nbsp;$X$,
+a function defined in effect&nbsp;$Y$ has to be called. This is the simplest
 implementation of our plugs.
 % Would be nice to have here a space for paragraph break...
 Additionally, a forward or external declaration of the called function
-may need to be inserted into the effect~$X$. That is because~$Y$
+may need to be inserted into the effect&nbsp;$X$. That is because&nbsp;$Y$
 may be in a separate compilation unit (in case of GLSL),
 or just defined lower in the code. In simple cases, such forward or external
-declarations can be inserted right at the beginning of effect~$X$ code.
+declarations can be inserted right at the beginning of effect&nbsp;$X$ code.
 </para>
 
 <para>Some shading language directives are required to be placed before
