@@ -184,9 +184,9 @@ language in some cumbersome limitations.
 <title>Motivation and previous work</title>
 
 <para>The most popular real-time shading languages right now are
-OpenGL \texttt{GLSL} \cite{glsl:book}, NVidia \texttt{Cg} and Direct 3D \texttt{HLSL}.
+OpenGL <literal>GLSL</literal> \cite{glsl:book}, NVidia <literal>Cg</literal> and Direct 3D <literal>HLSL</literal>.
 They do not provide a ready solution for connecting shaders from independent sources.
-The \texttt{CgFX} and HLSL \texttt{.fx} files encapsulate shading language code
+The <literal>CgFX</literal> and HLSL <literal>.fx</literal> files encapsulate shading language code
 in \emph{techniques} (for various graphic card capabilities)
 and within a single technique specify operations for each rendering pass.
 In neither case can we simply connect multiple shader source code files
@@ -271,7 +271,7 @@ language code quickly and the integration is built inside appropriate X3D nodes.
 with user shaders, by introducing a new shader language.
 %% This has
 %% advantages (hides the differences between GPU shading languages like
-%% \texttt{GLSL} and \texttt{HLSL}), but also
+%% <literal>GLSL</literal> and <literal>HLSL</literal>), but also
 %% On the other hand, we do not introduce
 %% a new shader language, which is both an advantage (easy implementation,
 %% easier to learn) and disadvantage (we do not hide differences e.g. between
@@ -356,14 +356,14 @@ Drupal's modules and our ``plugs'' are analogous to Drupal hooks.</para>
 points where calls to user-defined functions may be inserted. We call
 these places \textit{plugs}, as they act like sockets where logic
 may be added. Each plug has a name and a given set of parameters.
-The effects can use special function names, starting with \texttt{PLUG\_}
+The effects can use special function names, starting with <literal>PLUG\_</literal>
 and followed by the plug name. These declarations will be found
 and the renderer will insert appropriate calls to them from the base shader.</para>
 
 <para>A trivial example of an effect that makes colors two times brighter
 is below. This is a complete X3D file, so you can save
-it as \texttt{test.x3dv} and open with any tool supporting our
-extensions, like \texttt{view3dscene}.</para>
+it as <literal>test.x3dv</literal> and open with any tool supporting our
+extensions, like <literal>view3dscene</literal>.</para>
 
 <para>
 \begin{Verbatim}[commandchars=\\\{\},frame=single,fontsize=\small]
@@ -387,23 +387,23 @@ Shape \{ appearance Appearance \{
 
 <para>Our extensions to X3D are marked with the bold font in the example above.
 The GLSL code inside our extensions is marked with the italic font.
-%% GLSL function names starting with \texttt{PLUG_} are special,
+%% GLSL function names starting with <literal>PLUG_</literal> are special,
 %% they will be automatically called at the appropriate place with appropriate
 %% parameters from the final (automatically generated and used) shader.
-The special GLSL function name \texttt{PLUG\_texture\_apply}
-indicates that we use the \texttt{texture\_apply} plug.
+The special GLSL function name <literal>PLUG\_texture\_apply</literal>
+indicates that we use the <literal>texture\_apply</literal> plug.
 This particular plug is called right after applying the textures,
 and is the simplest way to ``just modify the pixel color''.
-%% The \texttt{texture\_apply} plug in
+%% The <literal>texture\_apply</literal> plug in
 %% the renderer internal shader. This particular plug,
-%% the \texttt{PLUG\_texture\_apply}, is called after the normal texture colors
+%% the <literal>PLUG\_texture\_apply</literal>, is called after the normal texture colors
 %% are applied, but before the alpha test and is a usual place
-\texttt{fragment\_color} is an \texttt{inout} parameter, by modifying it
+<literal>fragment\_color</literal> is an <literal>inout</literal> parameter, by modifying it
 we modify the color that will be displayed on the screen.</para>
 
 <para>A reference of all the plugs available in our implementation
 is on \URL{http://castle-engine.sourceforge.net/compositing_shaders.php}.
-For each plug, like this \texttt{PLUG\_texture\_apply},
+For each plug, like this <literal>PLUG\_texture\_apply</literal>,
 we define a list of parameters
 %(they have to be declared exactly the same in an effect),
 and when it is called.</para>
@@ -412,12 +412,12 @@ and when it is called.</para>
 
 <!--\begin{enumerate}-->
 
-<para>\item The \texttt{Effect} nodes may use plug names
+<para>\item The <literal>Effect</literal> nodes may use plug names
 defined inside the renderer internal shaders. This is the most usual case.
 It allows the authors to extend or override a particular shading parameter.</para>
 
-<para>\item The \texttt{Effect} nodes may also use the plug names defined
-in the previous \texttt{Effect} nodes on the same shape.
+<para>\item The <literal>Effect</literal> nodes may also use the plug names defined
+in the previous <literal>Effect</literal> nodes on the same shape.
 It is trivially easy (just add a ``magic'' comment) to define
 plugs in your own shader code. This way your own effects
 can be customized.</para>
@@ -434,13 +434,13 @@ and nicely separated from each other.
 </para>
 
 <para>%% without any traditional hassles. For example, bump mapping can be
-%% achieved using standard \texttt{ComposedShader} as well,
+%% achieved using standard <literal>ComposedShader</literal> as well,
 %% but then you have to write all this ``boilerplate'' code to also deal
 %% with all the possible lighting and textures configurations.
 %% Well, the renderer is still useful to calculate nice tangent vectors,
 %% although an authoring program could generate GLSL attributes for them as well.</para>
 
-<para>%% Same thing with shadow maps, they only plug to the \texttt{light\_scale}
+<para>%% Same thing with shadow maps, they only plug to the <literal>light\_scale</literal>
 %% calculation of appropriate light.</para>
 
 <!-- \end{enumerate} -->
@@ -449,21 +449,21 @@ and nicely separated from each other.
 We have been talking above about the ``renderer internal shaders'',
 but the truth is a little more flexible.
 When you place a standard shader node
-(like a \texttt{ComposedShader} node for GLSL shaders) on the
-\texttt{Appearance.shaders} list,
+(like a <literal>ComposedShader</literal> node for GLSL shaders) on the
+<literal>Appearance.shaders</literal> list,
 then it replaces the internal renderer shaders.
 If you define the same (or compatible) plugs inside your shader,
 then the internal renderer effects are even added to your own
 shader. Of course user effects are added to your shader too.
 This way even the standard X3D shader nodes become more flexible.
-Note that if you do not define any plugs inside your \texttt{ComposedShader} node,
+Note that if you do not define any plugs inside your <literal>ComposedShader</literal> node,
 it continues to function as before --- no effects
 will be added.</para>
 
 <section id="section.effect_node">
 <title>Effect node</title>
 
-<para>New \texttt{Effect} node holds information about
+<para>New <literal>Effect</literal> node holds information about
 the source code and uniform values specific to a given effect.
 The node specification below follows the style of
 the X3D specification \cite{x3d:spec}.</para>
@@ -488,7 +488,7 @@ MFNode [] \codeem{parts} [] # EffectPart
 \end{mycode}
 </para>
 
-<para>Inside the \texttt{Effect} node a number of uniform values may be defined,
+<para>Inside the <literal>Effect</literal> node a number of uniform values may be defined,
 passing any X3D value to the shader. Examples include passing
 current world time or a particular texture to the shader.
 Uniform values are declared exactly like described in the standard
@@ -525,7 +525,7 @@ MFString [] \codeem{url} []
 </para>
 
 <para>Inside the effect part source code, the functions that enhance
-standard shaders behavior are recognized by names starting with \texttt{PLUG\_}.
+standard shaders behavior are recognized by names starting with <literal>PLUG\_</literal>.
 Of course other functions can also be defined and used.
 Uniform variables can be passed to the effect,
 also varying variables can be passed between the vertex and fragment
@@ -533,12 +533,12 @@ parts, just like with standard shader nodes.
 </para>
 
 <para>
-In a single \texttt{EffectPart} node, many \texttt{PLUG\_}
+In a single <literal>EffectPart</literal> node, many <literal>PLUG\_</literal>
 functions may be declared. However, all plug functions must be declared in the appropriate
-effect type. For example, the \texttt{texture\_apply} plug cannot be used
-within a \texttt{VERTEX} shader.
+effect type. For example, the <literal>texture\_apply</literal> plug cannot be used
+within a <literal>VERTEX</literal> shader.
 If the effect requires some processing per-vertex and some per-fragment,
-it is necessary to use two \texttt{EffectPart} nodes, with different types.
+it is necessary to use two <literal>EffectPart</literal> nodes, with different types.
 This allows to implement our system for
 %% While this may seem like an arbitrary limitation,
 %% this reflects how shader parts are declared in
@@ -548,9 +548,9 @@ A single part may declare many variables and functions,
 but it must be completely contained within a given shader type.
 </para>
 
-<para>Note that it is completely reasonable to have an \texttt{EffectPart} node
-with source code that does not define any \texttt{PLUG\_xxx} functions.
-Such \texttt{EffectPart} node may be useful for defining shading language
+<para>Note that it is completely reasonable to have an <literal>EffectPart</literal> node
+with source code that does not define any <literal>PLUG\_xxx</literal> functions.
+Such <literal>EffectPart</literal> node may be useful for defining shading language
 utility functions, used by other effect parts.
 </para>
 
@@ -564,7 +564,7 @@ inside the given unit).
 
 <para>%% We have also considered and rejected a different approach to use plugs.
 %% In that approach, the plug name was indicated by a new field of
-%% the \texttt{EffectPart} node, not by a special \texttt{PLUG\_} function name
+%% the <literal>EffectPart</literal> node, not by a special <literal>PLUG\_</literal> function name
 %% inside the shader code.
 %% However, the implementation may need to know the full declaration
 %% of a plug function, to make a forward or external declaration of it.
@@ -574,12 +574,12 @@ inside the given unit).
 %% the plug function, one part defines the function body and so on).
 %% Both approaches seemed uncomfortable for authors
 %% and they didn't really offer a simpler implementation, so we dropped this idea.
-%% The current approach, to find the declarations of \texttt{PLUG\_xxx} functions
+%% The current approach, to find the declarations of <literal>PLUG\_xxx</literal> functions
 %% inside a complete shader code, is easy to implement and results in clean
 %% shader code of the effects. It also allows us to naturally use
 %% the separate compilation units in case of GLSL.</para>
 
-<para>%% Detecting special \texttt{PLUG\_} function names inside the shader code
+<para>%% Detecting special <literal>PLUG\_</literal> function names inside the shader code
 %% is trivial, and it turned out to be the best approach to design our effects.
 %% This means that each effect code is clean, and can be compiled separately
 %% from others. It allows us to naturally use
@@ -590,9 +590,9 @@ inside the given unit).
 <section id="section.effects_on_shape">
 <title>Effects for particular shapes</title>
 
-<para>There are various places where an \texttt{Effect} node may be used.
+<para>There are various places where an <literal>Effect</literal> node may be used.
 To apply an effect for a given shape appearance, it can be placed
-on the new \texttt{Appearance.effects} list:</para>
+on the new <literal>Appearance.effects</literal> list:</para>
 
 <para>\begin{mycode}
 \underline{Appearance}
@@ -603,11 +603,11 @@ MFNode [] \codeem{effects} [] # Effect
 
 <para>All the effects on this list (with suitable language) will be used.
 %% Note that this is different
-%% than the \texttt{Appearance.shaders}, which chooses only one shader.
+%% than the <literal>Appearance.shaders</literal>, which chooses only one shader.
 %% For effects, we choose all of them.
 This allows authors to define a library of independent shader effects
 and then trivially pick desired effects for each particular shape.
-Simply placing two effects on the \texttt{Appearance.effects} list
+Simply placing two effects on the <literal>Appearance.effects</literal> list
 makes them cooperate correctly.
 %% . This also allows to
 %% define a library of effects, that can be composited without any work
@@ -622,12 +622,12 @@ makes them cooperate correctly.
 </figure>
 
 <para>Note that all introduced nodes benefit from X3D mechanism to reuse the nodes
-by reference (the \texttt{DEF} / \texttt{USE} keywords). Reusing the
-\texttt{Effect} nodes
+by reference (the <literal>DEF</literal> / <literal>USE</literal> keywords). Reusing the
+<literal>Effect</literal> nodes
 is most natural and allows to combine existing effects in any desired way.
-Reusing the \texttt{EffectPart} nodes is also useful, when some effects
+Reusing the <literal>EffectPart</literal> nodes is also useful, when some effects
 would like to share a particular piece of code. For example,
-the same \texttt{EffectPart} node, with a library of useful
+the same <literal>EffectPart</literal> node, with a library of useful
 shading language functions, may be used for many effects.</para>
 
 <figure id="figure.fog">
@@ -653,24 +653,24 @@ so it colors the image even in the 2) case.</title>
 <section id="section.effects_on_group">
 <title>Effects for a group of nodes</title>
 
-<para>The \texttt{Effect} node is a descendant of the abstract \texttt{X3DChildNode}.
+<para>The <literal>Effect</literal> node is a descendant of the abstract <literal>X3DChildNode</literal>.
 As such it can be placed directly within X3D grouping nodes like
-\texttt{Group}, \texttt{Transform} and at the top level of the X3D file.
+<literal>Group</literal>, <literal>Transform</literal> and at the top level of the X3D file.
 Such effect will apply to all the shapes within the given group.
 The scope rules follow the X3D conventions for other nodes,
-like pointing device sensor nodes and \texttt{LocalFog}.</para>
+like pointing device sensor nodes and <literal>LocalFog</literal>.</para>
 
-<para>The \texttt{LocalFog} example is worth emphasizing. Using our system,
-an X3D viewer can implement the \texttt{LocalFog} node as a prototype
-that expands to our \texttt{Effect} node. This results in a 100\% correct
-and easy implementation of the standard \texttt{LocalFog} node.</para>
+<para>The <literal>LocalFog</literal> example is worth emphasizing. Using our system,
+an X3D viewer can implement the <literal>LocalFog</literal> node as a prototype
+that expands to our <literal>Effect</literal> node. This results in a 100\% correct
+and easy implementation of the standard <literal>LocalFog</literal> node.</para>
 
 <para>As one of the demos, we have implemented a realistic
 animated volumetric fog, where the fog density is stored in
 a 3D smooth noise texture (idea from \cite{humus:volumetricfog}).
 In a fragment shader, the 3D~texture is sampled
 along the line between the camera and pixel position in the 3D~space. This makes a very
-convincing effect of a dense fog. The \texttt{Effect} node with
+convincing effect of a dense fog. The <literal>Effect</literal> node with
 appropriate shader code is placed at the top level of the X3D file,
 so it simply works for all shapes. See figure \ref{figure.fog}.</para>
 
@@ -687,7 +687,7 @@ For example the spot light shape can be modified, possibly
 based on some texture information (see figure \ref{figure.fancy_spot}).
 Or a different lighting model may be implemented, like anisotropic Ward
 or Cook-Torrance.
-To make this possible, the \texttt{effects} field is added to every light node:</para>
+To make this possible, the <literal>effects</literal> field is added to every light node:</para>
 
 <para>\begin{mycode}
 \underline{X3DLightNode}
@@ -723,16 +723,16 @@ MFNode [] \codeem{effects} [] # Effect
 \end{Verbatim}
 \end{mycode}</para>
 
-<para>\texttt{X3DTextureNode} is an ancestor for all the standard texture nodes,
-like the \texttt{ImageTexture}. This allows to modify any X3D texture
+<para><literal>X3DTextureNode</literal> is an ancestor for all the standard texture nodes,
+like the <literal>ImageTexture</literal>. This allows to modify any X3D texture
 by shader effects.
-A plug \texttt{texture\_color} may be used to change the texture color,
+A plug <literal>texture\_color</literal> may be used to change the texture color,
 taking into account the current texture coordinates and other information.</para>
 
 <section id="section.procedural_textures">
 <title>Procedural textures</title>
 
-<para>A new X3D node \texttt{ShaderTexture} is available for creating
+<para>A new X3D node <literal>ShaderTexture</literal> is available for creating
 procedural textures using the GPU shading languages.
 %% This is suitable
 %% if the texture is defined completely using the shading language.
@@ -743,7 +743,7 @@ From a GPU point of view, there is no texture.
 %we swear.}.
 There is only a shader function that generates colors
 based on some vectors. By wrapping such function inside
-the \texttt{ShaderTexture} node, it can be treated exactly like other textures
+the <literal>ShaderTexture</literal> node, it can be treated exactly like other textures
 in the scene. In particular, texture coordinates
 (explicit or generated) can be comfortably provided
 for the procedural texture.
@@ -761,11 +761,11 @@ SFString [] \codeem{defaultTexCoord} "BOUNDS2D"
 \end{Verbatim}
 \end{mycode}</para>
 
-<para>%% Actually, the \texttt{effects} field is already defined at
-%% the \texttt{X3DTextureNode} class (see above).  It is mentioned here
+<para>%% Actually, the <literal>effects</literal> field is already defined at
+%% the <literal>X3DTextureNode</literal> class (see above).  It is mentioned here
 %% for completeness.</para>
 
-<para>An effect overriding the \texttt{texture\_color} plug
+<para>An effect overriding the <literal>texture\_color</literal> plug
 should be included, otherwise texture colors are undefined.
 Our implementation
 sets the default texture color to pink (RGB(1,~0,~1)), so it stands out,
@@ -774,69 +774,69 @@ reminding author to override it.</para>
 <para>The texture coordinates, or the algorithm to generate them,
 can be explicitly specified, just like for any other texture in X3D.
 %% . This follows the usual rules for all
-%% when a \texttt{X3DTextureCoordinateNode} node is placed
-%% inside the geometry \texttt{texCoord} field.
-%% Both explicit texture coordinate lists (\texttt{TextureCoordinate}
-%% \texttt{TextureCoordinate3D}, \texttt{TextureCoordinate4D})
+%% when a <literal>X3DTextureCoordinateNode</literal> node is placed
+%% inside the geometry <literal>texCoord</literal> field.
+%% Both explicit texture coordinate lists (<literal>TextureCoordinate</literal>
+%% <literal>TextureCoordinate3D</literal>, <literal>TextureCoordinate4D</literal>)
 %% and the coordinate generator nodes
-%% (like \texttt{TextureCoordinateGenerator}) are suitable.
-%% %% , \texttt{ProjectedTextureCoordinate}
+%% (like <literal>TextureCoordinateGenerator</literal>) are suitable.
+%% %% , <literal>ProjectedTextureCoordinate</literal>
 %% Note that our engine has some extensions to allow
-%% the \texttt{"BOUNDS2D"} and \texttt{"BOUNDS3D"} values to be also
-%% used for the \texttt{TextureCoordinateGenerator.mode} field, see
+%% the <literal>"BOUNDS2D"</literal> and <literal>"BOUNDS3D"</literal> values to be also
+%% used for the <literal>TextureCoordinateGenerator.mode</literal> field, see
 %% \cite{vrmleng:texcoordbounds}.
 When the texture coordinates are not explicitly given,
-the \texttt{defaultTexCoord} field determines how they are generated.
-\texttt{"BOUNDS2D"} generates 2D texture coordinates,
+the <literal>defaultTexCoord</literal> field determines how they are generated.
+<literal>"BOUNDS2D"</literal> generates 2D texture coordinates,
 adapting to the two largest bounding box sizes
 (the 3rd texture coordinate is always 0). This is most comfortable
 when the texture color depends only on the XY components of the texture coordinate.
 The precise behavior
-of \texttt{"BOUNDS2D"} follows the X3D \texttt{IndexedFaceSet} specification
-and the precise behavior of \texttt{"BOUNDS3D"} is described in
+of <literal>"BOUNDS2D"</literal> follows the X3D <literal>IndexedFaceSet</literal> specification
+and the precise behavior of <literal>"BOUNDS3D"</literal> is described in
 the \textit{Texturing3D} component of the X3D specification.</para>
 
 <para>%%  (section \textit{"Texture coordinate generation for primitive objects"})
 %%   is used.
 %%   This adapts 3D texture coordinates to the bounding box sizes.
 %%   It's most suitable for 3D textures (the 4th texture coordinate
-%%   component can be ignored; or the 4D vector may be treated as homogeneous, as \texttt{"BOUNDS3D"} will always
+%%   component can be ignored; or the 4D vector may be treated as homogeneous, as <literal>"BOUNDS3D"</literal> will always
 %%   set the 4th component to 1).</para>
 
 <!-- %% \end{enumerate} -->
 
-<para>%% The idea is that using a \texttt{ShaderTexture} should be as comfortable
+<para>%% The idea is that using a <literal>ShaderTexture</literal> should be as comfortable
 %% as any other texture node.</para>
 
-<para>%% Projective texture mapping by \texttt{ProjectedTextureCoordinate}
+<para>%% Projective texture mapping by <literal>ProjectedTextureCoordinate</literal>
 %% is also our extension, see \cite{vrmleng:projectivetexturing}.</para>
 </section>
 
 <section id="section.when_use_shader_texture">
 <title>When to use the ShaderTexture</title>
 
-<para>For textures other than the \texttt{ShaderTexture},
-when the \texttt{texture\_color} plugs are called,
+<para>For textures other than the <literal>ShaderTexture</literal>,
+when the <literal>texture\_color</literal> plugs are called,
 the internal shaders have already calculated the initial texture
 color by actually sampling the texture image. This is useful if you
 want to modify this color. If you'd rather ignore the normal
 sampled color, and always override it with your own, consider using
-the special \texttt{ShaderTexture} node instead. Using
-a normal texture node (like \texttt{ImageTexture}) for this
+the special <literal>ShaderTexture</literal> node instead. Using
+a normal texture node (like <literal>ImageTexture</literal>) for this
 would be uncomfortable, as you would have to load a dummy texture image,
 and the shaders could (depending on optimization) waste some time
 on calculating a color that will be actually ignored later.</para>
 
-<para>Note that in all cases (effects at \texttt{ImageTexture},
-at \texttt{ShaderTexture}, etc.) you can always use additional
-textures inside the effect. Just like inside a standard \texttt{ComposedShader},
-you can declare an \texttt{SFNode} field inside an \texttt{Effect}
+<para>Note that in all cases (effects at <literal>ImageTexture</literal>,
+at <literal>ShaderTexture</literal>, etc.) you can always use additional
+textures inside the effect. Just like inside a standard <literal>ComposedShader</literal>,
+you can declare an <literal>SFNode</literal> field inside an <literal>Effect</literal>
 to pass any texture node to the shader as a uniform value.
 This allows to combine any number of textures inside an effect.
 The only difference
-between \texttt{ShaderTexture} and other textures is what the system
+between <literal>ShaderTexture</literal> and other textures is what the system
 does automatically for you, that is what color is passed
-to the first \texttt{texture\_color} plug.</para>
+to the first <literal>texture\_color</literal> plug.</para>
 
 <figure id="figure.shader_texture_edge_detection">
   <title>ShaderTexture doing an edge detection operation on a normal ImageTexture.</title>
@@ -854,7 +854,7 @@ to the first \texttt{texture\_color} plug.</para>
 <para>Note that the shader effects for textures are calculated at each screen fragment
 (not at each texel). So the effects are not concerned about the texture size
 or texture filtering options. We can just use the interpolated texture
-coordinates in the \texttt{texture\_color} plug.</para>
+coordinates in the <literal>texture\_color</literal> plug.</para>
 
 <figure id="figure.shader_texture_no_filtering_problems">
   <title>Yellowish arc is done by a texture effect, and so is not
@@ -883,16 +883,16 @@ coordinates in the \texttt{texture\_color} plug.</para>
 \end{mycode}</para>
 
 <para>This defines a point where calls to user functions declared as
-\texttt{PLUG\_name} will be inserted. They will be called with given
+<literal>PLUG\_name</literal> will be inserted. They will be called with given
 parameters.</para>
 
-<para>Many effects may use the same \texttt{PLUG\_name}.
-Even within a single effect, the same \texttt{PLUG\_name} may be used
-many times. All the \texttt{PLUG\_name} functions
+<para>Many effects may use the same <literal>PLUG\_name</literal>.
+Even within a single effect, the same <literal>PLUG\_name</literal> may be used
+many times. All the <literal>PLUG\_name</literal> functions
 will be uniquely renamed to not collide with each other.</para>
 
 <para>The calls will be added in the order they are specified on the
-\texttt{effects} list. More precisely, the most local effects
+<literal>effects</literal> list. More precisely, the most local effects
 (at light sources and textures) are called first, then the effects
 at shape appearance, and finally the effects inside the grouping nodes.
 Although, preferably, for most effects this order will not matter.</para>
@@ -900,27 +900,27 @@ Although, preferably, for most effects this order will not matter.</para>
 <para>A plug is often defined to allow modifying some parameter
 repeatedly (like adding or modulating the fragment color),
 so one or more of the parameters are often allowed to be handled
-as \texttt{inout} values.</para>
+as <literal>inout</literal> values.</para>
 
 <para>The same plug name may be defined many times in the source shader.
-This means that a single \texttt{PLUG\_xxx} function will be called
+This means that a single <literal>PLUG\_xxx</literal> function will be called
 many times. For example, this is useful when the algorithm is naturally
 expressed as a loop, but it had to be unrolled for shader source
 (for example, to slightly tweak some loop iterations).
 The plug names that are available per-light source and per-texture
 are an example of this.
-%% If you use the \texttt{PLUG\_texture\_color}
-%% inside \texttt{Appearance.effects}, you change the color of all
+%% If you use the <literal>PLUG\_texture\_color</literal>
+%% inside <literal>Appearance.effects</literal>, you change the color of all
 %% the textures (even shader textures).
 %% Not really available, as params to texture\_color differ.
-Using the \texttt{PLUG\_light\_scale}
-inside \texttt{Appearance.effects}, the intensity
+Using the <literal>PLUG\_light\_scale</literal>
+inside <literal>Appearance.effects</literal>, the intensity
 of all the light sources on the given shape can be changed. Contrast this with using
-the same \texttt{PLUG\_light\_scale} inside a \texttt{X3DLightNode.effects},
+the same <literal>PLUG\_light\_scale</literal> inside a <literal>X3DLightNode.effects</literal>,
 where only the given light node contribution is changed.</para>
 
 <para>Currently all the plugs must be procedures, that is their result type
-must be declared as \texttt{void}. We have been considering
+must be declared as <literal>void</literal>. We have been considering
 a possibility of functions, where part of the calculation may be replaced
 by a call to a plugged function. While not difficult to implement,
 this idea seems unnecessary after many tests.
@@ -931,15 +931,15 @@ some previous code. This also means that using a procedural plug
 concept to keep. We want the effects to cooperate with each other,
 not to ``hijack'' from each other some parts of the functionality.</para>
 
-<para>New plugs can be defined inside the \texttt{Effect} nodes,
+<para>New plugs can be defined inside the <literal>Effect</literal> nodes,
 as well as inside the complete shaders (like standard
-\texttt{ComposedShader} nodes).
+<literal>ComposedShader</literal> nodes).
 In the first case, the plugs
 are only available for the following effects of the same shape.</para>
 
 <para>The advantage of using magic comments to define plugs is that
 they can be ignored and a shader source remains valid.
-This means that \texttt{ComposedShader} nodes can define custom plugs
+This means that <literal>ComposedShader</literal> nodes can define custom plugs
 and still work (although with no extra effects) even in X3D browsers
 that do not support our extensions.</para>
 
@@ -947,7 +947,7 @@ that do not support our extensions.</para>
 <title>Forward declarations</title>
 
 <para>Suppose we have an effect~$X$ that defines a new plug.
-%, by includes a magic \texttt{/* PLUG: ... */} comment.
+%, by includes a magic <literal>/* PLUG: ... */</literal> comment.
 When this plug is used by another effect~$Y$,
 then an appropriate function call is automatically inserted into the generated shader.
 In the middle of the source code of effect~$X$,
@@ -963,22 +963,22 @@ declarations can be inserted right at the beginning of effect~$X$ code.
 
 <para>Some shading language directives are required to be placed before
 all normal declarations. For example, in case of the \emph{OpenGL shading language},
-the \texttt{\#version} as well as some \texttt{\#extension} directives
+the <literal>\#version</literal> as well as some <literal>\#extension</literal> directives
 must occur at the beginning of the shader code.
-To handle such cases, another magic comment \texttt{/* PLUG-DECLARATIONS */}
+To handle such cases, another magic comment <literal>/* PLUG-DECLARATIONS */</literal>
 is available.
 If present, it signifies a place where forward or external declarations
 should be inserted.</para>
 
 <!-- %% because it may
 %% These (forward or external) declarations are inserted at
-%% the point of special \texttt{/* PLUG-DECLARATIONS */}
+%% the point of special <literal>/* PLUG-DECLARATIONS */</literal>
 %% comment, or (when it is missing) simply at the beginning of shader source.
-%% This applies in the same way to shader code inside an \texttt{EffectPart},
-%% or inside standard X3D node like \texttt{ShaderPart}.
+%% This applies in the same way to shader code inside an <literal>EffectPart</literal>,
+%% or inside standard X3D node like <literal>ShaderPart</literal>.
 
-%% \texttt{/* PLUG-DECLARATIONS */} should be placed after such directives
-%% and before any \texttt{/* PLUG: ... */} declarations.
+%% <literal>/* PLUG-DECLARATIONS */</literal> should be placed after such directives
+%% and before any <literal>/* PLUG: ... */</literal> declarations.
 -->
 
 </section>
@@ -988,7 +988,7 @@ should be inserted.</para>
 
 <para>The behavior is defined only if the provided shading language code
 is a correct, self-contained code. The errors (like unterminated block)
-%%  (``\texttt{\{}'' without matching ``\texttt{\}}'')
+%%  (``<literal>\{</literal>'' without matching ``<literal>\</literal>}'')
 %% ,
 %% or an unterminated comment)
 may only be detected after the complete shader
@@ -1010,7 +1010,7 @@ plug function names and comments.
 
 %% It should be noted however that in particularly nasty cases,
 %% a deliberately poorly coded effect may cause troubles for other effects.
-%% In particular, since you can use \texttt{\#define} and macros in your effect code,
+%% In particular, since you can use <literal>\#define</literal> and macros in your effect code,
 %% you can do nasty tricks to break other effects. You can make them compile,
 %% but function incorrectly. However, we do not consider
 %% it a real problem. You really have to deliberately want to do something bad,
@@ -1022,7 +1022,7 @@ plug function names and comments.
 %% %% inside the browser).
 
 %% Note that this isn't a security problem - - - bad shader code only breaks
-%% rendering of a particular shape. Besides, X3D \texttt{ComposedShader} node allows users
+%% rendering of a particular shape. Besides, X3D <literal>ComposedShader</literal> node allows users
 %% to execute any shading language code anyway. So if there's anything dangerous
 %% (for example a buggy OpenGL may cause the browser process to exit with
 %% segmentation fault on some special shader code snippets),
@@ -1039,7 +1039,7 @@ just like the standard shader nodes. So we can combine any number of textures
 inside an effect. As an example we wrote a simple effect that mixes a couple of
 textures based on a terrain height (see figure \ref{figure.terrain}).
 We could also pass any other uniform value to the effect, for example
-passing the current time from an X3D \texttt{TimeSensor} allows to make
+passing the current time from an X3D <literal>TimeSensor</literal> allows to make
 animated effects.</para>
 
 <figure id="figure.terrain">
@@ -1050,11 +1050,11 @@ animated effects.</para>
   </mediaobject>
 </figure>
 
-<para>We can wrap 2D or 3D noise inside a \texttt{ShaderTexture}
+<para>We can wrap 2D or 3D noise inside a <literal>ShaderTexture</literal>
 (see figure \ref{figure.noise}).
-A texture node like \texttt{NoiseTexture} from InstantReality
+A texture node like <literal>NoiseTexture</literal> from InstantReality
 \cite{instant:noisetex}
-may be implemented on GPU by a simple prototype using the \texttt{ShaderTexture}.
+may be implemented on GPU by a simple prototype using the <literal>ShaderTexture</literal>.
 </para>
 
 <figure id="figure.noise">
@@ -1087,7 +1087,7 @@ and what they have in common.</para>
 %% Our approach also allowed us to easily implement and test
 %% two alternative versions for generating water normals.
 %% One approach was to take normals from the pre-recorded sequence of images
-%% (encoded inside \texttt{MovieTexture},
+%% (encoded inside <literal>MovieTexture</literal>,
 %% with noise images generated by the \emph{Blender} renderer).
 %% The second approach was to calculate normals on the GPU from
 %% a generated smooth 3D noise. Thanks to our effects system,
@@ -1173,26 +1173,26 @@ uniform values and attributes are integrated with X3D fields.</para>
 <para>Many complete example models using our effects
 are referenced from our page on
 \URL{http://castle-engine.sourceforge.net/compositing_shaders.php}.
-%% The relevant demos are mostly inside the \texttt{compositing\_shaders}
-%% subdirectory, also the \texttt{water} subdirectory contains
+%% The relevant demos are mostly inside the <literal>compositing\_shaders</literal>
+%% subdirectory, also the <literal>water</literal> subdirectory contains
 %% the mentioned water effects.
 You can open these examples using any of our engine tools,
-like \texttt{view3dscene}.</para>
+like <literal>view3dscene</literal>.</para>
 
 <!--
 
-%% You can run \texttt{view3dscene} with \texttt{- -debug-log-shaders} command-line
+%% You can run <literal>view3dscene</literal> with <literal>- -debug-log-shaders</literal> command-line
 %% option. Output will show you the final shader code generated,
 %% and also the OpenGL log after linking the shaders.
 %% %% Be sure to redirect the output to a file and you may want to test it first
 %% %% with a simple scene with one shape - - - as the output may be quite large.
 %% This is a useful way to learn about our shader rendering internals.
 
-%% Another useful option to try in \texttt{view3dscene} is to switch to
+%% Another useful option to try in <literal>view3dscene</literal> is to switch to
 %% \textit{View $\rightarrow$ Shaders $\rightarrow$ Enable For Everything} mode.
 %% This will force shader rendering for all the shapes,
 %% while by default we use shader rendering only for the shapes that
-%% require particular effects (shaders by \texttt{ComposedShader}, effects
+%% require particular effects (shaders by <literal>ComposedShader</literal>, effects
 %% described in this paper, shadow maps and such).
 %% Forcing shader rendering for everything allows to see
 %% how our shaders implement the whole X3D lighting and texturing model.
@@ -1221,7 +1221,7 @@ of our effects.
 %% it forces
 %% cleaner shader code (you cannot use undeclared functions from other
 %% shader parts) and it gives you better line numbers in error messages
-%% (although a pre-processor directive like \texttt{\#line} could also be used for
+%% (although a pre-processor directive like <literal>\#line</literal> could also be used for
 %% this).
 
 %% and we think that the same set of plugs will be useful for them - - - but it's just a theory.
