@@ -67,10 +67,10 @@ concepts like shapes, light sources and textures.
 with many advanced graphic features.
 </para>
 
-<para>The X3D \textit{Programmable shaders component} \cite{x3d:shaders}
-(part of the X3D standard) defines how \emph{shaders} can be assigned
+<para>The X3D <emphasis>Programmable shaders component</emphasis> \cite{x3d:shaders}
+(part of the X3D standard) defines how <emphasis>shaders</emphasis> can be assigned
 to particular shapes. % and how they interact with other X3D features.
-\emph{Shaders} are programs usually executed on the graphic processor unit
+<emphasis>Shaders</emphasis> are programs usually executed on the graphic processor unit
 (GPU). They control the per-vertex and per-pixel processing,
 for example summing the lights contribution
 and mixing the texture colors. The authors
@@ -79,7 +79,7 @@ a myriad of interesting graphic effects possible in X3D models.
 </para>
 
 <para>The shaders designed using the standard nodes
-\textit{replace} the normal rendering functionality, not \textit{enhance} it.
+<emphasis>replace</emphasis> the normal rendering functionality, not <emphasis>enhance</emphasis> it.
 This reflects the underlying API, like OpenGL or Direct3D.
 The 3D libraries, in turn, follow the hardware idea that shader code
 should be a complete and optimized program
@@ -96,17 +96,17 @@ to do the common job.
 
 <para>As an example, consider this simplified lighting equation:
 $$ \sum_{l\in Lights} shadow(l) * light_color(l, material, normal(point)) $$
-%% The \textit{shadow} function returns values in the [0..1] range,
+%% The <emphasis>shadow</emphasis> function returns values in the [0..1] range,
 %% scaling the light color. If the object is not in the shadow, it returns 1.
-%% The \textit{normal} function returns a normal vector at given point.
+%% The <emphasis>normal</emphasis> function returns a normal vector at given point.
 Different effects want to change various parts of this equation,
 without touching the others.
-For example, the \textit{shadow} function may check a shadow map pixel,
+For example, the <emphasis>shadow</emphasis> function may check a shadow map pixel,
 or (when shadow map is not available) always return 1.
-The \textit{normal} function may take the vector straight from
+The <emphasis>normal</emphasis> function may take the vector straight from
 the geometry description, or calculate it using a texture value (classic bump mapping).
 See figure \ref{figure.bump_mapping_shadows}.
-The \textit{light_color} function may be replaced to use different
+The <emphasis>light_color</emphasis> function may be replaced to use different
 lighting models.
 % (Phong, Ward, Cook-Torrance and so on).
 Sometimes it makes sense to change these functions
@@ -154,28 +154,27 @@ pieces of a shader code. All the effects defined this way effortlessly
 cooperate and can be combined with each other and with application internal
 shaders. This makes shader programs:</para>
 
-<para>\begin{enumerate}
-\item Much easier to create. We can jump straight into the implementation
-  of our imagined algorithm in the shader.
-  We are only interested in modifying the relevant shader calculation
-  parameter. We do not need to care about the rest of the shader.
+<orderedlist>
+  <listitem><para>Much easier to create. We can jump straight into the implementation
+    of our imagined algorithm in the shader.
+    We are only interested in modifying the relevant shader calculation
+    parameter. We do not need to care about the rest of the shader.</para></listitem>
 
-\item Much more powerful. Our effect
-  immediately cooperates with absolutely every normal feature of X3D rendering.
-  This makes the implemented effect useful for a wide range of real uses,
-  not only for a particular situation or a particular model (as it often happens
-  with specialized shader code).
-  All X3D light sources, textures, even other shader effects,
-  are correctly applied.
-\end{enumerate}
-</para>
+  <listitem><para>Much more powerful. Our effect
+    immediately cooperates with absolutely every normal feature of X3D rendering.
+    This makes the implemented effect useful for a wide range of real uses,
+    not only for a particular situation or a particular model (as it often happens
+    with specialized shader code).
+    All X3D light sources, textures, even other shader effects,
+    are correctly applied.</para></listitem>
+</orderedlist>
 
 <para>It is important that we still keep
 the full power of a chosen GPU shading language.
 We deliberately do not try to invent here a new language, or wrap existing
 language in some cumbersome limitations.
 %% This is most flexible for authors,
-%% and it also allows an easy implementation --- there is no need for any complex
+%% and it also allows an easy implementation &mdash; there is no need for any complex
 %% shading language processing inside the application.</para>
 
 </chapter>
@@ -187,12 +186,12 @@ language in some cumbersome limitations.
 OpenGL <literal>GLSL</literal> \cite{glsl:book}, NVidia <literal>Cg</literal> and Direct 3D <literal>HLSL</literal>.
 They do not provide a ready solution for connecting shaders from independent sources.
 The <literal>CgFX</literal> and HLSL <literal>.fx</literal> files encapsulate shading language code
-in \emph{techniques} (for various graphic card capabilities)
+in <emphasis>techniques</emphasis> (for various graphic card capabilities)
 and within a single technique specify operations for each rendering pass.
 In neither case can we simply connect multiple shader source code files
 and expect the result to be a valid program.</para>
 
-<para>The X3D \textit{Programmable shaders component} \cite{x3d:shaders}
+<para>The X3D <emphasis>Programmable shaders component</emphasis> \cite{x3d:shaders}
 makes the three shading languages mentioned above available to X3D authors.
 Complete shader code may be assigned to specific shapes.
 Although it does not offer any way of compositing shader effects,
@@ -205,9 +204,9 @@ how to pass uniform values (including textures) to the shaders.</para>
 <para>An old solution to combine effects, used even before the shading languages,
 is a multi-pass rendering. Each rendering pass adds or multiplies
 to the buffer contents, adding a layer with desired effect.
-However, this is expensive --- in each pass we usually have to repeat
+However, this is expensive &mdash; in each pass we usually have to repeat
 some work, at least transforming and clipping the geometry.
-It is also not flexible --- we can only modify
+It is also not flexible &mdash; we can only modify
 the complete result of the previous pass.
 %% In our work, we want to allow a single rendering pass to be as
 %% powerful as it can.
@@ -303,7 +302,7 @@ Drupal (\URL{http://drupal.org/}),
 an open-source CMS system written in PHP,
 has a very nice system of modules. Each module
 can extend the functionality of the base system (or other module)
-by implementing a \textit{hook}, which is just a normal PHP function
+by implementing a <emphasis>hook</emphasis>, which is just a normal PHP function
 with a special name and appropriate set of parameters. Modules can also define
 their own hooks (for use by other modules) and invoke them when appropriate.
 This creates a system where it's trivially easy to define new hooks
@@ -334,7 +333,7 @@ Drupal's modules and our ``plugs'' are analogous to Drupal hooks.</para>
 % http://mew.cx/osg_glsl_july2005.pdf
 % I see no way to connect shaders?
 %
-% Irrlight - - - also no way to connect shaders?
+% Irrlight &mdash; also no way to connect shaders?
 %
 % Blender Game Engine: no way to connect shaders, Python code can
 % set the final (complete) shader source only?
@@ -354,7 +353,7 @@ Drupal's modules and our ``plugs'' are analogous to Drupal hooks.</para>
 
 <para>The core idea of our approach is that the base shader code defines
 points where calls to user-defined functions may be inserted. We call
-these places \textit{plugs}, as they act like sockets where logic
+these places <emphasis>plugs</emphasis>, as they act like sockets where logic
 may be added. Each plug has a name and a given set of parameters.
 The effects can use special function names, starting with <literal>PLUG_</literal>
 and followed by the plug name. These declarations will be found
@@ -371,17 +370,17 @@ extensions, like <literal>view3dscene</literal>.</para>
 PROFILE Interchange
 Shape \{ appearance Appearance \{
   material Material \{ \}
-\textbf{  effects Effect \{}
-\textbf{    language "GLSL"}
-\textbf{    parts EffectPart \{}
-\textbf{      type "FRAGMENT"}
-\textbf{      url "data:text/plain,}
-\textbf{      \textit{void PLUG_texture_apply(}}
-\textbf{      \textit{  inout vec4 fragment_color,}}
-\textbf{      \textit{  const in vec3 normal)}}
-\textbf{      \textit{\{}}
-\textbf{      \textit{  fragment_color.rgb *= 2.0;}}
-\textbf{      \textit{\}}" \} \}}
+<emphasis role="bold">  effects Effect \{</emphasis>
+<emphasis role="bold">    language "GLSL"</emphasis>
+<emphasis role="bold">    parts EffectPart \{</emphasis>
+<emphasis role="bold">      type "FRAGMENT"</emphasis>
+<emphasis role="bold">      url "data:text/plain,</emphasis>
+<emphasis role="bold">      <emphasis>void PLUG_texture_apply(</emphasis></emphasis>
+<emphasis role="bold">      <emphasis>  inout vec4 fragment_color,</emphasis></emphasis>
+<emphasis role="bold">      <emphasis>  const in vec3 normal)</emphasis></emphasis>
+<emphasis role="bold">      <emphasis>\{</emphasis></emphasis>
+<emphasis role="bold">      <emphasis>  fragment_color.rgb *= 2.0;</emphasis></emphasis>
+<emphasis role="bold">      <emphasis>\</emphasis></emphasis>" \} \}}
 \} geometry Sphere \{ \} \}
 \end{Verbatim}</para>
 
@@ -410,40 +409,39 @@ and when it is called.</para>
 
 <para>Many usage scenarios are possible:</para>
 
-<!--\begin{enumerate}-->
+<orderedlist>
+  <listitem><para>The <literal>Effect</literal> nodes may use plug names
+    defined inside the renderer internal shaders. This is the most usual case.
+    It allows the authors to extend or override a particular shading parameter.</para></listitem>
 
-<para>\item The <literal>Effect</literal> nodes may use plug names
-defined inside the renderer internal shaders. This is the most usual case.
-It allows the authors to extend or override a particular shading parameter.</para>
+  <listitem><para>The <literal>Effect</literal> nodes may also use the plug names defined
+    in the previous <literal>Effect</literal> nodes on the same shape.
+    It is trivially easy (just add a ``magic'' comment) to define
+    plugs in your own shader code. This way your own effects
+    can be customized.</para></listitem>
 
-<para>\item The <literal>Effect</literal> nodes may also use the plug names defined
-in the previous <literal>Effect</literal> nodes on the same shape.
-It is trivially easy (just add a ``magic'' comment) to define
-plugs in your own shader code. This way your own effects
-can be customized.</para>
+  <listitem><para>Inside the renderer implementation, the same approach can be used
+    to implement some internal effects.
+    We have reimplemented many internal effects of our engine,
+    like the fog, shadow maps (see \cite{vrmleng:shadowmaps})
+    and the bump mapping to use our ``plugs'' approach.
+    This made their implementation very clean, short
+    and nicely separated from each other.
+    %% It also proves that
+    %% the authors have the power to implement such effects easily by themselves.
+    </para>
 
-<para>\item Inside the renderer implementation, the same approach can be used
-to implement some internal effects.
-We have reimplemented many internal effects of our engine,
-like the fog, shadow maps (see \cite{vrmleng:shadowmaps})
-and the bump mapping to use our ``plugs'' approach.
-This made their implementation very clean, short
-and nicely separated from each other.
-%% It also proves that
-%% the authors have the power to implement such effects easily by themselves.
-</para>
+    <para>%% without any traditional hassles. For example, bump mapping can be
+    %% achieved using standard <literal>ComposedShader</literal> as well,
+    %% but then you have to write all this ``boilerplate'' code to also deal
+    %% with all the possible lighting and textures configurations.
+    %% Well, the renderer is still useful to calculate nice tangent vectors,
+    %% although an authoring program could generate GLSL attributes for them as well.</para>
 
-<para>%% without any traditional hassles. For example, bump mapping can be
-%% achieved using standard <literal>ComposedShader</literal> as well,
-%% but then you have to write all this ``boilerplate'' code to also deal
-%% with all the possible lighting and textures configurations.
-%% Well, the renderer is still useful to calculate nice tangent vectors,
-%% although an authoring program could generate GLSL attributes for them as well.</para>
-
-<para>%% Same thing with shadow maps, they only plug to the <literal>light_scale</literal>
-%% calculation of appropriate light.</para>
-
-<!-- \end{enumerate} -->
+    <para>%% Same thing with shadow maps, they only plug to the <literal>light_scale</literal>
+    %% calculation of appropriate light.</para>
+    </listitem>
+</orderedlist>
 
 <para>Actually, there are even more possibilities.
 We have been talking above about the ``renderer internal shaders'',
@@ -457,7 +455,7 @@ then the internal renderer effects are even added to your own
 shader. Of course user effects are added to your shader too.
 This way even the standard X3D shader nodes become more flexible.
 Note that if you do not define any plugs inside your <literal>ComposedShader</literal> node,
-it continues to function as before --- no effects
+it continues to function as before &mdash; no effects
 will be added.</para>
 
 <section id="section.effect_node">
@@ -492,7 +490,7 @@ MFNode [] \codeem{parts} [] # EffectPart
 passing any X3D value to the shader. Examples include passing
 current world time or a particular texture to the shader.
 Uniform values are declared exactly like described in the standard
-X3D \textit{Programmable shaders} component \cite{x3d:shaders}.</para>
+X3D <emphasis>Programmable shaders</emphasis> component \cite{x3d:shaders}.</para>
 
 <para>
 %% , just like
@@ -555,7 +553,7 @@ utility functions, used by other effect parts.
 </para>
 
 <para>For shading languages that have separate compilation units
-(like the \emph{OpenGL Shading Language}) the implementation may choose to place
+(like the <emphasis>OpenGL Shading Language</emphasis>) the implementation may choose to place
 each effect part in such separate unit. This forces the shader code to be
 cleaner, as you cannot use undeclared functions and variables from other parts.
 It also allows for cleaner error detection (parsing errors will be detected
@@ -583,7 +581,7 @@ inside the given unit).
 %% is trivial, and it turned out to be the best approach to design our effects.
 %% This means that each effect code is clean, and can be compiled separately
 %% from others. It allows us to naturally use
-%% the \textit{separate compilation units} in case of GLSL implementation.</para>
+%% the <emphasis>separate compilation units</emphasis> in case of GLSL implementation.</para>
 
 </section>
 
@@ -794,9 +792,9 @@ when the texture color depends only on the XY components of the texture coordina
 The precise behavior
 of <literal>"BOUNDS2D"</literal> follows the X3D <literal>IndexedFaceSet</literal> specification
 and the precise behavior of <literal>"BOUNDS3D"</literal> is described in
-the \textit{Texturing3D} component of the X3D specification.</para>
+the <emphasis>Texturing3D</emphasis> component of the X3D specification.</para>
 
-<para>%%  (section \textit{"Texture coordinate generation for primitive objects"})
+<para>%%  (section <emphasis>"Texture coordinate generation for primitive objects"</emphasis>)
 %%   is used.
 %%   This adapts 3D texture coordinates to the bounding box sizes.
 %%   It's most suitable for 3D textures (the 4th texture coordinate
@@ -927,7 +925,7 @@ this idea seems unnecessary after many tests.
 Procedural plugs are easier to declare, as the call to the plug
 may be simply inserted, while in case of function it will have to replace
 some previous code. This also means that using a procedural plug
-\textit{never} replaces or removes some existing code, which is a very nice
+<emphasis>never</emphasis> replaces or removes some existing code, which is a very nice
 concept to keep. We want the effects to cooperate with each other,
 not to ``hijack'' from each other some parts of the functionality.</para>
 
@@ -962,7 +960,7 @@ declarations can be inserted right at the beginning of effect~$X$ code.
 </para>
 
 <para>Some shading language directives are required to be placed before
-all normal declarations. For example, in case of the \emph{OpenGL shading language},
+all normal declarations. For example, in case of the <emphasis>OpenGL shading language</emphasis>,
 the <literal>\#version</literal> as well as some <literal>\#extension</literal> directives
 must occur at the beginning of the shader code.
 To handle such cases, another magic comment <literal>/* PLUG-DECLARATIONS */</literal>
@@ -997,7 +995,7 @@ It should be noted that for shading languages with separate compilation units,
 the parsing errors can be at least reported always for the correct code piece
 (effect part).</para>
 
-<para>The \textbf{application does not need to parse the shader code} at any point.
+<para>The <emphasis role="bold">application does not need to parse the shader code</emphasis> at any point.
 Only a trivial text search in the code is necessary to detect the magic
 plug function names and comments.
 %% Still, an incorrect effect code may cause the whole shader to malfunction.
@@ -1021,7 +1019,7 @@ plug function names and comments.
 %% %% how the other effects are implemented (maybe how they are implemented
 %% %% inside the browser).
 
-%% Note that this isn't a security problem - - - bad shader code only breaks
+%% Note that this isn't a security problem &mdash; bad shader code only breaks
 %% rendering of a particular shape. Besides, X3D <literal>ComposedShader</literal> node allows users
 %% to execute any shading language code anyway. So if there's anything dangerous
 %% (for example a buggy OpenGL may cause the browser process to exit with
@@ -1065,7 +1063,7 @@ may be implemented on GPU by a simple prototype using the <literal>ShaderTexture
   </mediaobject>
 </figure>
 
-<para>\emph{Water} is very nice to implement with the help of our effects,
+<para><emphasis>Water</emphasis> is very nice to implement with the help of our effects,
 as a proper water simulation
 is naturally a combination of a couple effects.
 To simulate waves we want to vary vertex
@@ -1088,7 +1086,7 @@ and what they have in common.</para>
 %% two alternative versions for generating water normals.
 %% One approach was to take normals from the pre-recorded sequence of images
 %% (encoded inside <literal>MovieTexture</literal>,
-%% with noise images generated by the \emph{Blender} renderer).
+%% with noise images generated by the <emphasis>Blender</emphasis> renderer).
 %% The second approach was to calculate normals on the GPU from
 %% a generated smooth 3D noise. Thanks to our effects system,
 %% we could immediately test our alternative normal vector approaches,
@@ -1153,7 +1151,7 @@ See figure \ref{figure.flowers}.
 
 <para>We would like to emphasize that all the effects demonstrated here
 are theoretically already possible to implement using the standard
-X3D \textit{Programmable shaders component} \cite{x3d:shaders}. However, such implementation
+X3D <emphasis>Programmable shaders component</emphasis> \cite{x3d:shaders}. However, such implementation
 would be extremely cumbersome.
 You would first have to implement all the necessary multi-texturing, lighting,
 shadows, and other rendering features in a shader code.
@@ -1163,7 +1161,7 @@ Also note that a shader should remain optimized for a particular setting.
 %% like which light sources and fog nodes affect the given shape.
 The only manageable way to do this, that would work for all the lighting
 and texturing conditions, is to write a shader generator program.
-Which is actually exactly what our effects already do for you ---
+Which is actually exactly what our effects already do for you &mdash;
 the implementation of our effects constructs and links
 the appropriate shader code, gathering the information from all the nodes
 that affect the given shape. The information is nicely integrated
@@ -1185,11 +1183,11 @@ like <literal>view3dscene</literal>.</para>
 %% option. Output will show you the final shader code generated,
 %% and also the OpenGL log after linking the shaders.
 %% %% Be sure to redirect the output to a file and you may want to test it first
-%% %% with a simple scene with one shape - - - as the output may be quite large.
+%% %% with a simple scene with one shape &mdash; as the output may be quite large.
 %% This is a useful way to learn about our shader rendering internals.
 
 %% Another useful option to try in <literal>view3dscene</literal> is to switch to
-%% \textit{View $\rightarrow$ Shaders $\rightarrow$ Enable For Everything} mode.
+%% <emphasis>View $\rightarrow$ Shaders $\rightarrow$ Enable For Everything</emphasis> mode.
 %% This will force shader rendering for all the shapes,
 %% while by default we use shader rendering only for the shapes that
 %% require particular effects (shaders by <literal>ComposedShader</literal>, effects
@@ -1207,11 +1205,11 @@ like <literal>view3dscene</literal>.</para>
 <title>Implementation notes</title>
 
 <para>We have implemented all the X3D extensions described in this paper
-for the \emph{OpenGL Shading Language} (GLSL).
+for the <emphasis>OpenGL Shading Language</emphasis> (GLSL).
 However, we have designed our extensions
 to be applicable to other shading languages as well (like Cg or HLSL)
 and we believe they can be handled in a similar fashion.
-In particular, we have tested that the \emph{separate compilation units}
+In particular, we have tested that the <emphasis>separate compilation units</emphasis>
 concept of GLSL, while very useful, is not necessary for proper implementation
 of our effects.
 </para>
@@ -1224,10 +1222,10 @@ of our effects.
 %% (although a pre-processor directive like <literal>\#line</literal> could also be used for
 %% this).
 
-%% and we think that the same set of plugs will be useful for them - - - but it's just a theory.
+%% and we think that the same set of plugs will be useful for them &mdash; but it's just a theory.
 %% An implementation of our effects for other shading languages may
 %% find other opportunities for plugs.
-%% In particular, we have tested that the \emph{separate compilation units}
+%% In particular, we have tested that the <emphasis>separate compilation units</emphasis>
 %% of GLSL are not necessary for a correct implementation of our effects.
 %% We also believe that most of our plugs (like ``do something in object space'',
 %% ``do something in eye space'') are generic enough to be usable
