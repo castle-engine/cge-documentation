@@ -387,7 +387,7 @@ and is the simplest way to ``just modify the pixel color''.
 we modify the color that will be displayed on the screen.</para>
 
 <para>A reference of all the plugs available in our implementation
-is on \URL{http://vrmlengine.sourceforge.net/compositing_shaders.php}.
+is on \URL{http://castle-engine.sourceforge.net/compositing_shaders.php}.
 For each plug, like this \texttt{PLUG\_texture\_apply},
 we define a list of parameters
 %(they have to be declared exactly the same in an effect),
@@ -1135,7 +1135,7 @@ uniform values and attributes are integrated with X3D fields.</para>
 
 <para>Many complete example models using our effects
 are referenced from our page on
-\URL{http://vrmlengine.sourceforge.net/compositing_shaders.php}.
+\URL{http://castle-engine.sourceforge.net/compositing_shaders.php}.
 %% The relevant demos are mostly inside the \texttt{compositing\_shaders}
 %% subdirectory, also the \texttt{water} subdirectory contains
 %% the mentioned water effects.
