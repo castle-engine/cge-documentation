@@ -613,7 +613,7 @@ makes them cooperate correctly.
 %% define a library of effects, that can be composited without any work
 %% needed by user.</para>
 
-<figure>
+<figure id="figure.toon_and_fresnel">
   <title>Toon and Fresnel effects combined.</title>
   <mediaobject>
   <imageobject role="html"> <imagedata format="PNG" fileref="images/fresnel_and_toon.png" /> </imageobject>
@@ -838,7 +838,7 @@ between \texttt{ShaderTexture} and other textures is what the system
 does automatically for you, that is what color is passed
 to the first \texttt{texture\_color} plug.</para>
 
-<figure>
+<figure id="figure.shader_texture_edge_detection">
   <title>ShaderTexture doing an edge detection operation on a normal ImageTexture.</title>
   <mediaobject>
   <imageobject role="html"> <imagedata format="PNG" fileref="images/shader_texture_edge_detection.png" /> </imageobject>
