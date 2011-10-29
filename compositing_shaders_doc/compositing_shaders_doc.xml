@@ -650,7 +650,7 @@ like pointing device sensor nodes and <literal>LocalFog</literal>.</para>
 
 <para>The <literal>LocalFog</literal> example is worth emphasizing. Using our system,
 an X3D viewer can implement the <literal>LocalFog</literal> node as a prototype
-that expands to our <literal>Effect</literal> node. This results in a 100\% correct
+that expands to our <literal>Effect</literal> node. This results in a 100% correct
 and easy implementation of the standard <literal>LocalFog</literal> node.</para>
 
 <para>As one of the demos, we have implemented a realistic
@@ -723,8 +723,7 @@ procedural textures using the GPU shading languages.
 The texture contents are not stored anywhere (not even on GPU)
 and the renderer does not manage any texture resources.
 From a GPU point of view, there is no texture.
-%\footnote{But the spoon is real,
-%we swear.}.
+<!-- \footnote{But the spoon is real, we swear.}. -->
 There is only a shader function that generates colors
 based on some vectors. By wrapping such function inside
 the <literal>ShaderTexture</literal> node, it can be treated exactly like other textures
@@ -785,8 +784,6 @@ the <emphasis>Texturing3D</emphasis> component of the X3D specification.</para>
 %%   It's most suitable for 3D textures (the 4th texture coordinate
 %%   component can be ignored; or the 4D vector may be treated as homogeneous, as <literal>"BOUNDS3D"</literal> will always
 %%   set the 4th component to 1).</para>
-
-<!-- %% \end{enumerate} -->
 
 <para>%% The idea is that using a <literal>ShaderTexture</literal> should be as comfortable
 %% as any other texture node.</para>
@@ -943,7 +940,7 @@ declarations can be inserted right at the beginning of effect&nbsp;<emphasis>X</
 
 <para>Some shading language directives are required to be placed before
 all normal declarations. For example, in case of the <emphasis>OpenGL shading language</emphasis>,
-the <literal>\#version</literal> as well as some <literal>\#extension</literal> directives
+the <literal>#version</literal> as well as some <literal>#extension</literal> directives
 must occur at the beginning of the shader code.
 To handle such cases, another magic comment <literal>/* PLUG-DECLARATIONS */</literal>
 is available.
@@ -990,7 +987,7 @@ plug function names and comments.
 
 %% It should be noted however that in particularly nasty cases,
 %% a deliberately poorly coded effect may cause troubles for other effects.
-%% In particular, since you can use <literal>\#define</literal> and macros in your effect code,
+%% In particular, since you can use <literal>#define</literal> and macros in your effect code,
 %% you can do nasty tricks to break other effects. You can make them compile,
 %% but function incorrectly. However, we do not consider
 %% it a real problem. You really have to deliberately want to do something bad,
@@ -1201,7 +1198,7 @@ of our effects.
 %% it forces
 %% cleaner shader code (you cannot use undeclared functions from other
 %% shader parts) and it gives you better line numbers in error messages
-%% (although a pre-processor directive like <literal>\#line</literal> could also be used for
+%% (although a pre-processor directive like <literal>#line</literal> could also be used for
 %% this).
 
 %% and we think that the same set of plugs will be useful for them &mdash; but it's just a theory.
