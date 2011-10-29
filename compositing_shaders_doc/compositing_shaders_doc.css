@@ -7,4 +7,14 @@ pre.screen {
   padding: 0.3em;
 }
 
-span.underline {text-decoration: underline;}
+span.underline { text-decoration: underline; }
+
+/* Tests with making underline in <screen> better:
+pre.screen span.underline {
+  display: block;
+  width: 90%;
+  border-bottom: thin solid black;
+  margin-bottom: 0px;
+  padding-bottom: 0px;
+}
+*/
