@@ -94,9 +94,11 @@ and the authors want to depend on these internal shaders
 to do the common job.
 </para>
 
-<para>As an example, consider this simplified lighting equation:
-$$ \sum_{l\in Lights} shadow(l) * light_color(l, material, normal(point)) $$
-%% The <emphasis>shadow</emphasis> function returns values in the [0..1] range,
+<para>As an example, consider this simplified lighting equation:</para>
+
+<para><emphasis>\sum_{l\in Lights} shadow(l) * light_color(l, material, normal(point))</emphasis></para>
+
+<para>%% The <emphasis>shadow</emphasis> function returns values in the [0..1] range,
 %% scaling the light color. If the object is not in the shadow, it returns 1.
 %% The <emphasis>normal</emphasis> function returns a normal vector at given point.
 Different effects want to change various parts of this equation,
@@ -924,19 +926,19 @@ that do not support our extensions.</para>
 <section id="section.forward_declarations">
 <title>Forward declarations</title>
 
-<para>Suppose we have an effect&nbsp;$X$ that defines a new plug.
+<para>Suppose we have an effect&nbsp;<emphasis>X</emphasis> that defines a new plug.
 %, by includes a magic <literal>/* PLUG: ... */</literal> comment.
-When this plug is used by another effect&nbsp;$Y$,
+When this plug is used by another effect&nbsp;<emphasis>Y</emphasis>,
 then an appropriate function call is automatically inserted into the generated shader.
-In the middle of the source code of effect&nbsp;$X$,
-a function defined in effect&nbsp;$Y$ has to be called. This is the simplest
+In the middle of the source code of effect&nbsp;<emphasis>X</emphasis>,
+a function defined in effect&nbsp;<emphasis>Y</emphasis> has to be called. This is the simplest
 implementation of our plugs.
 % Would be nice to have here a space for paragraph break...
 Additionally, a forward or external declaration of the called function
-may need to be inserted into the effect&nbsp;$X$. That is because&nbsp;$Y$
+may need to be inserted into the effect&nbsp;<emphasis>X</emphasis>. That is because&nbsp;<emphasis>Y</emphasis>
 may be in a separate compilation unit (in case of GLSL),
 or just defined lower in the code. In simple cases, such forward or external
-declarations can be inserted right at the beginning of effect&nbsp;$X$ code.
+declarations can be inserted right at the beginning of effect&nbsp;<emphasis>X</emphasis> code.
 </para>
 
 <para>Some shading language directives are required to be placed before
