@@ -43,4 +43,7 @@ set       toc,title
 <!-- Insert alpha character. -->
 <xsl:template match="processing-instruction('alpha')">&#x03B1;</xsl:template>
 
+<xsl:param name="chunker.output.doctype-public">-//W3C//DTD HTML 4.01 Transitional//EN</xsl:param>
+<xsl:param name="chunker.output.doctype-system">http://www.w3.org/TR/html4/loose.dtd</xsl:param>
+
 </xsl:stylesheet>
