@@ -646,24 +646,6 @@ would like to share a particular piece of code. For example,
 the same <literal>EffectPart</literal> node, with a library of useful
 shading language functions, may be used for many effects.</para>
 
-<figure id="figure.fog">
-  <title>Volumetric fog scene: 1) No fog; 2) No lighting; 3) Lights and fog.
-Note that the fog is assumed to have its own ambient lighting,
-so it colors the image even in the 2) case.</title>
-  <mediaobject>
-  <imageobject role="html"> <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_fog.png" /> </imageobject>
-  <imageobject role="fo">   <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_fog.png" width="3in" contentwidth="3in" /> </imageobject>
-  </mediaobject>
-  <mediaobject>
-  <imageobject role="html"> <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_light.png" /> </imageobject>
-  <imageobject role="fo">   <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_light.png" width="3in" contentwidth="3in" /> </imageobject>
-  </mediaobject>
-  <mediaobject>
-  <imageobject role="html"> <imagedata format="PNG" fileref="images/volumetric_animated_fog_all.png" /> </imageobject>
-  <imageobject role="fo">   <imagedata format="PNG" fileref="images/volumetric_animated_fog_all.png" width="3in" contentwidth="3in" /> </imageobject>
-  </mediaobject>
-</figure>
-
 </section>
 
 <section id="section.effects_on_group">
@@ -689,6 +671,44 @@ along the line between the camera and pixel position in the 3D&nbsp;space. This 
 convincing effect of a dense fog. The <literal>Effect</literal> node with
 appropriate shader code is placed at the top level of the X3D file,
 so it simply works for all shapes. See figure \ref{figure.fog}.</para>
+
+<figure id="figure.fog">
+  <title>Volumetric fog with animated density.</title>
+
+<informaltable frame="none">
+  <tgroup cols="2" align="center">
+  <colspec colnum='1' colname='col1' colwidth='1*'/>
+  <colspec colnum='2' colname='col2' colwidth='1*'/>
+
+  <tbody>
+    <row><entry>
+      <mediaobject>
+      <imageobject role="html"> <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_fog.png" /> </imageobject>
+      <imageobject role="fo">   <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_fog.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
+      </mediaobject>
+      No fog.
+    </entry>
+    <entry>
+      <mediaobject>
+      <imageobject role="html"> <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_light.png" /> </imageobject>
+      <imageobject role="fo">   <imagedata format="PNG" fileref="images/volumetric_animated_fog_no_light.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
+      </mediaobject>
+      No lighting.
+      Note that the fog is assumed to have its own ambient lighting,
+      so it colors the image even in this case.
+    </entry></row>
+    <row><entry>
+      <mediaobject>
+      <imageobject role="html"> <imagedata format="PNG" fileref="images/volumetric_animated_fog_all.png" /> </imageobject>
+      <imageobject role="fo">   <imagedata format="PNG" fileref="images/volumetric_animated_fog_all.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
+      </mediaobject>
+      Lights and fog.
+    </entry>
+    <entry /></row>
+  </tbody>
+  </tgroup>
+</informaltable>
+</figure>
 
 </section>
 

@@ -21,3 +21,6 @@ pre.screen span.underline {
   padding-bottom: 0px;
 }
 */
+
+/* To make fog figures look good, otherwise the text stretches them too much. */
+div.figure-contents table td { max-width: 400px; vertical-align: top; }
