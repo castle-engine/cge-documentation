@@ -121,8 +121,7 @@ Our approach allows you to do everything mentioned here.
 </para>
 
 <figure id="figure.bump_mapping_shadows">
-  <title>Japanese shrine model with more and more effects applied:
-Phong shading (per-pixel lighting), bump mapping, shadows from two lights.
+  <title>Japanese shrine model with more and more effects applied.
 The model is based on <ulink url="http://opengameart.org/content/shrine-shinto-japan"/>.</title>
   <titleabbrev>Japanese shrine model with more and more effects applied.
 </titleabbrev>
@@ -138,36 +137,42 @@ The model is based on <ulink url="http://opengameart.org/content/shrine-shinto-j
       <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_0.png" /> </imageobject>
       <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_0.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
       </mediaobject>
+      No effects.
     </entry>
     <entry>
       <mediaobject>
       <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_1_per_pixel_lighting.png" /> </imageobject>
       <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_1_per_pixel_lighting.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
       </mediaobject>
+      Phong shading (per-pixel lighting).
     </entry></row>
     <row><entry>
       <mediaobject>
       <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_2_bump_mapping.png" /> </imageobject>
       <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_2_bump_mapping.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
       </mediaobject>
+      Bump mapping.
     </entry>
     <entry>
       <mediaobject>
       <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_3_shadow_1st.png" /> </imageobject>
       <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_3_shadow_1st.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
       </mediaobject>
+      1st shadow map.
     </entry></row>
     <row><entry>
       <mediaobject>
       <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_4_shadow_2nd.png" /> </imageobject>
       <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_4_shadow_2nd.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
       </mediaobject>
+      2nd shadow map.
     </entry>
     <entry>
       <mediaobject>
       <imageobject role="html"> <imagedata format="PNG" fileref="images/rhan_shrine_5_everything.png" /> </imageobject>
       <imageobject role="fo">   <imagedata format="PNG" fileref="images/rhan_shrine_5_everything.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
       </mediaobject>
+      Both shadow maps.
     </entry></row>
   </tbody>
   </tgroup>
@@ -259,7 +264,7 @@ algorithm of this layer. </para>
 
 <!-- (see also http://groups.google.com/group/blendertorenderman/browse_thread/thread/aaf07831b91be9db?pli=1 , confirms my findings) -->
 
-<para>Sh (\URL{http://libsh.org/}, \cite{sh:book})
+<para>Sh (<ulink url="http://libsh.org/" />, \cite{sh:book})
 allows writing shader code (that can run on GPU) directly inside a
 C++ program.
 %% For this, Sh extends the C++ language (through C++
@@ -278,7 +283,7 @@ be integrated into a renderer regardless of its programming language.
 We do not need a C++ compiler to generate a final GPU shader
 and users do not need to be familiar with C++.</para>
 
-<para>OGRE (\URL{http://www.ogre3d.org/}), an open-source 3D engine written in C++, has a system
+<para>OGRE (<ulink url="http://www.ogre3d.org/" />), an open-source 3D engine written in C++, has a system
 for adding shader extensions (see \cite{ogre:shader}). Its idea is similar
 to our system (enhance the built-in shaders with our own effects),
 however the whole job of combining a shader is done by operating
@@ -323,7 +328,7 @@ composable shaders for GPU.</para>
 
 <para>At the end, we would like to mention a solution from a completely
 different domain, that is surprisingly similar to ours in some ways.
-Drupal (\URL{http://drupal.org/}),
+Drupal (<ulink url="http://drupal.org/" />),
 an open-source CMS system written in PHP,
 has a very nice system of modules. Each module
 can extend the functionality of the base system (or other module)
@@ -429,7 +434,7 @@ and is the simplest way to <quote>just modify the pixel color</quote>.
 we modify the color that will be displayed on the screen.</para>
 
 <para>A reference of all the plugs available in our implementation
-is on \URL{http://castle-engine.sourceforge.net/compositing_shaders.php}.
+is on <ulink url="http://castle-engine.sourceforge.net/compositing_shaders.php" />.
 For each plug, like this <literal>PLUG_texture_apply</literal>,
 we define a list of parameters
 %(they have to be declared exactly the same in an effect),
@@ -1111,10 +1116,7 @@ and what they have in common.</para>
 -->
 
 <figure id="figure.water">
-  <title>Water using our effects: 1) Per-pixel lighting and bump mapping.
-2) Per-pixel lighting and reflections and refractions (by a single environment cube map texture).
-3) All effects.</title>
-  <titleabbrev>Water using our effects framework.</titleabbrev>
+  <title>Water using our effects framework.</title>
 
 <informaltable frame="none">
   <tgroup cols="2" align="center">
@@ -1127,24 +1129,28 @@ and what they have in common.</para>
       <imageobject role="html"> <imagedata format="PNG" fileref="images/water_shaders_0.png" /> </imageobject>
       <imageobject role="fo">   <imagedata format="PNG" fileref="images/water_shaders_0.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
       </mediaobject>
+      Per-pixel lighting.
     </entry>
     <entry>
       <mediaobject>
       <imageobject role="html"> <imagedata format="PNG" fileref="images/water_shaders_1.png" /> </imageobject>
       <imageobject role="fo">   <imagedata format="PNG" fileref="images/water_shaders_1.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
       </mediaobject>
+      Bump mapping. <!-- (with per-pix lighting) -->
     </entry></row>
     <row><entry>
       <mediaobject>
       <imageobject role="html"> <imagedata format="PNG" fileref="images/water_shaders_2.png" /> </imageobject>
       <imageobject role="fo">   <imagedata format="PNG" fileref="images/water_shaders_2.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
       </mediaobject>
+      Reflections and refractions. <!-- (with per-pix lighting) --> <!-- (by a single environment cube map texture).-->
     </entry>
     <entry>
       <mediaobject>
       <imageobject role="html"> <imagedata format="PNG" fileref="images/water_shaders_3.png" /> </imageobject>
       <imageobject role="fo">   <imagedata format="PNG" fileref="images/water_shaders_3.png" width="2.7in" contentwidth="2.7in" /> </imageobject>
       </mediaobject>
+      All effects.
     </entry></row>
   </tbody>
   </tgroup>
@@ -1191,7 +1197,7 @@ uniform values and attributes are integrated with X3D fields.</para>
 
 <para>Many complete example models using our effects
 are referenced from our page on
-\URL{http://castle-engine.sourceforge.net/compositing_shaders.php}.
+<ulink url="http://castle-engine.sourceforge.net/compositing_shaders.php" />.
 %% The relevant demos are mostly inside the <literal>compositing_shaders</literal>
 %% subdirectory, also the <literal>water</literal> subdirectory contains
 %% the mentioned water effects.
