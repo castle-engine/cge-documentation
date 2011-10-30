@@ -103,4 +103,12 @@
   </fo:inline>
 </xsl:template>
 
+<!-- Set slightly lighter background on <screen> (default is E0E0E0)
+     and add border. -->
+<xsl:attribute-set name="shade.verbatim.style">
+  <xsl:attribute name="background-color">#FAFAFA</xsl:attribute>
+  <xsl:attribute name="border">0.5pt solid black</xsl:attribute>
+  <xsl:attribute name="padding">0.05in</xsl:attribute>
+</xsl:attribute-set>
+
 </xsl:stylesheet>
