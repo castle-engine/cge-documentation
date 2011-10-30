@@ -11,4 +11,4 @@ clean:
 # The size generated here must be synchronized with CSS
 # width setting for figure in ../../compositing_shaders_doc.css
 %.png: ../%.png
-	convert $< -geometry 300 $@
+	convert $< -geometry 400 $@
