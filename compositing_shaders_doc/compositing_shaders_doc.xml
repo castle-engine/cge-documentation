@@ -1,12 +1,12 @@
 <?xml version='1.0'?>
-<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
-  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.5/docbookx.dtd">
 
 <!--
   Offline version of this DTD (as installed from Debian testing package) is
-  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd"
+  "/usr/share/sgml/docbook/dtd/xml/4.5/docbookx.dtd"
   Online version of this DTD is
-  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
+  "http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd"
 -->
 
 <book>
@@ -96,7 +96,12 @@ to do the common job.
 
 <para>As an example, consider this simplified lighting equation:</para>
 
-<para><emphasis>\sum_{l\in Lights} shadow(l) * light_color(l, material, normal(point))</emphasis></para>
+<informalequation>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="formulas/1.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="SVG" fileref="formulas/1.svg" /> </imageobject>
+  </mediaobject>
+</informalequation>
 
 <para>%% The <emphasis>shadow</emphasis> function returns values in the [0..1] range,
 %% scaling the light color. If the object is not in the shadow, it returns 1.
@@ -773,7 +778,7 @@ procedural textures using the GPU shading languages.
 The texture contents are not stored anywhere (not even on GPU)
 and the renderer does not manage any texture resources.
 From a GPU point of view, there is no texture.
-<!-- \footnote{But the spoon is real, we swear.}. -->
+<!-- <footnote>But the spoon is real, we swear.</footnote> -->
 There is only a shader function that generates colors
 based on some vectors. By wrapping such function inside
 the <literal>ShaderTexture</literal> node, it can be treated exactly like other textures
@@ -1240,7 +1245,7 @@ like <literal>view3dscene</literal>.</para>
 %% This is a useful way to learn about our shader rendering internals.
 
 %% Another useful option to try in <literal>view3dscene</literal> is to switch to
-%% <emphasis>View $\rightarrow$ Shaders $\rightarrow$ Enable For Everything</emphasis> mode.
+%% <emphasis>View &rarr;Shaders &rarr;Enable For Everything</emphasis> mode.
 %% This will force shader rendering for all the shapes,
 %% while by default we use shader rendering only for the shapes that
 %% require particular effects (shaders by <literal>ComposedShader</literal>, effects

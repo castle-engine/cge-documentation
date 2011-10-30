@@ -11,7 +11,9 @@ html_post = mkdir -p $(1)admonitions/ && \
         $(1)admonitions/ && \
   cp -f $(BASE_DOCUMENT_NAME).css $(1) && \
   rm -Rf $(1)images/ && \
-  cp -Rf images/html $(1)images
+  cp -Rf images/html $(1)images && \
+  mkdir -p $(1)formulas/ && \
+  cp -Rf formulas/*.png $(1)formulas/
 
 .PHONY: default
 default: validate-xmllint html pdf
