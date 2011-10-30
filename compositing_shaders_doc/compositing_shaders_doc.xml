@@ -107,7 +107,7 @@ For example, the <emphasis>shadow</emphasis> function may check a shadow map pix
 or (when shadow map is not available) always return 1.
 The <emphasis>normal</emphasis> function may take the vector straight from
 the geometry description, or calculate it using a texture value (classic bump mapping).
-See figure \ref{figure.bump_mapping_shadows}.
+See <xref linkend="figure.bump_mapping_shadows" />.
 The <emphasis>light_color</emphasis> function may be replaced to use different
 lighting models.
 % (Phong, Ward, Cook-Torrance and so on).
@@ -672,7 +672,7 @@ In a fragment shader, the 3D&nbsp;texture is sampled
 along the line between the camera and pixel position in the 3D&nbsp;space. This makes a very
 convincing effect of a dense fog. The <literal>Effect</literal> node with
 appropriate shader code is placed at the top level of the X3D file,
-so it simply works for all shapes. See figure \ref{figure.fog}.</para>
+so it simply works for all shapes. See <xref linkend="figure.fog" />.</para>
 
 <figure id="figure.fog">
   <title>Volumetric fog with animated density.</title>
@@ -722,7 +722,7 @@ types of objects, not just shapes. For example a particular light source
 may have a shader effect assigned.
 This allows to modify the contribution of a given light.
 For example the spot light shape can be modified, possibly
-based on some texture information (see figure \ref{figure.fancy_spot}).
+based on some texture information (see <xref linkend="figure.fancy_spot" />).
 Or a different lighting model may be implemented, like anisotropic Ward
 or Cook-Torrance.
 To make this possible, the <literal>effects</literal> field is added to every light node:</para>
@@ -885,7 +885,7 @@ to the first <literal>texture_color</literal> plug.</para>
 (not at each texel). So the effects are not concerned about the texture size
 or texture filtering options. We can just use the interpolated texture
 coordinates in the <literal>texture_color</literal> plug.
-Figure \ref{figure.shader_texture_no_filtering_problems}
+<xref linkend="figure.shader_texture_no_filtering_problems" />
 shows a yellow arc drawn on a texture by our effect.
 As you can see, the arc is drawn perfectly, without any concern about
 the pixel resolution of the underlying texture.
@@ -1068,7 +1068,7 @@ plug function names and comments.
 <para>Effects may define and use their own uniform variables, including textures,
 just like the standard shader nodes. So we can combine any number of textures
 inside an effect. As an example we wrote a simple effect that mixes a couple of
-textures based on a terrain height (see figure \ref{figure.terrain}).
+textures based on a terrain height (see <xref linkend="figure.terrain" />).
 We could also pass any other uniform value to the effect, for example
 passing the current time from an X3D <literal>TimeSensor</literal> allows to make
 animated effects.</para>
@@ -1082,7 +1082,7 @@ animated effects.</para>
 </figure>
 
 <para>We can wrap 2D or 3D noise inside a <literal>ShaderTexture</literal>
-(see figure \ref{figure.noise}).
+(see <xref linkend="figure.noise" />).
 A texture node like <literal>NoiseTexture</literal> from InstantReality
 <xref linkend="bib.instantreality.noisetex" />
 may be implemented on GPU by a simple prototype using the <literal>ShaderTexture</literal>.
@@ -1104,7 +1104,7 @@ heights, or vary per-fragment normal vectors (for best results,
 we want to do both things).
 We also want to simulate the fact that water has reflections and
 is transparent. We have implemented a nice water using this approach,
-with (initially) two independent effect nodes. See figure \ref{figure.water}.
+with (initially) two independent effect nodes. See <xref linkend="figure.water" />.
 Then we have tested two alternative
 approaches for normal generation (take from pre-recorded series of normal-maps,
 or calculate from a smooth 3D noise). They both generate normal
@@ -1191,7 +1191,7 @@ We also have plugs to change the geometry in object space.
 %% conditions.
 Since the transformation is done on GPU, there's practically
 no speed penalty for animating thousands of flowers in our test scene.
-See figure \ref{figure.flowers}.
+See <xref linkend="figure.flowers" />.
 </para>
 
 <figure id="figure.flowers">
