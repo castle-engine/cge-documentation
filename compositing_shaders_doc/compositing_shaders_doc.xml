@@ -46,18 +46,27 @@ Our effects seamlessly cooperate with each other and with
 the shaders used internally by the 3D application.
 Thus the effects are reusable, work in various combinations
 and under all lighting and texture conditions.
-%This makes the GPU shaders more usable for 3D content authors.
-We have designed our effects to fit naturally in 3D scene graph formats,
+This makes the GPU shaders more useful for 3D content authors.</para>
+
+<!-- TODO: clumsy wording? -->
+<para>Our approach may also be used to integrate internal effects
+inside a 3D renderer. Modern renderers need to combine many effects,
+like lighting, bump mapping and shadow maps.
+As such, it becomes important to develop all these internal effects easily and separately.</para>
+<!--
+As modern 3D renderers have a number of built-in internal effects
+available (like )
+This makes the implementation of 3D renderers simpler and cleaner,
+as many internal effects
+become more independent.</para>
+-->
+
+<para>We have designed our effects to fit naturally in 3D scene graph formats,
 in particular we present a number of extensions to the X3D standard.
 Our extensions nicely integrate shader effects with X3D
-<!-- groups, -->
-concepts like shapes, light sources and textures.
+concepts like shapes, groups, light sources and textures.
 </para>
 
-<!--
-%% The browser implementation may also gain from using the same approach
-%% for composing internal shaders.
--->
 </preface>
 
 <chapter id="chapter.overview">
@@ -69,7 +78,7 @@ with many advanced graphic features.
 
 <para>The X3D <emphasis>Programmable shaders component</emphasis> <xref linkend="bib.x3d_shaders" />
 (part of the X3D standard) defines how <emphasis>shaders</emphasis> can be assigned
-to particular shapes. % and how they interact with other X3D features.
+to particular shapes. <!-- and how they interact with other X3D features. -->
 <emphasis>Shaders</emphasis> are programs usually executed on the graphic processor unit
 (GPU). They control the per-vertex and per-pixel processing,
 for example summing the lights contribution
@@ -103,9 +112,12 @@ to do the common job.
   </mediaobject>
 </informalequation>
 
-<para>%% The <emphasis>shadow</emphasis> function returns values in the [0..1] range,
-%% scaling the light color. If the object is not in the shadow, it returns 1.
-%% The <emphasis>normal</emphasis> function returns a normal vector at given point.
+<para>
+<!--
+The <emphasis>shadow</emphasis> function returns values in the [0..1] range,
+scaling the light color. If the object is not in the shadow, it returns 1.
+The <emphasis>normal</emphasis> function returns a normal vector at given point.
+-->
 Different effects want to change various parts of this equation,
 without touching the others.
 For example, the <emphasis>shadow</emphasis> function may check a shadow map pixel,
@@ -114,15 +126,16 @@ The <emphasis>normal</emphasis> function may take the vector straight from
 the geometry description, or calculate it using a texture value (classic bump mapping).
 See <xref linkend="figure.bump_mapping_shadows" />.
 The <emphasis>light_color</emphasis> function may be replaced to use different
-lighting models.
-% (Phong, Ward, Cook-Torrance and so on).
+lighting models (Phong, Ward, Cook-Torrance and so on).
 Sometimes it makes sense to change these functions
 for all the light sources and sometimes only a specific light source
 should behave differently.
 Our approach allows you to do everything mentioned here.
-%% by inserting a piece
-%% of custom shader code into a calculation of a particular function.
-%on a particular object.
+<!--
+by inserting a piece
+of custom shader code into a calculation of a particular function.
+on a particular object.
+-->
 </para>
 
 <para role="figure_2_column">
@@ -210,9 +223,9 @@ shaders. This makes shader programs:</para>
 the full power of a chosen GPU shading language.
 We deliberately do not try to invent here a new language, or wrap existing
 language in some cumbersome limitations.
-%% This is most flexible for authors,
-%% and it also allows an easy implementation &mdash; there is no need for any complex
-%% shading language processing inside the application.</para>
+This is most flexible for authors,
+and it also allows an easy implementation &mdash; there is no need for any complex
+shading language processing inside the application.</para>
 
 </chapter>
 
@@ -234,8 +247,10 @@ and expect the result to be a valid program.</para>
 makes the three shading languages mentioned above available to X3D authors.
 Complete shader code may be assigned to specific shapes.
 Although it does not offer any way of compositing shader effects,
-%the point of this component
-%is to expose functionality that maps straightforward to graphic APIs like OpenGL.
+<!--
+the point of this component
+is to expose functionality that maps straightforward to graphic APIs like OpenGL.
+-->
 this component is still an important base for our work. It defines
 how to comfortably keep shader code inside X3D nodes. It also shows
 how to pass uniform values (including textures) to the shaders.</para>
@@ -247,8 +262,8 @@ However, this is expensive &mdash; in each pass we usually have to repeat
 some work, at least transforming and clipping the geometry.
 It is also not flexible &mdash; we can only modify
 the complete result of the previous pass.
-%% In our work, we want to allow a single rendering pass to be as
-%% powerful as it can.
+In our work, we want to allow a single rendering pass to be as
+powerful as it can.
 Arranging shader functions in a pipeline has similar disadvantages
 as multi-pass rendering, except there's no speed penalty in this case.</para>
 
@@ -276,8 +291,8 @@ algorithm of this layer. </para>
 <para>Sh (<ulink url="http://libsh.org/" />, <xref linkend="bib.sh" />)
 allows writing shader code (that can run on GPU) directly inside a
 C++ program.
-%% For this, Sh extends the C++ language (through C++
-%% operator overloading and macros tricks).
+For this, Sh extends the C++ language (through C++
+operator overloading and macros tricks).
 It allows an excellent
 integration between C++ code and shaders, hiding the ugly details of
 passing variables between normal code (that executes on CPU) and
@@ -307,21 +322,23 @@ language code quickly and the integration is built inside appropriate X3D nodes.
 
 <para>AnySL <xref linkend="bib.anysl" /> allows to integrate internal renderer shaders
 with user shaders, by introducing a new shader language.
-%% This has
-%% advantages (hides the differences between GPU shading languages like
-%% <literal>GLSL</literal> and <literal>HLSL</literal>), but also
-%% On the other hand, we do not introduce
-%% a new shader language, which is both an advantage (easy implementation,
-%% easier to learn) and disadvantage (we do not hide differences e.g. between
-%% ).
-%% We strive to do something more and allow effortless
-%% integration between many user shaders.
-%%
-%% We also try to be simpler as we do not
-%% introduce any new shading language. On the other hand, the disadvantage
-%% of our approach is that we do not hide the differences between various shading languages.
-%% User effects have to be implemented in the same GPU shading language
-%% that is used by the renderer.
+<!-- TODO: use this, uncomment
+  This has
+  advantages (hides the differences between GPU shading languages like
+  <literal>GLSL</literal> and <literal>HLSL</literal>), but also
+  On the other hand, we do not introduce
+  a new shader language, which is both an advantage (easy implementation,
+  easier to learn) and disadvantage (we do not hide differences e.g. between
+  ).
+  We strive to do something more and allow effortless
+  integration between many user shaders.
+
+  We also try to be simpler as we do not
+  introduce any new shading language. On the other hand, the disadvantage
+  of our approach is that we do not hide the differences between various shading languages.
+  User effects have to be implemented in the same GPU shading language
+  that is used by the renderer.
+-->
 </para>
 
 <para>Spark <xref linkend="bib.spark" /> is a recent work presenting a new language to develop
@@ -347,42 +364,42 @@ their own hooks (for use by other modules) and invoke them when appropriate.
 This creates a system where it's trivially easy to define new hooks
 and to use existing hooks.
 Many modules can implement the same hook and cooperate without any problems.
-%% The whole hook system is defined completely in PHP, as it's a scripting
-%% language and we can query the list of loaded functions by name,
-%% and call function by its name.
+The whole hook system is defined completely in PHP, as it's a scripting
+language and we can query the list of loaded functions by name,
+and call function by its name.
 Drupal approach is quite similar to our
 core idea of combining effects. Our effects are similar to
 Drupal's modules and our <quote>plugs</quote> are analogous to Drupal hooks.</para>
 
-<para>%% Our effects can define functions with special names to enhance
-%% the standard shader behavior, just like Drupal modules can define functions
-%% to act on an event from another module.
-%% We can also define new plugs, for other effects to use.
-%% Of course we also have some special problems
-%% (shading language is quite far from a scripting language,
-%% so calling the plugs must be implemented by text replacements)
-%% and some special opportunities (we can define effects at
-%% the appropriate nodes of X3D, like textures and lights sources,
-%% as we do not want to throw all the effects in one bag).</para>
+<para>Our effects can define functions with special names to enhance
+the standard shader behavior, just like Drupal modules can define functions
+to act on an event from another module.
+We can also define new plugs, for other effects to use.
+Of course we also have some special problems
+(shading language is quite far from a scripting language,
+so calling the plugs must be implemented by text replacements)
+and some special opportunities (we can define effects at
+the appropriate nodes of X3D, like textures and lights sources,
+as we do not want to throw all the effects in one bag).</para>
 
 <!--
-% OpenSceneGraph:
-% http://www.openscenegraph.org/projects/osg/wiki/Support/Tutorials/ShadersParameters
-% http://www.openscenegraph.org/projects/osg/wiki/Support/Tutorials/ShadersIntroduction
-% http://mew.cx/osg_glsl_july2005.pdf
-% I see no way to connect shaders?
-%
-% Irrlight &mdash; also no way to connect shaders?
-%
-% Blender Game Engine: no way to connect shaders, Python code can
-% set the final (complete) shader source only?
-% http://download.blender.org/documentation/GE/Blender.htm
-% http://www.blender.org/development/release-logs/blender-248/realtime-glsl-materials/
-% See also source, inside source/gameengine/:
-% ./Ketsji/BL_Shader.h
-% ./Ketsji/BL_Shader.cpp
-% ./Ketsji/BL_BlenderShader.h
-% ./Ketsji/BL_BlenderShader.cpp
+  OpenSceneGraph:
+  http://www.openscenegraph.org/projects/osg/wiki/Support/Tutorials/ShadersParameters
+  http://www.openscenegraph.org/projects/osg/wiki/Support/Tutorials/ShadersIntroduction
+  http://mew.cx/osg_glsl_july2005.pdf
+  I see no way to connect shaders?
+
+  Irrlight &mdash; also no way to connect shaders?
+
+  Blender Game Engine: no way to connect shaders, Python code can
+  set the final (complete) shader source only?
+  http://download.blender.org/documentation/GE/Blender.htm
+  http://www.blender.org/development/release-logs/blender-248/realtime-glsl-materials/
+  See also source, inside source/gameengine/:
+  ./Ketsji/BL_Shader.h
+  ./Ketsji/BL_Shader.cpp
+  ./Ketsji/BL_BlenderShader.h
+  ./Ketsji/BL_BlenderShader.cpp
 -->
 
 </chapter>
@@ -428,17 +445,21 @@ Shape {
 
 <para>Our extensions to X3D are marked with the bold font in the example above.
 The GLSL code inside our extensions is marked with the italic font.
-%% GLSL function names starting with <literal>PLUG_</literal> are special,
-%% they will be automatically called at the appropriate place with appropriate
-%% parameters from the final (automatically generated and used) shader.
+<!--
+GLSL function names starting with <literal>PLUG_</literal> are special,
+they will be automatically called at the appropriate place with appropriate
+parameters from the final (automatically generated and used) shader.
+-->
 The special GLSL function name <literal>PLUG_texture_apply</literal>
 indicates that we use the <literal>texture_apply</literal> plug.
 This particular plug is called right after applying the textures,
 and is the simplest way to <quote>just modify the pixel color</quote>.
-%% The <literal>texture_apply</literal> plug in
-%% the renderer internal shader. This particular plug,
-%% the <literal>PLUG_texture_apply</literal>, is called after the normal texture colors
-%% are applied, but before the alpha test and is a usual place
+<!--
+The <literal>texture_apply</literal> plug in
+the renderer internal shader. This particular plug,
+the <literal>PLUG_texture_apply</literal>, is called after the normal texture colors
+are applied, but before the alpha test and is a usual place
+-->
 <literal>fragment_color</literal> is an <literal>inout</literal> parameter, by modifying it
 we modify the color that will be displayed on the screen.</para>
 
@@ -446,7 +467,7 @@ we modify the color that will be displayed on the screen.</para>
 is on <ulink url="http://castle-engine.sourceforge.net/compositing_shaders.php" />.
 For each plug, like this <literal>PLUG_texture_apply</literal>,
 we define a list of parameters
-%(they have to be declared exactly the same in an effect),
+<!-- (they have to be declared exactly the same in an effect), -->
 and when it is called.</para>
 
 <para>Many usage scenarios are possible:</para>
@@ -1235,33 +1256,30 @@ uniform values and attributes are integrated with X3D fields.</para>
 <para>Many complete example models using our effects
 are referenced from our page on
 <ulink url="http://castle-engine.sourceforge.net/compositing_shaders.php" />.
-%% The relevant demos are mostly inside the <literal>compositing_shaders</literal>
-%% subdirectory, also the <literal>water</literal> subdirectory contains
-%% the mentioned water effects.
 You can open these examples using any of our engine tools,
-like <literal>view3dscene</literal>.</para>
+like <literal>view3dscene</literal>
+(<ulink url="http://castle-engine.sourceforge.net/view3dscene.php" />).</para>
 
-<!--
+<para>You can run <literal>view3dscene</literal> with <literal>--debug-log-shaders</literal> command-line
+option. Output will show you the final shader code generated,
+and also the OpenGL log after linking the shaders.
+Be sure to redirect the output to a file as it may be quite large.
+<!-- and you may want to test it first
+with a simple scene with one shape &mdash; -->
+This is a useful way to learn about our shader rendering internals.</para>
 
-%% You can run <literal>view3dscene</literal> with <literal>- -debug-log-shaders</literal> command-line
-%% option. Output will show you the final shader code generated,
-%% and also the OpenGL log after linking the shaders.
-%% %% Be sure to redirect the output to a file and you may want to test it first
-%% %% with a simple scene with one shape &mdash; as the output may be quite large.
-%% This is a useful way to learn about our shader rendering internals.
-
-%% Another useful option to try in <literal>view3dscene</literal> is to switch to
-%% <emphasis>View &rarr;Shaders &rarr;Enable For Everything</emphasis> mode.
-%% This will force shader rendering for all the shapes,
-%% while by default we use shader rendering only for the shapes that
-%% require particular effects (shaders by <literal>ComposedShader</literal>, effects
-%% described in this paper, shadow maps and such).
-%% Forcing shader rendering for everything allows to see
-%% how our shaders implement the whole X3D lighting and texturing model.
-%% It also forces all the lighting calculation to be done per-pixel, resulting
-%% in perfect specular highlights and spot light shapes.
-
--->
+<para>Another useful option to try in <literal>view3dscene</literal> is to switch to
+<emphasis>View
+<phrase role="symbol">&rarr;</phrase> Shaders
+<phrase role="symbol">&rarr;</phrase> Enable For Everything</emphasis> mode.
+This will force shader rendering for all the shapes,
+while by default we use shader rendering only for the shapes that
+require particular effects (shaders by <literal>ComposedShader</literal>, effects
+described in this paper, shadow maps and such).
+Forcing shader rendering for everything allows to see
+how our shaders implement the whole X3D lighting and texturing model.
+It also forces all the lighting calculation to be done per-pixel, resulting
+in perfect specular highlights and spot light shapes.</para>
 
 </chapter>
 
@@ -1278,34 +1296,34 @@ concept of GLSL, while very useful, is not necessary for proper implementation
 of our effects.
 </para>
 
-<!--
-%% concept, that is specific to GLSL, is useful here:
-%% it forces
-%% cleaner shader code (you cannot use undeclared functions from other
-%% shader parts) and it gives you better line numbers in error messages
-%% (although a pre-processor directive like <literal>#line</literal> could also be used for
-%% this).
+<!-- TODO: review, maybe uncomment:
+concept, that is specific to GLSL, is useful here:
+it forces
+cleaner shader code (you cannot use undeclared functions from other
+shader parts) and it gives you better line numbers in error messages
+(although a pre-processor directive like <literal>#line</literal> could also be used for
+this).
 
-%% and we think that the same set of plugs will be useful for them &mdash; but it's just a theory.
-%% An implementation of our effects for other shading languages may
-%% find other opportunities for plugs.
-%% In particular, we have tested that the <emphasis>separate compilation units</emphasis>
-%% of GLSL are not necessary for a correct implementation of our effects.
-%% We also believe that most of our plugs (like <quote>do something in object space</quote>,
-%% <quote>do something in eye space</quote>) are generic enough to be usable
-%% with all shading languages.
-
-%% for ph.d. uncomment:
-%% Our approach does not cause any speed loss. Effects code is just
-%% combined into the final shader code, without any transformations that
-%% could make it slower. Our process of <quote>combining</quote> effects is essentially
-%% adding function calls around. Fortunately, a function call has no speed
-%% penalty. Existing shading languages are defined
-%% such that functions can always be inlined (there is no recursion allowed,
-%% and parameter qualifiers have simple interpretation),
-%% and as far as we know they are actually always inlined by existing
-%% shading language compilers.
+and we think that the same set of plugs will be useful for them &mdash; but it's just a theory.
+An implementation of our effects for other shading languages may
+find other opportunities for plugs.
+In particular, we have tested that the <emphasis>separate compilation units</emphasis>
+of GLSL are not necessary for a correct implementation of our effects.
+We also believe that most of our plugs (like <quote>do something in object space</quote>,
+<quote>do something in eye space</quote>) are generic enough to be usable
+with all shading languages.
 -->
+
+<para>
+Our approach does not cause any speed loss. Effects code is just
+combined into the final shader code, without any transformations that
+could make it slower. Our process of <quote>combining</quote> effects is essentially
+adding function calls around. Fortunately, a function call has no speed
+penalty. Existing shading languages are defined
+such that functions can always be inlined (there is no recursion allowed,
+and parameter qualifiers have simple interpretation),
+and as far as we know they are actually always inlined by existing
+shading language compilers.</para>
 
 </chapter>
 
@@ -1329,9 +1347,9 @@ content authors. We have implemented our approach for the GLSL shading language.
 <title>Acknowledgements</title>
 
 <para>
-%% A lot of people helped and encouraged the development of our VRML/X3D engine,
-%% with it's rendering features and extensions. A big <quote>thank you</quote>
-%% goes to all of you.
+A lot of people helped and encouraged the development of our VRML/X3D engine,
+with it's rendering features and extensions. A big <quote>thank you</quote>
+goes to all of you!
 </para>
 
 </chapter>

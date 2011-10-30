@@ -112,6 +112,14 @@
   </fo:inline>
 </xsl:template>
 
+<!-- Make <phrase role="symbol"> use the symbol font, that has some
+     special characters. -->
+<xsl:template match="phrase[@role='symbol']">
+  <fo:inline font-family="Symbol">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+
 <!-- Set slightly lighter background on <screen> (default is E0E0E0)
      and add border. -->
 <xsl:attribute-set name="shade.verbatim.style">
