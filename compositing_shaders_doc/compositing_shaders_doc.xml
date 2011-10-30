@@ -320,12 +320,12 @@ with user shaders, by introducing a new shader language.
 <para>Spark <xref linkend="bib.spark" /> is a recent work presenting a new language to develop
 composable shaders for GPU.</para>
 
-<para>%% \cite{web3d2010:declarativeshader} presents a declarative approach
-%% to an advanced shader in X3D. However, it only allows a fixed set
-%% of functionality, kind od <quote>advanced and exhanced material</quote>.
-%% It does not expose any shader functionality to the authors.
-%% It merely allows the authors to use some advanced algorithms that in practice
-%% will be usually implemented by shaders inside the application.
+<para><xref linkend="bib.web3d2010.declarativeshader" /> presents a declarative approach
+to an advanced shader in X3D. However, it only allows a fixed set
+of functionality, kind of an <emphasis>advanced and exhanced material</emphasis>.
+It does not expose any shader functionality to the authors.
+It merely allows the authors to use some advanced algorithms that in practice
+will be usually implemented by shaders inside the application.
 </para>
 
 <para>At the end, we would like to mention a solution from a completely
@@ -458,7 +458,7 @@ and when it is called.</para>
   <listitem><para>Inside the renderer implementation, the same approach can be used
     to implement some internal effects.
     We have reimplemented many internal effects of our engine,
-    like the fog, shadow maps (see \cite{vrmleng:shadowmaps})
+    like the fog, shadow maps (see our shadow mapping extensions for X3D <xref linkend="bib.castleengine.shadowmaps" />)
     and the bump mapping to use our <quote>plugs</quote> approach.
     This made their implementation very clean, short
     and nicely separated from each other.
@@ -667,7 +667,7 @@ and easy implementation of the standard <literal>LocalFog</literal> node.</para>
 
 <para>As one of the demos, we have implemented a realistic
 animated volumetric fog, where the fog density is stored in
-a 3D smooth noise texture (idea from \cite{humus:volumetricfog}).
+a 3D smooth noise texture (idea from <xref linkend="bib.humus.volumetricfog" />).
 In a fragment shader, the 3D&nbsp;texture is sampled
 along the line between the camera and pixel position in the 3D&nbsp;space. This makes a very
 convincing effect of a dense fog. The <literal>Effect</literal> node with
@@ -816,7 +816,7 @@ can be explicitly specified, just like for any other texture in X3D.
 %% Note that our engine has some extensions to allow
 %% the <literal>"BOUNDS2D"</literal> and <literal>"BOUNDS3D"</literal> values to be also
 %% used for the <literal>TextureCoordinateGenerator.mode</literal> field, see
-%% \cite{vrmleng:texcoordbounds}.
+%% <xref linkend="bib.castleengine.texcoordbounds" />.
 When the texture coordinates are not explicitly given,
 the <literal>defaultTexCoord</literal> field determines how they are generated.
 <literal>"BOUNDS2D"</literal> generates 2D texture coordinates,
@@ -839,7 +839,7 @@ the <emphasis>Texturing3D</emphasis> component of the X3D specification.</para>
 %% as any other texture node.</para>
 
 <para>%% Projective texture mapping by <literal>ProjectedTextureCoordinate</literal>
-%% is also our extension, see \cite{vrmleng:projectivetexturing}.</para>
+%% is also our X3D extension, see <xref linkend="bib.castleengine.projectivetexturing" />.</para>
 </section>
 
 <section id="section.when_use_shader_texture">
@@ -1084,7 +1084,7 @@ animated effects.</para>
 <para>We can wrap 2D or 3D noise inside a <literal>ShaderTexture</literal>
 (see figure \ref{figure.noise}).
 A texture node like <literal>NoiseTexture</literal> from InstantReality
-\cite{instant:noisetex}
+<xref linkend="bib.instantreality.noisetex" />
 may be implemented on GPU by a simple prototype using the <literal>ShaderTexture</literal>.
 </para>
 
@@ -1325,7 +1325,8 @@ content authors. We have implemented our approach for the GLSL shading language.
 
 </chapter>
 
-<bibliography><title>References</title>
+<bibliography id="bibliography">
+<title>References</title>
 
 <!-- <bibliodiv><title>Books</title> -->
 
@@ -1407,8 +1408,7 @@ content authors. We have implemented our approach for the GLSL shading language.
     <title>Proceedings of the Conference on High Performance Graphics</title>.
     <publishername>Eurographics Association</publishername>, <pubdate>2010</pubdate>.
   </bibliomset>
-  <bibliomisc>See also <ulink url="http://www.cdl.uni-saarland.de/projects/anysl/" /></bibliomisc>
-  <!-- bibtex on http://portal.acm.org/citation.cfm?id=1921479.1921495 -->
+  <bibliomisc>See <ulink url="http://portal.acm.org/citation.cfm?id=1921479.1921495" />. See also AnySL website <ulink url="http://www.cdl.uni-saarland.de/projects/anysl/" />.</bibliomisc>
 </bibliomixed>
 
 <bibliomixed id="bib.spark">
@@ -1418,85 +1418,76 @@ content authors. We have implemented our approach for the GLSL shading language.
     <title role='article'>Spark: Modular, Composable Shaders for Graphics Hardware</title>.
   </bibliomset>
   <bibliomset relation='journal'>
-    <title>Proceedings of SIGGRAPH 2011</title>
+    <title>Proceedings of SIGGRAPH 2011</title>.
     <publishername>ACM</publishername>, <pubdate>2011</pubdate>.
   </bibliomset>
+  <bibliomisc>See <ulink url="http://graphics.stanford.edu/papers/spark/" />.</bibliomisc>
 </bibliomixed>
 
-<!--
-@inproceedings{vrmleng:shadowmaps,
-  author = {Kamburelis, Michalis},
-  title = "{Shadow maps and projective texturing in X3D}",
-  booktitle = {Proceedings of the 15th International Conference on Web 3D Technology},
-  series = {Web3D '10},
-  year = {2010},
-  isbn = {978-1-4503-0209-8},
-  location = {Los Angeles, California},
-  pages = {17- -26},
-  numpages = {10},
-  url = {http://doi.acm.org/10.1145/1836049.1836052},
-  doi = {http://doi.acm.org/10.1145/1836049.1836052},
-  acmid = {1836052},
-  publisher = {ACM},
-  address = {New York, NY, USA},
-  keywords = {X3D graphics, projective texturing, shadow maps, shadows},
-}
+<bibliomixed id="bib.castleengine.shadowmaps">
+  <abbrev>X3D Shadow Maps</abbrev>
+  <bibliomset relation='article'>
+    <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
+    <title role='article'>Shadow maps and projective texturing in X3D</title>.
+  </bibliomset>
+  <bibliomset relation='journal'>
+    <title>Proceedings of the 15th International Conference on Web 3D Technology</title>.
+    <publishername>ACM</publishername>, <pubdate>2010</pubdate>.
+  </bibliomset>
+  <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions_shadow_maps.php" />.</bibliomisc>
+</bibliomixed>
 
-%% misc{vrmleng:bumpmapping,
-%%   title = "{Bump mapping extensions}",
-%%   author = "Michalis Kamburelis",
-%%   year = "2008",
-%%   howpublished = "\webLink{http://vrmlengine.sourceforge.net/x3d_extensions.php#section_ext_bump_mapping}"
-%% }
+<bibliomixed id="bib.castleengine.bumpmapping">
+  <abbrev>X3D Bump Mapping</abbrev>
+  <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
+  <title><emphasis>Bump mapping extensions</emphasis></title>.
+  <pubdate>2008</pubdate>.
+  <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_bump_mapping" /></bibliomisc>
+</bibliomixed>
 
-@misc{humus:volumetricfog,
-  title = "{Volumetric Fogging 2}",
-  author = {Emil Persson},
-  year = "2006",
-  howpublished = "\webLink{http://www.humus.name/index.php?page=3D&ID=70}"
-}
-%% "Humus"
-%% ; nice overview also on \webLink{http://www.evl.uic.edu/sjames/cs525/shader.html}
+<bibliomixed id="bib.humus.volumetricfog">
+  <abbrev>Volumetric Fog</abbrev>
+  <firstname>Emil</firstname> <surname>Persson</surname> "Humus".
+  <title><emphasis>Volumetric Fogging 2</emphasis></title>.
+  <pubdate>2006</pubdate>.
+  <bibliomisc>See <ulink url="http://www.humus.name/index.php?page=3D&amp;ID=70" />. Nice overview also on <ulink url="http://www.evl.uic.edu/sjames/cs525/shader.html" />.</bibliomisc>
+</bibliomixed>
 
-%% misc{vrmleng:texcoordbounds,
-%%   title = "Tex coord generation dependent on bounding box",
-%%   author = "Michalis Kamburelis",
-%%   year = "2010",
-%%   howpublished = "\webLink{http://vrmlengine.sourceforge.net/x3d_extensions.php\#section_ext_tex_coord_bounds}"
-%% }
+<bibliomixed id="bib.castleengine.texcoordbounds">
+  <abbrev>X3D TexCoord Bounds</abbrev>
+  <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
+  <title><emphasis>Tex coord generation dependent on bounding box</emphasis></title>.
+  <pubdate>2010</pubdate>.
+  <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_tex_coord_bounds" />.</bibliomisc>
+</bibliomixed>
 
-%% misc{vrmleng:projectivetexturing,
-%%   title = "Projective texture mapping",
-%%   author = "Michalis Kamburelis",
-%%   year = "2010",
-%%   howpublished = "\webLink{http://vrmlengine.sourceforge.net/x3d_extensions_shadow_maps.php\#section_texture_projective}"
-%% }
+<bibliomixed id="bib.castleengine.projectivetexturing">
+  <abbrev>X3D Projective Texturing</abbrev>
+  <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
+  <title><emphasis>Projective texture mapping</emphasis></title>.
+  <pubdate>2010</pubdate>.
+  <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions_shadow_maps.php#section_texture_projective" />.</bibliomisc>
+</bibliomixed>
 
-@misc{instant:noisetex,
-  title = "{NoiseTexture}",
-  author = "{Instant Reality}",
-  howpublished = "\webLink{http://doc.instantreality.org/documentation/nodetype/NoiseTexture/}"
-}
+<bibliomixed id="bib.instantreality.noisetex">
+  <abbrev>NoiseTexture</abbrev>
+  <author><othername>Instant Reality</othername></author>.
+  <title><emphasis>NoiseTexture</emphasis></title>.
+  <bibliomisc>See <ulink url="http://doc.instantreality.org/documentation/nodetype/NoiseTexture/" />.</bibliomisc>
+</bibliomixed>
 
-@inproceedings{web3d2010:declarativeshader,
-  author = {Schwenk, Karsten and Jung, Yvonne and Behr, Johannes and Fellner, Dieter W.},
-  title = {A modern declarative surface shader for X3D},
-  booktitle = {Proceedings of the 15th International Conference on Web 3D Technology},
-  series = {Web3D '10},
-  year = {2010},
-  isbn = {978-1-4503-0209-8},
-  location = {Los Angeles, California},
-  pages = {7- -16},
-  numpages = {10},
-  url = {http://doi.acm.org/10.1145/1836049.1836051},
-  doi = {http://doi.acm.org/10.1145/1836049.1836051},
-  acmid = {1836051},
-  publisher = {ACM},
-  address = {New York, NY, USA},
-  keywords = {X3D, declarative shader, material description},
-}
-
--->
+<bibliomixed id="bib.web3d2010.declarativeshader">
+  <abbrev>X3D DeclarativeShader</abbrev>
+  <bibliomset relation='article'>
+    Karsten Schwenk, Yvonne Jung, Johannes Behr and Dieter W. Fellner.
+    <title role='article'>A modern declarative surface shader for X3D</title>.
+  </bibliomset>
+  <bibliomset relation='journal'>
+    <title>Proceedings of the 15th International Conference on Web 3D Technology</title>.
+    <publishername>ACM</publishername>, <pubdate>2010</pubdate>.
+  </bibliomset>
+  <bibliomisc>See <ulink url="http://doi.acm.org/10.1145/1836049.1836051" />.</bibliomisc>
+</bibliomixed>
 
 </bibliography>
 
