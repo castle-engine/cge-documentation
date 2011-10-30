@@ -120,4 +120,8 @@
   <xsl:attribute name="padding">0.05in</xsl:attribute>
 </xsl:attribute-set>
 
+<!-- Without this, tables in FO have internal frames, even when frame="none"
+     was used. -->
+<xsl:param name="table.cell.border.style">none</xsl:param>
+
 </xsl:stylesheet>
