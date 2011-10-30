@@ -125,6 +125,7 @@ Our approach allows you to do everything mentioned here.
 %on a particular object.
 </para>
 
+<para role="figure_2_column">
 <figure id="figure.bump_mapping_shadows">
   <title>Japanese shrine model with more and more effects applied.
 The model is based on <ulink url="http://opengameart.org/content/shrine-shinto-japan"/>.</title>
@@ -183,6 +184,7 @@ The model is based on <ulink url="http://opengameart.org/content/shrine-shinto-j
   </tgroup>
 </informaltable>
 </figure>
+</para>
 
 <para>We present a system for creating effects by essentially compositing
 pieces of a shader code. All the effects defined this way effortlessly
@@ -679,6 +681,7 @@ convincing effect of a dense fog. The <literal>Effect</literal> node with
 appropriate shader code is placed at the top level of the X3D file,
 so it simply works for all shapes. See <xref linkend="figure.fog" />.</para>
 
+<para role="figure_2_column">
 <figure id="figure.fog">
   <title>Volumetric fog with animated density.</title>
 
@@ -716,6 +719,7 @@ so it simply works for all shapes. See <xref linkend="figure.fog" />.</para>
   </tgroup>
 </informaltable>
 </figure>
+</para>
 
 </section>
 
@@ -1146,6 +1150,7 @@ and what they have in common.</para>
 %% in real-time.)
 -->
 
+<para role="figure_2_column">
 <figure id="figure.water">
   <title>Water using our effects framework.</title>
 
@@ -1187,6 +1192,7 @@ and what they have in common.</para>
   </tgroup>
 </informaltable>
 </figure>
+</para>
 
 <para>
 We also have plugs to change the geometry in object space.

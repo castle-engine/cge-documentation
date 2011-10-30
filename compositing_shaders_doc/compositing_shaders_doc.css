@@ -24,3 +24,25 @@ pre.screen span.underline {
 
 /* To make fog figures look good, otherwise the text stretches them too much. */
 div.figure-contents table td { max-width: 400px; vertical-align: top; }
+
+/* <figure> inside <para role="figure_2_column"> is assumed to be wider */
+p.figure_2_column + div.figure {
+  border: 1px solid black;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-bottom: 1em;
+
+  /* This must be synchronized with HTML image size set by images/html/Makefile */
+  width: 850px;
+}
+
+div.figure {
+  border: 1px solid black;
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-bottom: 1em;
+
+  /* This must be synchronized with HTML image size set by images/html/Makefile */
+  width: 450px;
+}
+
