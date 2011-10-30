@@ -1328,8 +1328,6 @@ content authors. We have implemented our approach for the GLSL shading language.
 <bibliography id="bibliography">
 <title>References</title>
 
-<!-- <bibliodiv><title>Books</title> -->
-
 <bibliomixed id="bib.x3d">
   <abbrev>X3D</abbrev>
   <author><othername>Web3D Consortium</othername></author>.
@@ -1351,24 +1349,6 @@ content authors. We have implemented our approach for the GLSL shading language.
   </bibliomset>
   <bibliomisc>Available online as part of the X3D specification, see <ulink url="http://web3d.org/x3d/specifications/ISO-IEC-19775-1.2-X3D-AbstractSpecification/Part01/components/shaders.html" /></bibliomisc>
 </bibliomixed>
-
-<bibliomixed id="bib.ogre_shader">
-  <abbrev>OGRE Shader</abbrev>
-  <title><emphasis>OGRE Wiki - RT Shader System</emphasis></title>.
-  <bibliomisc>See <ulink url="http://www.ogre3d.org/tikiwiki/RT+Shader+System&amp;structure=Development" />.</bibliomisc>
-</bibliomixed>
-
-<bibliomixed id="bib.sh">
-  <abbrev>Sh</abbrev>
-  Stefanus Du Toit and Michael McCool.
-  <title><emphasis>Metaprogramming GPUs with Sh</emphasis></title>.
-  <publishername>A K Peters/CRC Press</publishername>, <pubdate>2004</pubdate>.
-</bibliomixed>
-
-<!-- Links to "Metaprogramming GPUs with Sh":
- http://www.amazon.com/Metaprogramming-GPUs-Sh-Stefanus-Toit/dp/1568812299
- http://books.google.com/books?id=8RX4RmFRLmgC&pg=PA79&lpg=PA79&dq=ShAttrib2f&source=bl&ots=IOxd1-BQLL&sig=AIPgFRmbodNpCLWmwk-QV5JUjVo&hl=pl&ei=EylRTe7RB8qeOsiQ1aQI&sa=X&oi=book_result&ct=result&resnum=7&ved=0CEkQ6AEwBg#v=onepage&q=ShAttrib2f&f=false
--->
 
 <bibliomixed id="bib.glsl">
   <abbrev>GLSL</abbrev>
@@ -1398,6 +1378,23 @@ content authors. We have implemented our approach for the GLSL shading language.
   <bibliomisc>See <ulink url="http://msdn.microsoft.com/en-us/library/bb509561\%28v=vs.85\%29.aspx" />.</bibliomisc>
 </bibliomixed>
 
+<bibliomixed id="bib.sh">
+  <abbrev>Sh</abbrev>
+  Stefanus Du Toit and Michael McCool.
+  <title><emphasis>Metaprogramming GPUs with Sh</emphasis></title>.
+  <publishername>A K Peters/CRC Press</publishername>, <pubdate>2004</pubdate>.
+  <!-- Links to "Metaprogramming GPUs with Sh":
+   http://www.amazon.com/Metaprogramming-GPUs-Sh-Stefanus-Toit/dp/1568812299
+   http://books.google.com/books?id=8RX4RmFRLmgC&pg=PA79&lpg=PA79&dq=ShAttrib2f&source=bl&ots=IOxd1-BQLL&sig=AIPgFRmbodNpCLWmwk-QV5JUjVo&hl=pl&ei=EylRTe7RB8qeOsiQ1aQI&sa=X&oi=book_result&ct=result&resnum=7&ved=0CEkQ6AEwBg#v=onepage&q=ShAttrib2f&f=false
+  -->
+</bibliomixed>
+
+<bibliomixed id="bib.ogre_shader">
+  <abbrev>OGRE Shader</abbrev>
+  <title><emphasis>OGRE Wiki - RT Shader System</emphasis></title>.
+  <bibliomisc>See <ulink url="http://www.ogre3d.org/tikiwiki/RT+Shader+System&amp;structure=Development" />.</bibliomisc>
+</bibliomixed>
+
 <bibliomixed id="bib.anysl">
   <abbrev>AnySL</abbrev>
   <bibliomset relation='article'>
@@ -1424,6 +1421,27 @@ content authors. We have implemented our approach for the GLSL shading language.
   <bibliomisc>See <ulink url="http://graphics.stanford.edu/papers/spark/" />.</bibliomisc>
 </bibliomixed>
 
+<bibliomixed id="bib.web3d2010.declarativeshader">
+  <abbrev>X3D DeclarativeShader</abbrev>
+  <bibliomset relation='article'>
+    Karsten Schwenk, Yvonne Jung, Johannes Behr and Dieter W. Fellner.
+    <title role='article'>A modern declarative surface shader for X3D</title>.
+  </bibliomset>
+  <bibliomset relation='journal'>
+    <title>Proceedings of the 15th International Conference on Web 3D Technology</title>.
+    <publishername>ACM</publishername>, <pubdate>2010</pubdate>.
+  </bibliomset>
+  <bibliomisc>See <ulink url="http://doi.acm.org/10.1145/1836049.1836051" />.</bibliomisc>
+</bibliomixed>
+
+<bibliomixed id="bib.humus.volumetricfog">
+  <abbrev>Volumetric Fog</abbrev>
+  <firstname>Emil</firstname> <surname>Persson</surname> "Humus".
+  <title><emphasis>Volumetric Fogging 2</emphasis></title>.
+  <pubdate>2006</pubdate>.
+  <bibliomisc>See <ulink url="http://www.humus.name/index.php?page=3D&amp;ID=70" />. Nice overview also on <ulink url="http://www.evl.uic.edu/sjames/cs525/shader.html" />.</bibliomisc>
+</bibliomixed>
+
 <bibliomixed id="bib.castleengine.shadowmaps">
   <abbrev>X3D Shadow Maps</abbrev>
   <bibliomset relation='article'>
@@ -1443,14 +1461,6 @@ content authors. We have implemented our approach for the GLSL shading language.
   <title><emphasis>Bump mapping extensions</emphasis></title>.
   <pubdate>2008</pubdate>.
   <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_bump_mapping" /></bibliomisc>
-</bibliomixed>
-
-<bibliomixed id="bib.humus.volumetricfog">
-  <abbrev>Volumetric Fog</abbrev>
-  <firstname>Emil</firstname> <surname>Persson</surname> "Humus".
-  <title><emphasis>Volumetric Fogging 2</emphasis></title>.
-  <pubdate>2006</pubdate>.
-  <bibliomisc>See <ulink url="http://www.humus.name/index.php?page=3D&amp;ID=70" />. Nice overview also on <ulink url="http://www.evl.uic.edu/sjames/cs525/shader.html" />.</bibliomisc>
 </bibliomixed>
 
 <bibliomixed id="bib.castleengine.texcoordbounds">
@@ -1474,19 +1484,6 @@ content authors. We have implemented our approach for the GLSL shading language.
   <author><othername>Instant Reality</othername></author>.
   <title><emphasis>NoiseTexture</emphasis></title>.
   <bibliomisc>See <ulink url="http://doc.instantreality.org/documentation/nodetype/NoiseTexture/" />.</bibliomisc>
-</bibliomixed>
-
-<bibliomixed id="bib.web3d2010.declarativeshader">
-  <abbrev>X3D DeclarativeShader</abbrev>
-  <bibliomset relation='article'>
-    Karsten Schwenk, Yvonne Jung, Johannes Behr and Dieter W. Fellner.
-    <title role='article'>A modern declarative surface shader for X3D</title>.
-  </bibliomset>
-  <bibliomset relation='journal'>
-    <title>Proceedings of the 15th International Conference on Web 3D Technology</title>.
-    <publishername>ACM</publishername>, <pubdate>2010</pubdate>.
-  </bibliomset>
-  <bibliomisc>See <ulink url="http://doi.acm.org/10.1145/1836049.1836051" />.</bibliomisc>
 </bibliomixed>
 
 </bibliography>
