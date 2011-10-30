@@ -9,6 +9,9 @@ pre.screen {
 
 span.underline { text-decoration: underline; }
 
+/* Make <phrase role="italic"> render as italic */
+span.italic { font-style: italic; }
+
 /* Tests with making underline in <screen> better:
 pre.screen span.underline {
   display: block;

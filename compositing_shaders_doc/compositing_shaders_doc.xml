@@ -371,19 +371,19 @@ PROFILE Interchange
 Shape {
   appearance Appearance {
     material Material { }
-<emphasis role="bold">    effects Effect {</emphasis>
-<emphasis role="bold">      language "GLSL"</emphasis>
-<emphasis role="bold">      parts EffectPart {</emphasis>
-<emphasis role="bold">        type "FRAGMENT"</emphasis>
-<emphasis role="bold">        url "data:text/plain,</emphasis>
-<emphasis role="bold">        <emphasis>void PLUG_texture_apply(</emphasis></emphasis>
-<emphasis role="bold">        <emphasis>  inout vec4 fragment_color,</emphasis></emphasis>
-<emphasis role="bold">        <emphasis>  const in vec3 normal)</emphasis></emphasis>
-<emphasis role="bold">        <emphasis>{</emphasis></emphasis>
-<emphasis role="bold">        <emphasis>  fragment_color.rgb *= 2.0;</emphasis></emphasis>
-<emphasis role="bold">        <emphasis>}</emphasis></emphasis>"
-<emphasis role="bold">      }</emphasis>
-<emphasis role="bold">    }</emphasis>
+<emphasis role="bold">    effects Effect {
+      language "GLSL"
+      parts EffectPart {
+        type "FRAGMENT"
+        url "data:text/plain,
+        <phrase role="italic">void PLUG_texture_apply(
+          inout vec4 fragment_color,
+          const in vec3 normal)
+        {
+          fragment_color.rgb *= 2.0;
+        }</phrase>"
+      }
+    }</emphasis>
   }
   geometry Sphere { }
 }

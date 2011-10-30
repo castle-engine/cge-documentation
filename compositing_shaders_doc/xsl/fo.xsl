@@ -103,6 +103,15 @@
   </fo:inline>
 </xsl:template>
 
+<!-- Make <phrase role="italic"> work as italic.
+     Sometimes <emphasis> doesn't work for this, it tries to be too smart
+     when it's inside <emphasis role="bold"> for FO output. -->
+<xsl:template match="phrase[@role='italic']">
+  <fo:inline font-style="italic">
+    <xsl:apply-templates/>
+  </fo:inline>
+</xsl:template>
+
 <!-- Set slightly lighter background on <screen> (default is E0E0E0)
      and add border. -->
 <xsl:attribute-set name="shade.verbatim.style">
