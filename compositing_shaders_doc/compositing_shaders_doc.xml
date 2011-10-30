@@ -1365,18 +1365,18 @@ content authors. We have implemented our approach for the GLSL shading language.
  http://books.google.com/books?id=8RX4RmFRLmgC&pg=PA79&lpg=PA79&dq=ShAttrib2f&source=bl&ots=IOxd1-BQLL&sig=AIPgFRmbodNpCLWmwk-QV5JUjVo&hl=pl&ei=EylRTe7RB8qeOsiQ1aQI&sa=X&oi=book_result&ct=result&resnum=7&ved=0CEkQ6AEwBg#v=onepage&q=ShAttrib2f&f=false
 -->
 
-<bibliomixed id="bib.glsl_book">
-  <abbrev>GLSL Book</abbrev>
-  Randi J. Rost.
-  <title><emphasis>OpenGL Shading Language</emphasis></title>.
-  <publishername>Addison-Wesley</publishername>, <pubdate>2004</pubdate>.
-</bibliomixed>
-
 <bibliomixed id="bib.glsl">
   <abbrev>GLSL</abbrev>
   Khronos Group.
   <title><emphasis>OpenGL Shading Language</emphasis></title>.
   <bibliomisc>See <ulink url="http://www.opengl.org/documentation/glsl/" />.</bibliomisc>
+</bibliomixed>
+
+<bibliomixed id="bib.glsl_book">
+  <abbrev>GLSL Book</abbrev>
+  Randi J. Rost.
+  <title><emphasis>OpenGL Shading Language</emphasis></title>.
+  <publishername>Addison-Wesley</publishername>, <pubdate>2004</pubdate>.
 </bibliomixed>
 
 <bibliomixed id="bib.cg">
