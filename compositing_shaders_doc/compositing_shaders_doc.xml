@@ -884,11 +884,15 @@ to the first <literal>texture_color</literal> plug.</para>
 <para>Note that the shader effects for textures are calculated at each screen fragment
 (not at each texel). So the effects are not concerned about the texture size
 or texture filtering options. We can just use the interpolated texture
-coordinates in the <literal>texture_color</literal> plug.</para>
+coordinates in the <literal>texture_color</literal> plug.
+Figure \ref{figure.shader_texture_no_filtering_problems}
+shows a yellow arc drawn on a texture by our effect.
+As you can see, the arc is drawn perfectly, without any concern about
+the pixel resolution of the underlying texture.
+</para>
 
 <figure id="figure.shader_texture_no_filtering_problems">
-  <title>Yellowish arc is done by a texture effect, and so is not
-    affected by the pixelated look of the base image texture.</title>
+  <title>Texture effects are not concerned with small texture resolution.</title>
   <mediaobject>
   <imageobject role="html"> <imagedata format="PNG" fileref="images/shader_texture_no_filtering_problems.png" /> </imageobject>
   <imageobject role="fo">   <imagedata format="PNG" fileref="images/shader_texture_no_filtering_problems.png" width="3in" contentwidth="3in" /> </imageobject>
