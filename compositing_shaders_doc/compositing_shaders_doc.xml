@@ -652,16 +652,20 @@ MFNode [] <emphasis role="bold">effects</emphasis> [] # Effect
 </screen>
 
 <para>All the effects on this list (with suitable language) will be used.
-%% Note that this is different
-%% than the <literal>Appearance.shaders</literal>, which chooses only one shader.
-%% For effects, we choose all of them.
+<!--
+Note that this is different
+than the <literal>Appearance.shaders</literal>, which chooses only one shader.
+For effects, we choose all of them.
+-->
 This allows authors to define a library of independent shader effects
 and then trivially pick desired effects for each particular shape.
 Simply placing two effects on the <literal>Appearance.effects</literal> list
 makes them cooperate correctly.
-%% . This also allows to
-%% define a library of effects, that can be composited without any work
-%% needed by user.</para>
+<!--
+. This also allows to
+define a library of effects, that can be composited without any work
+needed by user.
+--></para>
 
 <figure id="figure.toon_and_fresnel">
   <title>Toon and Fresnel effects combined.</title>
@@ -759,6 +763,14 @@ For example the spot light shape can be modified, possibly
 based on some texture information (see <xref linkend="figure.fancy_spot" />).
 Or a different lighting model may be implemented, like anisotropic Ward
 or Cook-Torrance.
+<!--
+<para>,
+or even replace the default
+calculation of the light source contribution. In the second case,
+the default calculation will not even be used in the shader,
+so it will not slow down the calculation without a reason.</para>
+Removed: replacing not really implemented now, not needed.
+-->
 To make this possible, the <literal>effects</literal> field is added to every light node:</para>
 
 <screen><phrase role="underline">X3DLightNode</phrase>
@@ -774,10 +786,6 @@ MFNode [] <emphasis role="bold">effects</emphasis> [] # Effect
   </mediaobject>
 </figure>
 
-<para>%% , or even replace the default
-%% calculation of the light source contribution. In the second case,
-%% the default calculation will not even be used in the shader,
-%% so it will not slow down the calculation without a reason.</para>
 </section>
 
 <section id="section.effects_on_texture">
@@ -802,8 +810,10 @@ taking into account the current texture coordinates and other information.</para
 
 <para>A new X3D node <literal>ShaderTexture</literal> is available for creating
 procedural textures using the GPU shading languages.
-%% This is suitable
-%% if the texture is defined completely using the shading language.
+<!--
+This is suitable
+if the texture is defined completely using the shading language.
+-->
 The texture contents are not stored anywhere (not even on GPU)
 and the renderer does not manage any texture resources.
 From a GPU point of view, there is no texture.
@@ -974,10 +984,12 @@ expressed as a loop, but it had to be unrolled for shader source
 (for example, to slightly tweak some loop iterations).
 The plug names that are available per-light source and per-texture
 are an example of this.
-%% If you use the <literal>PLUG_texture_color</literal>
-%% inside <literal>Appearance.effects</literal>, you change the color of all
-%% the textures (even shader textures).
-%% Not really available, as params to texture_color differ.
+<!--
+If you use the <literal>PLUG_texture_color</literal>
+inside <literal>Appearance.effects</literal>, you change the color of all
+the textures (even shader textures).
+Removed: Not really available, as params to texture_color differ.
+-->
 Using the <literal>PLUG_light_scale</literal>
 inside <literal>Appearance.effects</literal>, the intensity
 of all the light sources on the given shape can be changed. Contrast this with using
@@ -1011,15 +1023,15 @@ that do not support our extensions.</para>
 <section id="section.forward_declarations">
 <title>Forward declarations</title>
 
-<para>Suppose we have an effect&nbsp;<emphasis>X</emphasis> that defines a new plug.
-%, by includes a magic <literal>/* PLUG: ... */</literal> comment.
+<para>Suppose we have an effect&nbsp;<emphasis>X</emphasis> that defines a new plug,
+by including a magic <literal>/* PLUG: ... */</literal> comment.
 When this plug is used by another effect&nbsp;<emphasis>Y</emphasis>,
 then an appropriate function call is automatically inserted into the generated shader.
 In the middle of the source code of effect&nbsp;<emphasis>X</emphasis>,
 a function defined in effect&nbsp;<emphasis>Y</emphasis> has to be called. This is the simplest
-implementation of our plugs.
-% Would be nice to have here a space for paragraph break...
-Additionally, a forward or external declaration of the called function
+implementation of our plugs.</para>
+
+<para>Additionally, a forward or external declaration of the called function
 may need to be inserted into the effect&nbsp;<emphasis>X</emphasis>. That is because&nbsp;<emphasis>Y</emphasis>
 may be in a separate compilation unit (in case of GLSL),
 or just defined lower in the code. In simple cases, such forward or external
@@ -1035,15 +1047,15 @@ is available.
 If present, it signifies a place where forward or external declarations
 should be inserted.</para>
 
-<!-- %% because it may
-%% These (forward or external) declarations are inserted at
-%% the point of special <literal>/* PLUG-DECLARATIONS */</literal>
-%% comment, or (when it is missing) simply at the beginning of shader source.
-%% This applies in the same way to shader code inside an <literal>EffectPart</literal>,
-%% or inside standard X3D node like <literal>ShaderPart</literal>.
+<!--
+These (forward or external) declarations are inserted at
+the point of special <literal>/* PLUG-DECLARATIONS */</literal>
+comment, or (when it is missing) simply at the beginning of shader source.
+This applies in the same way to shader code inside an <literal>EffectPart</literal>,
+or inside standard X3D node like <literal>ShaderPart</literal>.
 
-%% <literal>/* PLUG-DECLARATIONS */</literal> should be placed after such directives
-%% and before any <literal>/* PLUG: ... */</literal> declarations.
+<literal>/* PLUG-DECLARATIONS */</literal> should be placed after such directives
+and before any <literal>/* PLUG: ... */</literal> declarations.
 -->
 
 </section>
@@ -1053,46 +1065,63 @@ should be inserted.</para>
 
 <para>The behavior is defined only if the provided shading language code
 is a correct, self-contained code. The errors (like unterminated block)
-%%  (<quote><literal>{</literal></quote> without matching <quote><literal>\</literal>}</quote>)
-%% ,
-%% or an unterminated comment)
+<!-- or an unterminated comment) -->
 may only be detected after the complete shader
 is determined and compiled by the GPU.
 It should be noted that for shading languages with separate compilation units,
 the parsing errors can be at least reported always for the correct code piece
 (effect part).</para>
 
+<para>An invalid effect code may disable
+all other user effects on the given shape. That is because
+there's no reliable way to detect which user effect prevents the compilation.
+At least for shading languages
+without the <emphasis>separate compilation units</emphasis> feature.
+In such case, the application may decide to disable <emphasis>all</emphasis>
+user-provided effects for given shape.
+However, this isn't exactly a new problem &mdash; bad shader code
+may always cause enough trouble to prevent the shape from being sensibly rendered.</para>
+
+<!--
+<para>It also isn't a security problem &mdash;
+X3D <literal>ComposedShader</literal> node allows users
+to execute any shading language code anyway. So if there's anything dangerous
+(for example a buggy OpenGL may cause the browser process to exit with
+segmentation fault on some special shader code snippets),
+it could be done without using our effects as well.
+This is the same security challenge as the new WebGL is facing &mdash;
+some bugs in 3D libraries (like OpenGL) become security problems when
+the file author has flexibility to (almost directly) issue OpenGL
+calls or provide custom shader code.</para>
+-->
+
+<!--
+<para>In all our practical tests, this approach didn't cause any problems.
+Since each effect can be implemented separately, it can also be tested separately,
+and in practice it's usually obvious where to look for the parsing error.</para>
+-->
+
+<!--
+<para>It may be noted that in nasty cases,
+a deliberately poorly coded effect may cause troubles for other effects.
+In particular, since you can use <literal>#define</literal> and macros in your effect code,
+you can do nasty tricks to break other effects. You can make them compile,
+but function incorrectly. However, we do not consider
+it a real problem. You really have to deliberately want to do something bad,
+and be familiar with internals about how the shader is generated,
+to achieve some particular weird behavior.
+It does not happen by accident in our experience.
+Moreover, you may need to use the internal knowledge
+how the other effects are implemented (maybe how they are implemented
+inside the browser).</para>
+-->
+
 <para>The <emphasis role="bold">application does not need to parse the shader code</emphasis> at any point.
 Only a trivial text search in the code is necessary to detect the magic
 plug function names and comments.
-%% Still, an incorrect effect code may cause the whole shader to malfunction.
+<!-- Still, an incorrect effect code may cause the whole shader to malfunction. -->
 </para>
 
-<!--
-%% In all our practical tests, this approach didn't cause any problems.
-%% Since each effect can be implemented separately, it can also be tested separately,
-%% and in practice it's usually obvious where to look for the parsing error.
-
-%% It should be noted however that in particularly nasty cases,
-%% a deliberately poorly coded effect may cause troubles for other effects.
-%% In particular, since you can use <literal>#define</literal> and macros in your effect code,
-%% you can do nasty tricks to break other effects. You can make them compile,
-%% but function incorrectly. However, we do not consider
-%% it a real problem. You really have to deliberately want to do something bad,
-%% and be familiar with internals about how the shader is generated,
-%% to achieve some particular weird behavior.
-%% It does not happen by accident in our experience.
-%% %% Moreover, you may need to use the internal knowledge
-%% %% how the other effects are implemented (maybe how they are implemented
-%% %% inside the browser).
-
-%% Note that this isn't a security problem &mdash; bad shader code only breaks
-%% rendering of a particular shape. Besides, X3D <literal>ComposedShader</literal> node allows users
-%% to execute any shading language code anyway. So if there's anything dangerous
-%% (for example a buggy OpenGL may cause the browser process to exit with
-%% segmentation fault on some special shader code snippets),
-%% you could do it without using our effects framework anyway.
--->
 </section>
 </chapter>
 
@@ -1138,42 +1167,32 @@ heights, or vary per-fragment normal vectors (for best results,
 we want to do both things).
 We also want to simulate the fact that water has reflections and
 is transparent. We have implemented a nice water using this approach,
-with (initially) two independent effect nodes. See <xref linkend="figure.water" />.
-Then we have tested two alternative
-approaches for normal generation (take from pre-recorded series of normal-maps,
-or calculate from a smooth 3D noise). They both generate normal
-vectors in the tangent space, overriding a plug defined by yet another effect
-that transforms normals into the eye space.
+with (initially) two independent effect nodes. See <xref linkend="figure.water" />.</para>
+
+<para>We were also able to easily test
+two alternative approaches for generating water normal vectors.
+One approach was to take normals from the pre-recorded sequence of images
+(encoded inside X3D <literal>MovieTexture</literal>,
+with noise images generated by the <emphasis>Blender</emphasis> renderer).
+The second approach was to calculate normals on the GPU from
+a generated smooth 3D noise.
+The implementation of these two approaches is contained in two separate
+<literal>Effect</literal> nodes, and is concerned
+only with calculating the normal vectors in the object space.
+Yet another <literal>Effect</literal> node is responsible for
+transforming these normal vectors into the eye space.
 This way we have extracted all the common logic into a separate effect,
-making it clear where the alternative normal generation methods differ
-and what they have in common.</para>
+making it clear where the alternative versions differ and what they have
+in common.
+This was possible because one effect can define
+new plug names, that can be used by the other effects.</para>
 
-<!--
-%% Our approach also allowed us to easily implement and test
-%% two alternative versions for generating water normals.
-%% One approach was to take normals from the pre-recorded sequence of images
-%% (encoded inside <literal>MovieTexture</literal>,
-%% with noise images generated by the <emphasis>Blender</emphasis> renderer).
-%% The second approach was to calculate normals on the GPU from
-%% a generated smooth 3D noise. Thanks to our effects system,
-%% we could immediately test our alternative normal vector approaches,
-%% without touching the water reflection / refraction effect.
-%% Moreover, the implementations of these two approaches are concerned
-%% only with calculating the normal vectors in the object space.
-%% They override a special plug of yet another effect, that transforms
-%% these normal vectors into the eye space.
-%% This way we have extracted all the common logic into a separate effect,
-%% making it clear where the alternative versions differ and what they have
-%% in common.
-%% This was possible because one effect can define
-%% new plug names, that can be used by the other effects.
-
-%% (As for the results about which one is better: predictably, we showed
-%% that using GPU noise is slower, requires a better GPU,
-%% but also improves the quality noticeably. With GPU noise, there is no problem
-%% with aliasing of the noise texture and the noise parameters can be adjusted
-%% in real-time.)
--->
+<para>As for the question <quote>Which approach to generating water normals
+turned out to be better?</quote>
+Predictably, we showed that using GPU noise is slower, requires a better GPU,
+but also improves the quality noticeably. With GPU noise, there is no problem
+with aliasing of the noise texture and the noise parameters can be adjusted
+in real-time.</para>
 
 <para role="figure_2_column">
 <figure id="figure.water">
@@ -1221,10 +1240,10 @@ and what they have in common.</para>
 
 <para>
 We also have plugs to change the geometry in object space.
-%% Again, since the effect is integrated with all the browser shaders,
-%% you only need to code a simple function to change the vertex positions
-%% as you want. The effect instantly works with all the lighting and texturing
-%% conditions.
+Again, since the effect is integrated with all the browser shaders,
+you only need to code a simple function to change the vertex positions
+as you want. The effect instantly works with all the lighting and texturing
+conditions.
 Since the transformation is done on GPU, there's practically
 no speed penalty for animating thousands of flowers in our test scene.
 See <xref linkend="figure.flowers" />.
@@ -1240,14 +1259,17 @@ See <xref linkend="figure.flowers" />.
 
 <para>We would like to emphasize that all the effects demonstrated here
 are theoretically already possible to implement using the standard
-X3D <emphasis>Programmable shaders component</emphasis> <xref linkend="bib.x3d_shaders" />. However, such implementation
+X3D <emphasis>Programmable shaders component</emphasis> <xref linkend="bib.x3d_shaders" />.
+However, such implementation
 would be extremely cumbersome.
 You would first have to implement all the necessary multi-texturing, lighting,
 shadows, and other rendering features in a shader code.
 This is a large work if we consider all the X3D rendering options.
 Also note that a shader should remain optimized for a particular setting.
-%% Actually, it isn't even possible, unless we can calculate some global options,
-%% like which light sources and fog nodes affect the given shape.
+<!--
+Actually, it isn't even possible, unless we can calculate some global options,
+like which light sources and fog nodes affect the given shape.
+-->
 The only manageable way to do this, that would work for all the lighting
 and texturing conditions, is to write a shader generator program.
 Which is actually exactly what our effects already do for you &mdash;
