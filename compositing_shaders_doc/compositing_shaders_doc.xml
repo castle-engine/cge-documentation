@@ -350,7 +350,7 @@ composable shaders for GPU.</para>
 
 <para><xref linkend="bib.web3d2010.declarativeshader" /> presents a declarative approach
 to an advanced shader in X3D. However, it only allows a fixed set
-of functionality, kind of an <emphasis>advanced and exhanced material</emphasis>.
+of functionality, kind of an <emphasis>advanced and enhanced material</emphasis>.
 It does not expose any shader functionality to the authors.
 It merely allows the authors to use some advanced algorithms that in practice
 will be usually implemented by shaders inside the application.
@@ -494,19 +494,23 @@ and when it is called.</para>
     and the bump mapping to use our <quote>plugs</quote> approach.
     This made their implementation very clean, short
     and nicely separated from each other.
-    %% It also proves that
-    %% the authors have the power to implement such effects easily by themselves.
+    It also proves that
+    the authors have the power to implement similar effects easily by themselves.
     </para>
 
-    <para>%% without any traditional hassles. For example, bump mapping can be
-    %% achieved using standard <literal>ComposedShader</literal> as well,
-    %% but then you have to write all this <quote>boilerplate</quote> code to also deal
-    %% with all the possible lighting and textures configurations.
-    %% Well, the renderer is still useful to calculate nice tangent vectors,
-    %% although an authoring program could generate GLSL attributes for them as well.</para>
+<!--
+    <para>
+    without any traditional hassles. For example, bump mapping can be
+    achieved using standard <literal>ComposedShader</literal> as well,
+    but then you have to write all this <quote>boilerplate</quote> code to also deal
+    with all the possible lighting and textures configurations.
+    Well, the renderer is still useful to calculate nice tangent vectors,
+    although an authoring program could generate GLSL attributes for them as well.</para>
 
-    <para>%% Same thing with shadow maps, they only plug to the <literal>light_scale</literal>
-    %% calculation of appropriate light.</para>
+    <para>
+    Same thing with shadow maps, they only plug to the <literal>light_scale</literal>
+    calculation of appropriate light.</para>
+-->
     </listitem>
 </orderedlist>
 
@@ -592,8 +596,10 @@ within a <literal>VERTEX</literal> shader.
 If the effect requires some processing per-vertex and some per-fragment,
 it is necessary to use two <literal>EffectPart</literal> nodes, with different types.
 This allows to implement our system for
-%% While this may seem like an arbitrary limitation,
-%% this reflects how shader parts are declared in
+<!--
+While this may seem like an arbitrary limitation,
+this reflects how shader parts are declared in
+-->
 shading languages with
 separate namespaces for vertex and fragment parts (like GLSL).
 A single part may declare many variables and functions,
@@ -614,28 +620,32 @@ It also allows for cleaner error detection (parsing errors will be detected
 inside the given unit).
 </para>
 
-<para>%% We have also considered and rejected a different approach to use plugs.
-%% In that approach, the plug name was indicated by a new field of
-%% the <literal>EffectPart</literal> node, not by a special <literal>PLUG_</literal> function name
-%% inside the shader code.
-%% However, the implementation may need to know the full declaration
-%% of a plug function, to make a forward or external declaration of it.
-%% One way to overcome this problem was to require repeating this declaration
-%% in another field. Another solution was to split shader code into more
-%% parts (for example, one part declares the uniform variables, one part declares
-%% the plug function, one part defines the function body and so on).
-%% Both approaches seemed uncomfortable for authors
-%% and they didn't really offer a simpler implementation, so we dropped this idea.
-%% The current approach, to find the declarations of <literal>PLUG_xxx</literal> functions
-%% inside a complete shader code, is easy to implement and results in clean
-%% shader code of the effects. It also allows us to naturally use
-%% the separate compilation units in case of GLSL.</para>
+<!--
+<para>
+We have also considered and rejected a different approach to use plugs.
+In that approach, the plug name was indicated by a new field of
+the <literal>EffectPart</literal> node, not by a special <literal>PLUG_</literal> function name
+inside the shader code.
+However, the implementation may need to know the full declaration
+of a plug function, to make a forward or external declaration of it.
+One way to overcome this problem was to require repeating this declaration
+in another field. Another solution was to split shader code into more
+parts (for example, one part declares the uniform variables, one part declares
+the plug function, one part defines the function body and so on).
+Both approaches seemed uncomfortable for authors
+and they didn't really offer a simpler implementation, so we dropped this idea.
+The current approach, to find the declarations of <literal>PLUG_xxx</literal> functions
+inside a complete shader code, is easy to implement and results in clean
+shader code of the effects. It also allows us to naturally use
+the separate compilation units in case of GLSL.</para>
 
-<para>%% Detecting special <literal>PLUG_</literal> function names inside the shader code
-%% is trivial, and it turned out to be the best approach to design our effects.
-%% This means that each effect code is clean, and can be compiled separately
-%% from others. It allows us to naturally use
-%% the <emphasis>separate compilation units</emphasis> in case of GLSL implementation.</para>
+<para>
+Detecting special <literal>PLUG_</literal> function names inside the shader code
+is trivial, and it turned out to be the best approach to design our effects.
+This means that each effect code is clean, and can be compiled separately
+from others. It allows us to naturally use
+the <emphasis>separate compilation units</emphasis> in case of GLSL implementation.</para>
+-->
 
 </section>
 
@@ -837,9 +847,9 @@ SFString [] <emphasis role="bold">defaultTexCoord</emphasis> "BOUNDS2D"
   # ["BOUNDS2D"|"BOUNDS3D"]
 </screen>
 
-<para>%% Actually, the <literal>effects</literal> field is already defined at
-%% the <literal>X3DTextureNode</literal> class (see above).  It is mentioned here
-%% for completeness.</para>
+<para>Actually, the <literal>effects</literal> field is already defined in
+the base <literal>X3DTextureNode</literal> class mentioned previously.
+It is repeated here only for completeness.</para>
 
 <para>An effect overriding the <literal>texture_color</literal> plug
 should be included, otherwise texture colors are undefined.
@@ -849,41 +859,51 @@ reminding author to override it.</para>
 
 <para>The texture coordinates, or the algorithm to generate them,
 can be explicitly specified, just like for any other texture in X3D.
-%% . This follows the usual rules for all
-%% when a <literal>X3DTextureCoordinateNode</literal> node is placed
-%% inside the geometry <literal>texCoord</literal> field.
-%% Both explicit texture coordinate lists (<literal>TextureCoordinate</literal>
-%% <literal>TextureCoordinate3D</literal>, <literal>TextureCoordinate4D</literal>)
-%% and the coordinate generator nodes
-%% (like <literal>TextureCoordinateGenerator</literal>) are suitable.
-%% %% , <literal>ProjectedTextureCoordinate</literal>
-%% Note that our engine has some extensions to allow
-%% the <literal>"BOUNDS2D"</literal> and <literal>"BOUNDS3D"</literal> values to be also
-%% used for the <literal>TextureCoordinateGenerator.mode</literal> field, see
-%% <xref linkend="bib.castleengine.texcoordbounds" />.
-When the texture coordinates are not explicitly given,
-the <literal>defaultTexCoord</literal> field determines how they are generated.
-<literal>"BOUNDS2D"</literal> generates 2D texture coordinates,
-adapting to the two largest bounding box sizes
-(the 3rd texture coordinate is always 0). This is most comfortable
-when the texture color depends only on the XY components of the texture coordinate.
-The precise behavior
-of <literal>"BOUNDS2D"</literal> follows the X3D <literal>IndexedFaceSet</literal> specification
-and the precise behavior of <literal>"BOUNDS3D"</literal> is described in
-the <emphasis>Texturing3D</emphasis> component of the X3D specification.</para>
+This is done by placing any <literal>X3DTextureCoordinateNode</literal>
+node inside the geometry <literal>texCoord</literal> field.
+Both explicit texture coordinate lists (<literal>TextureCoordinate</literal>
+<literal>TextureCoordinate3D</literal>, <literal>TextureCoordinate4D</literal>)
+as well as the coordinate generator nodes
+(like <literal>TextureCoordinateGenerator</literal> and
+<literal>ProjectedTextureCoordinate</literal>) are allowed.
+Note that projective texture mapping
+by the <literal>ProjectedTextureCoordinate</literal>
+is also our X3D extension, see <xref linkend="bib.castleengine.projectivetexturing" />.</para>
 
-<para>%%  (section <emphasis>"Texture coordinate generation for primitive objects"</emphasis>)
-%%   is used.
-%%   This adapts 3D texture coordinates to the bounding box sizes.
-%%   It's most suitable for 3D textures (the 4th texture coordinate
-%%   component can be ignored; or the 4D vector may be treated as homogeneous, as <literal>"BOUNDS3D"</literal> will always
-%%   set the 4th component to 1).</para>
+<para>When the texture coordinates are not given,
+the <literal>defaultTexCoord</literal> field determines how they are generated:</para>
 
-<para>%% The idea is that using a <literal>ShaderTexture</literal> should be as comfortable
-%% as any other texture node.</para>
+<orderedlist>
+  <listitem><para><literal>"BOUNDS2D"</literal> generates 2D texture coordinates,
+    adapting to the two largest bounding box sizes. The precise behavior
+    of <literal>"BOUNDS2D"</literal> follows the X3D <literal>IndexedFaceSet</literal> specification.</para>
 
-<para>%% Projective texture mapping by <literal>ProjectedTextureCoordinate</literal>
-%% is also our X3D extension, see <xref linkend="bib.castleengine.projectivetexturing" />.</para>
+    <para>This is most comfortable
+    when the texture color depends only on the XY components of the texture coordinate.
+    The 3rd texture coordinate component is always 0,
+    and the 4th component is always 1.</para></listitem>
+
+  <listitem><para><literal>"BOUNDS3D"</literal> generates 3D texture coordinates.
+    The texture coordinates are adapted to all three bounding box sizes,
+    precisely following X3D specification section
+    <emphasis>"Texture coordinate generation for primitive objects"</emphasis>
+    of the <emphasis>Texturing3D</emphasis> component.</para>
+
+    <para>This is most suitable for true 3D textures. The 4th texture coordinate
+    component can be ignored. Or the 4D vector may be treated as homogeneous,
+    as <literal>"BOUNDS3D"</literal> will always
+    set the 4th component to 1.</para></listitem>
+</orderedlist>
+
+<para>The <literal>"BOUNDS*"</literal> names are consistent
+with another of our engine extensions. Namely, we allow
+the values <literal>"BOUNDS2D"</literal> and <literal>"BOUNDS3D"</literal>
+to be also used for the <literal>TextureCoordinateGenerator.mode</literal> field.
+See <xref linkend="bib.castleengine.texcoordbounds" />.</para>
+
+<para>In the end, the idea is that using a <literal>ShaderTexture</literal>
+should be as comfortable as any other texture node.</para>
+
 </section>
 
 <section id="section.when_use_shader_texture">
