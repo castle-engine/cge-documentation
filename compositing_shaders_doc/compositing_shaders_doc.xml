@@ -1098,7 +1098,7 @@ there's no reliable way to detect which user effect prevents the compilation.
 At least for shading languages
 without the <emphasis>separate compilation units</emphasis> feature.
 In such case, the application may decide to disable <emphasis>all</emphasis>
-user-provided effects for given shape.
+user-provided effects for a given shape.
 However, this isn't exactly a new problem &mdash; bad shader code
 may always cause enough trouble to prevent the shape from being sensibly rendered.</para>
 
