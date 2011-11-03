@@ -1,6 +1,10 @@
 <?xml version='1.0'?>
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
-  "/usr/share/sgml/docbook/dtd/xml/4.5/docbookx.dtd">
+  "/usr/share/sgml/docbook/dtd/xml/4.5/docbookx.dtd" [
+<!-- C++ with zero-width no-break space character, to avoid breaking it
+     into two lines (C+ and +). -->
+<!ENTITY cpp "C&#xFEFF;+&#xFEFF;+" >
+]>
 
 <!--
   Offline version of this DTD (as installed from Debian testing package) is
@@ -290,33 +294,33 @@ algorithm of this layer. </para>
 
 <para>Sh (<ulink url="http://libsh.org/" />, <xref linkend="bib.sh" />)
 allows writing shader code (that can run on GPU) directly inside a
-C++ program.
-For this, Sh extends the C++ language (through C++
+&cpp; program.
+For this, Sh extends the &cpp; language (through &cpp;
 operator overloading and macros tricks).
 It allows an excellent
-integration between C++ code and shaders, hiding the ugly details of
+integration between &cpp; code and shaders, hiding the ugly details of
 passing variables between normal code (that executes on CPU) and
 shader code (that usually executes on GPU). We can use
 object-oriented concepts to create a general shader that can
 later be extended, for example by overriding virtual
-methods. However, this is a solution closely coupled with C++. It's
-suitable if we have a 3D engine in C++, we want to use it in
-our own C++ program and extend its shaders. Our solution is simpler,
+methods. However, this is a solution closely coupled with &cpp;. It's
+suitable if we have a 3D engine in &cpp;, we want to use it in
+our own &cpp; program and extend its shaders. Our solution is simpler,
 treating shader effects as part of the 3D content and can
 be integrated into a renderer regardless of its programming language.
-We do not need a C++ compiler to generate a final GPU shader
-and users do not need to be familiar with C++.</para>
+We do not need a &cpp; compiler to generate a final GPU shader
+and users do not need to be familiar with &cpp;.</para>
 
-<para>OGRE (<ulink url="http://www.ogre3d.org/" />), an open-source 3D engine written in C++, has a system
+<para>OGRE (<ulink url="http://www.ogre3d.org/" />), an open-source 3D engine written in &cpp;, has a system
 for adding shader extensions (see <xref linkend="bib.ogre_shader" />). Its idea is similar
 to our system (enhance the built-in shaders with our own effects),
 however the whole job of combining a shader is done by operating
-on particular shader by C++ code. The developer has to code
+on particular shader by &cpp; code. The developer has to code
 the logic deciding which shaders are extended and most of the specification
-about how the extension is called is done in the C++ code.
+about how the extension is called is done in the &cpp; code.
 This has the nice advantage of being able to encapsulate some fixed-function
 features as well, however the whole system must be carefully controlled by
-the C++ code.
+the &cpp; code.
 In our approach, we allow the authors to write direct shading
 language code quickly and the integration is built inside appropriate X3D nodes.</para>
 
