@@ -52,7 +52,6 @@ Thus the effects are reusable, work in various combinations
 and under all lighting and texture conditions.
 This makes the GPU shaders more useful for 3D content authors.</para>
 
-<!-- TODO: clumsy wording? -->
 <para>Our approach may also be used to integrate internal effects
 inside a 3D renderer. Modern renderers need to combine many effects,
 like lighting, bump mapping and shadow maps.
@@ -77,7 +76,8 @@ concepts like shapes, groups, light sources and textures.
 <title>Overview</title>
 
 <para>X3D <xref linkend="bib.x3d" /> is an open standard for representing interactive 3D models,
-with many advanced graphic features.
+with many advanced graphic features. <xref linkend="chapter.x3d" />
+describes X3D in more detail.
 </para>
 
 <para>The X3D <emphasis>Programmable shaders component</emphasis> <xref linkend="bib.x3d_shaders" />
@@ -89,6 +89,8 @@ for example summing the lights contribution
 and mixing the texture colors. The authors
 can create and assign shaders to shapes, which makes
 a myriad of interesting graphic effects possible in X3D models.
+<xref linkend="chapter.shaders" /> describes shaders and the standard
+way to use them with X3D.
 </para>
 
 <para>The shaders designed using the standard nodes
@@ -230,6 +232,251 @@ language in some cumbersome limitations.
 This is most flexible for authors,
 and it also allows an easy implementation &mdash; there is no need for any complex
 shading language processing inside the application.</para>
+
+</chapter>
+
+<chapter id="chapter.x3d">
+<title>What is X3D?</title>
+
+<para>Simply put, X3D is a format for 3D models. It's quite large,
+and some of it's areas are quite complex, and as such
+it resembles a declarative programming language (for example,
+there are prototypes and external prototypes to define new language nodes).
+The language is standardized, with open and precise specification
+available to everyone (<xref linkend="bib.x3d" />).</para>
+
+<para>X3D specifies various nodes and fields, with well-defined meaning,
+to declare common 3D objects and operations
+(like 3D triangle meshes, with materials, textures and such;
+operations include e.g. grouping, with transformations and such).
+Many nodes are suitable for interactive operating and scripting
+(sensors for keyboard, mouse and other inputs,
+scripts for processing the results of some operations
+and triggering other operations). Prototypes are available
+for defining new node types, and external prototypes are available
+to load prototypes from other files.
+This provides you opportunities to define whole libraries of new objects,
+cooperating with each other, much alike libraries and modules
+for functions and classes in normal programming languages.</para>
+
+<para><emphasis>Short history</emphasis>: The predecessor of X3D is called VRML.
+Initial VRML version, VRML 1.0, was based on a subset of even older format,
+Inventor. Later VRML version, VRML 2.0 (called also VRML 97 due to it's release
+date), changed the syntax a lot and added a lot of new features for
+interactive 3D worlds, with rich graphic effects.
+X3D version numbers start from 3.0, to emphasize that X3D is
+a natural progression from the VRML. The current version of X3D is 3.2,
+with X3D 3.3 in the process of being finalized.</para>
+
+<para>A lot of the 3D software handles various VRML and X3D versions,
+and commonly calls the format just "VRML/X3D".</para>
+
+<para>X3D allows to encode the nodes graph in various formats.
+The most classic is a text file format, that requires a specialized parser,
+and is called nowadays "classic (VRML) encoding". The commonly used now
+is an XML encoding. There is also a binary encoding, following standard
+methods to binary encode XML.</para>
+
+<!--
+\begin{itemize}
+  \item \textbf{Extensible 3D}: language to describe 3D worlds.
+  \item Open (full specifications on~\texttt{http://www.web3d.org/}), popular standard.
+  \item Easy to express all typical 3D world features.
+  \item In simple cases, a~tree of nodes.
+    In a~general case, a~directed graph of nodes, cycles possible.
+  \item Each node has a~set of fields, some fields contain in turn children nodes.
+\end{itemize}
+
+-->
+
+<para>An example of simple X3D file in classic encoding:</para>
+
+<screen>#X3D V3.2 utf8
+PROFILE Interchange
+Shape {
+  geometry Sphere { radius 2 }
+}
+</screen>
+
+<para>The same example in the XML encoding (DTD and XML schema declarations
+are usually added here, but we omitted them for brevity):</para>
+
+<!--
+&lt;!DOCTYPE X3D PUBLIC
+  "ISO//Web3D//DTD X3D 3.2//EN"
+  "http://www.web3d.org/specifications/x3d-3.2.dtd"&gt;
+&lt;X3D version="3.2" profile="Interchange"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
+  xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.2.xsd"&gt;
+-->
+
+<screen>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;X3D version="3.2" profile="Interchange"&gt;
+  &lt;Scene&gt;
+    &lt;Shape&gt;
+      &lt;Sphere radius="2" /&gt;
+    &lt;/Shape&gt;
+  &lt;/Scene&gt;
+&lt;/X3D&gt;
+</screen>
+
+<!--
+\begin{frame}{X3D has a~lot features}
+
+That's why we chose to integrate our concept with X3D.
+
+Besides standard rendering features (indexed geometries with materials
+and~animations), the~X3D specification includes many
+advanced 3D visualization stuff. For example:
+
+\begin{itemize}
+  \item NURBS,
+  \item advanced texturing (cube maps, 2D and~3D textures, multi-texturing),
+  \item particle effects,
+  \item physics,
+  \item skinned humanoid animation.
+\end{itemize}
+\end{frame}
+
+% TODO- remove, instead more slides about our invention?
+\begin{frame}{X3D as a~programming language}
+
+There are some aspects of X3D that make it more interesting,
+more like ``(declarative) programming language'' than just ``3D~model format'':
+
+\begin{itemize}
+  \item DEF/USE: references, for all nodes.
+  \item Events: sending and~receiving events.
+%    declarative analogy to calling a~method in imperative programming.
+    E.g.~open a~door when user presses a~handled.
+  \item Prototypes: define new nodes,
+  %pełnowartościowe,
+    by combining existing ones.
+  \item Scripts: integration with script languages (like JavaScript) easy.
+    %% Script remains a~``black box'' for~X3D. At the~same time
+    %% in X3D we define exactly what parts of the~scene are accessed.
+     %  np.~JavaScript. U mnie &mdash; z~własnym prostym językiem skryptowym
+     % oraz ze skompilowanym kodem w~ObjectPascalu.
+     % Więcej nowinek w~vrml\_engine\_doc, sekcja "advanced features".
+\end{itemize}
+\end{frame}
+-->
+
+<!--
+<para>Programs that interpret and render X3D are traditionally
+called <quote>X3D browsers</quote>, as an analogy to <quote>WWW browsers</quote>
+and to emphasize the fact that X3D is a dynamic and interactive content.
+
+In our work, we often use the term <quote>3D renderer</quote>,
+since we consider most of our invention applicable to any application
+rendering any 3D scene graph format.
+But in practice, the <quote>3D renderer</quote> that we think
+about is the same thing as <quote>X3D browsers</quote> in practice.
+-->
+
+</chapter>
+
+<chapter id="chapter.shaders">
+<title>Shaders and X3D</title>
+
+<!--
+\begin{itemize}
+  \item Languages to calculate shading color of 3D stuff.
+    Implement per-vertex work,
+    let GPU rasterize, implement per-pixel work.
+    % Chociaż przy pomocy pewnych sztuczek (tekstury oparte na~float,
+    % render to textury) można je wykorzystać do~ogólnych obliczeń,
+    % obecnie do~ogólnych obliczeń wygodniejsze są CUDA/OpenCL
+    % (google.com/q=gpgpu).
+    % Można próbować
+    % geom shader
+  \item For real-time (implemented on GPU) shaders, there are three
+    popular choices: GLSL (OpenGL), Cg (NVidia: OpenGL or~Direct 3D),
+    HLSL (Direct 3D).
+  \item Of course, you can use shaders in X3D.
+\end{itemize}
+\end{frame}
+
+- What is a graphic shading language?
+1-2 paragraph description.
+1-2 paragraph description of GLSL, and 1 sentences for Cg and HLSL.
+Example of GLSL code.
+-->
+
+<para>Example GLSL vertex shader and accompanying fragment shader:</para>
+
+<screen>TODO
+</screen>
+
+<screen>TODO
+</screen>
+
+<para>The shader code should be passed to the rendering library.
+In case of GLSL, the shader code is just passed to the appropriate
+OpenGL calls, that take care of preparing it for execution on GPU.
+In case of other shading languages, some additional work may be required
+to compile the shader and then pass this compiled version to the final
+rendering library.</para>
+
+<para>With X3D, we can simply place the shader code inside
+X3D node called <literal>ComposedShader</literal>. The renderer (X3D browser)
+will take care to correctly pass the shader code to the underlying
+3D library and GPU.</para>
+
+<para>A simple working example showing X3D with GLSL shader code:</para>
+
+<screen>#X3D V3.2 utf8
+PROFILE Interchange
+Shape {
+  appearance Appearance {
+    shaders ComposedShader {
+      language "GLSL"
+      parts ShaderPart {
+        type "FRAGMENT"
+        url "data:text/plain,
+        <emphasis role="bold">void main(void)
+        {
+          gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+        }</emphasis>"
+      }
+    }
+  }
+  geometry Sphere { radius 2 }
+}
+</screen>
+
+<!--
+\begin{frame}{Shader replaces the~calculations}
+
+\begin{itemize}
+  %  \item + Wybiera pierwszy obsługiwany shader.
+  %% \item + Można łatwo przekazać do~shadera wartości uniform (per-object)
+  %%   albo attribute (per-vertex). Np.~przekaż aktualny czas
+  %%    to shadera.
+  \item + Easy implementation for renderer, since this is how GPU works,
+    this is what OpenGL exposes etc.
+  \item - \textbf{Difficult implementation of your own shaders}.
+    Before implementing your effects, first learn to recreate
+    the~necessary features from fixed-function.
+    Sure, you can let some renderer auto-generate a~large shader for you,
+    and~only modify it, but...
+  \item - \textbf{You create one-time shaders, not reusable}.
+    Particular shader is tied to a~scene configuration,
+    like the~number and~type of lights and~textures.
+    %% General shader implementing everything
+    %% would be awfully slow, unless you use \texttt{\#ifdefs} &mdash; in which case
+    %% it's awfully large.
+  \item - \textbf{All the~effects in one huge shader}.
+    Ultimately, this means that you create a~large shader with \texttt{\#ifdefs},
+    that is not maintainable. Adding / removing an effect means carefully
+    inserting logic into a~large code.
+\end{itemize}
+\end{frame}
+
+- How to use shaders can be used with X3D?
+
+The X3D specification provides a standard set of nodes to attach shaders (that is, shading language code) to 3D shapes. This approach maps very naturally to exisiting 3D APIs, like OpenGL. In this section we would like to shortly describe these nodes, since the goal of our work is to propose an alternative and improved method for attaching shaders.
+-->
 
 </chapter>
 
