@@ -408,8 +408,10 @@ OpenGL <literal>GLSL</literal> <xref linkend="bib.glsl" />,
 NVidia <literal>Cg</literal> <xref linkend="bib.cg" /> and
 Direct 3D <literal>HLSL</literal> <xref linkend="bib.hlsl" />.
 They are used for the same purposes and offer practically the same possibilities.
-X3D, and the extensions
-for compositing shaders described in this paper, supports all three of these
+<!--For the sake of this simple introduction, we will not go into discussion
+about their differences, advantages and disadvantages against each other.-->
+X3D, and our extensions
+for compositing shaders described in this paper, support all three of these
 languages.</para>
 
 <para>The current implementation of our extensions
@@ -423,7 +425,7 @@ As such, most of our examples in this paper will show <literal>GLSL</literal>.
 <screen><emphasis>/* vertex shader */</emphasis>
 void main(void)
 {
-  <emphasis>/* pass unchanged texture coordinare to the fragment shader */</emphasis>
+  <emphasis>/* pass unchanged texture coordinate to the fragment shader */</emphasis>
   gl_TexCoord[0] = gl_MultiTexCoord0;
   <emphasis>/* calculate vertex position in clip space */</emphasis>
   gl_Position = ftransform();
@@ -455,7 +457,7 @@ to compile the shader and then pass this compiled version to the final
 rendering library.</para>
 -->
 The complexity of this operation (and the differences between various
-shading language) can be fortunately completely ignored by us.
+shading languages at this step) can be fortunately completely ignored by us.
 That is because standard X3D
 <emphasis>Programmable shaders component</emphasis>
 <xref linkend="bib.x3d_shaders" />
@@ -476,6 +478,7 @@ Shape {
         url "data:text/plain,
           <emphasis role="bold">void main(void)
           {
+            /* just draw the pixel red */
             gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
           }</emphasis>"
       }
@@ -522,12 +525,13 @@ Shape {
 </screen>
 
 <para>The shader code provided this way <emphasis>replaces</emphasis>
-the standard calculations. All the necessary lighting and texturing effects have
-to be reimplemented from scratch in our shader. There is no way to combine
+the standard calculations done by the GPU. This means that all
+the lighting and texturing effects, if needed, have to be reimplemented
+from scratch in our shader. There is no way to combine
 our shader with standard rendering features, and it is impossible
 to automatically combine two shader sources. This drawback reflects
-the design of the hardware (GPU). And it is this drawback that our
-work tries to overcome.</para>
+the design of the hardware. And the whole work presented in this paper
+strives to overcome this problem.</para>
 
 <!--
 Shader replaces the~calculations, ComposedShader approach, facts:
