@@ -344,12 +344,9 @@ the sphere up.</para>
 <!-- Something about scripts?
 <para>The behavior of X3D scene can also be enhanced by scripting
 languages.</para>
-  \item Scripts: integration with script languages (like JavaScript) easy.
-    %% Script remains a~``black box'' for~X3D. At the~same time
-    %% in X3D we define exactly what parts of the~scene are accessed.
-     %  np.~JavaScript. U mnie &mdash; z~własnym prostym językiem skryptowym
-     % oraz ze skompilowanym kodem w~ObjectPascalu.
-     % Więcej nowinek w~vrml\_engine\_doc, sekcja "advanced features".
+Scripts: integration with script languages (like JavaScript) easy.
+Script remains a~``black box'' for~X3D. At the~same time
+in X3D we define exactly what parts of the~scene are accessed.
 -->
 
 <!--
@@ -385,49 +382,86 @@ about is the same thing as <quote>X3D browsers</quote> in practice.
 <chapter id="chapter.shaders">
 <title>Shaders and X3D</title>
 
-<!--
-\begin{itemize}
-  \item Languages to calculate shading color of 3D stuff.
-    Implement per-vertex work,
-    let GPU rasterize, implement per-pixel work.
-    % Chociaż przy pomocy pewnych sztuczek (tekstury oparte na~float,
-    % render to textury) można je wykorzystać do~ogólnych obliczeń,
-    % obecnie do~ogólnych obliczeń wygodniejsze są CUDA/OpenCL
-    % (google.com/q=gpgpu).
-    % Można próbować
-    % geom shader
-  \item For real-time (implemented on GPU) shaders, there are three
-    popular choices: GLSL (OpenGL), Cg (NVidia: OpenGL or~Direct 3D),
-    HLSL (Direct 3D).
-  \item Of course, you can use shaders in X3D.
-\end{itemize}
-\end{frame}
-
-- What is a graphic shading language?
-1-2 paragraph description.
-1-2 paragraph description of GLSL, and 1 sentences for Cg and HLSL.
-Example of GLSL code.
+<para>Graphic processing unit (GPU) is given a set of 3D points
+(vertexes) connected into triangles. For each vertex, some work
+should be performed, at least to transform it from an object space
+into the clip space (this is when we move and rotate our objects,
+and where we can apply perspective projection). <emphasis>Vertex shaders</emphasis>
+allow to replace this per-vertex work with a custom program written in a special
+<emphasis>shading language</emphasis>.
+When the vertexes are processed, the GPU performs <emphasis>rasterization</emphasis>,
+determining which screen pixels are actually covered by the triangles.
+Then each pixel is drawn, which involves calculating the actual color to be drawn
+(for example, mixing color from the lighting calculation with the texture color).
+<emphasis>Fragment (pixel) shaders</emphasis> allow to replace this
+per-pixel work with a custom program.<!-- <footnote>
+<para>The distinction between <emphasis>fragment</emphasis> and <emphasis>pixel</emphasis>
+terms is not important for our paper. Usually, <emphasis>one fragment</emphasis>
+is exactly the same thing as <emphasis>one pixel</emphasis>.
+There are some operations that change this simple correspondence,
+but they are not important for our simple introduction to shaders.</para></footnote>
 -->
+</para>
+
+<para>The most popular real-time shading languages right now are
+OpenGL <literal>GLSL</literal> <xref linkend="bib.glsl" />,
+NVidia <literal>Cg</literal> <xref linkend="bib.cg" /> and
+Direct 3D <literal>HLSL</literal> <xref linkend="bib.hlsl" />.
+They are used for the same purposes and offer practically the same possibilities.
+X3D, and the extensions
+for compositing shaders described in this paper, supports all three of these
+languages.</para>
+
+<para>The current implementation of our extensions
+supports only the <literal>GLSL</literal> (<emphasis>OpenGL Shading Language</emphasis>),
+which is probably the most natural to use in an engine based on OpenGL.
+As such, most of our examples in this paper will show <literal>GLSL</literal>.
+</para>
 
 <para>Example GLSL vertex shader and accompanying fragment shader:</para>
 
-<screen>TODO
+<screen><emphasis>/* vertex shader */</emphasis>
+void main(void)
+{
+  <emphasis>/* pass unchanged texture coordinare to the fragment shader */</emphasis>
+  gl_TexCoord[0] = gl_MultiTexCoord0;
+  <emphasis>/* calculate vertex position in clip space */</emphasis>
+  gl_Position = ftransform();
+}
 </screen>
 
-<screen>TODO
+<screen><emphasis>/* fragment shader */
+/* the texture contents are loaded outside of the shader program,
+   by appropriate OpenGL calls. */</emphasis>
+uniform sampler2D myTexture;
+void main(void)
+{
+  <emphasis>/* take the texture color at given coordinates, multiply by 2,
+     use it to set fragment (pixel) color */</emphasis>
+  gl_FragColor = texture2D(myTexture, gl_TexCoord[0].st) * 2.0;
+}
 </screen>
 
-<para>The shader code should be passed to the rendering library.
-In case of GLSL, the shader code is just passed to the appropriate
-OpenGL calls, that take care of preparing it for execution on GPU.
+<para>The shader source code should be processed and passed to the rendering
+3D library, like OpenGL, that in turn will pass it to the hardware (GPU).
+<!--
+Shading languages other than GLSL may require an additional compilation
+step
+This is an easy but sometimes
+In case of GLSL, the shader code is just passed directly to the appropriate
+OpenGL calls, that take care of preparing it for the execution on GPU.
 In case of other shading languages, some additional work may be required
 to compile the shader and then pass this compiled version to the final
 rendering library.</para>
-
-<para>With X3D, we can simply place the shader code inside
-X3D node called <literal>ComposedShader</literal>. The renderer (X3D browser)
-will take care to correctly pass the shader code to the underlying
-3D library and GPU.</para>
+-->
+The complexity of this operation (and the differences between various
+shading language) can be fortunately completely ignored by us.
+That is because standard X3D
+<emphasis>Programmable shaders component</emphasis>
+<xref linkend="bib.x3d_shaders" />
+gives us a simple way to attach a shader source code to a 3D shape.
+The X3D browser will do all the necessary job of handling the shader
+to the underlying libraries and hardware.</para>
 
 <para>A simple working example showing X3D with GLSL shader code:</para>
 
@@ -440,10 +474,10 @@ Shape {
       parts ShaderPart {
         type "FRAGMENT"
         url "data:text/plain,
-        <emphasis role="bold">void main(void)
-        {
-          gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
-        }</emphasis>"
+          <emphasis role="bold">void main(void)
+          {
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+          }</emphasis>"
       }
     }
   }
@@ -451,37 +485,74 @@ Shape {
 }
 </screen>
 
+<para>And a little longer example, showing X3D with the previous shader
+code (multiplying texture by 2).</para>
+
+<screen>#X3D V3.2 utf8
+PROFILE Interchange
+Shape {
+  appearance Appearance {
+    shaders ComposedShader {
+      language "GLSL"
+      inputOutput SFNode myTexture ImageTexture { url "test_texture.png" }
+      parts [
+        ShaderPart {
+          type "VERTEX"
+          url "data:text/plain,
+            <emphasis role="bold">void main(void)
+            {
+              gl_TexCoord[0] = gl_MultiTexCoord0;
+              gl_Position = ftransform();
+            }</emphasis>"
+        }
+        ShaderPart {
+          type "FRAGMENT"
+          url "data:text/plain,
+            <emphasis role="bold">uniform sampler2D myTexture;
+            void main(void)
+            {
+              gl_FragColor = texture2D(myTexture, gl_TexCoord[0].st)*2.0;
+            }</emphasis>"
+        }
+      ]
+    }
+  }
+  geometry Sphere { radius 2 }
+}
+</screen>
+
+<para>The shader code provided this way <emphasis>replaces</emphasis>
+the standard calculations. All the necessary lighting and texturing effects have
+to be reimplemented from scratch in our shader. There is no way to combine
+our shader with standard rendering features, and it is impossible
+to automatically combine two shader sources. This drawback reflects
+the design of the hardware (GPU). And it is this drawback that our
+work tries to overcome.</para>
+
 <!--
-\begin{frame}{Shader replaces the~calculations}
+Shader replaces the~calculations, ComposedShader approach, facts:
 
-\begin{itemize}
-  %  \item + Wybiera pierwszy obsługiwany shader.
-  %% \item + Można łatwo przekazać do~shadera wartości uniform (per-object)
-  %%   albo attribute (per-vertex). Np.~przekaż aktualny czas
-  %%    to shadera.
-  \item + Easy implementation for renderer, since this is how GPU works,
-    this is what OpenGL exposes etc.
-  \item - \textbf{Difficult implementation of your own shaders}.
-    Before implementing your effects, first learn to recreate
-    the~necessary features from fixed-function.
-    Sure, you can let some renderer auto-generate a~large shader for you,
-    and~only modify it, but...
-  \item - \textbf{You create one-time shaders, not reusable}.
-    Particular shader is tied to a~scene configuration,
-    like the~number and~type of lights and~textures.
-    %% General shader implementing everything
-    %% would be awfully slow, unless you use \texttt{\#ifdefs} &mdash; in which case
-    %% it's awfully large.
-  \item - \textbf{All the~effects in one huge shader}.
-    Ultimately, this means that you create a~large shader with \texttt{\#ifdefs},
-    that is not maintainable. Adding / removing an effect means carefully
-    inserting logic into a~large code.
-\end{itemize}
-\end{frame}
++ Chooses first applicable shader.
++ You can pass uniform (per-object) and attribute (per-vertex)
+  values easily. Like current time, or texture.
++ Easy implementation for renderer, since this is how GPU works,
+  this is what OpenGL exposes etc.
+- \textbf{Difficult implementation of your own shaders}.
+  Before implementing your effects, first learn to recreate
+  the~necessary features from fixed-function.
+  Sure, you can let some renderer auto-generate a~large shader for you,
+  and~only modify it, but...
+- \textbf{You create one-time shaders, not reusable}.
+  Particular shader is tied to a~scene configuration,
+  like the~number and~type of lights and~textures.
+  General shader implementing everything
+  would be awfully slow, unless you use \texttt{\#ifdefs} &mdash; in which case
+  it's awfully large.
+- \textbf{All the~effects in one huge shader}.
+  Ultimately, this means that you create a~large shader with \texttt{\#ifdefs},
+  that is not maintainable. Adding / removing an effect means carefully
+  inserting logic into a~large code.
 
-- How to use shaders can be used with X3D?
-
-The X3D specification provides a standard set of nodes to attach shaders (that is, shading language code) to 3D shapes. This approach maps very naturally to exisiting 3D APIs, like OpenGL. In this section we would like to shortly describe these nodes, since the goal of our work is to propose an alternative and improved method for attaching shaders.
 -->
 
 </chapter>
@@ -489,11 +560,11 @@ The X3D specification provides a standard set of nodes to attach shaders (that i
 <chapter id="chapter.previous_work">
 <title>Motivation and previous work</title>
 
-<para>The most popular real-time shading languages right now are
-OpenGL <literal>GLSL</literal> <xref linkend="bib.glsl" />,
+<para>The popular real-time shading languages
+(OpenGL <literal>GLSL</literal> <xref linkend="bib.glsl" />,
 NVidia <literal>Cg</literal> <xref linkend="bib.cg" /> and
-Direct 3D <literal>HLSL</literal> <xref linkend="bib.hlsl" />.
-They do not provide a ready solution for connecting shaders from independent sources.
+Direct 3D <literal>HLSL</literal> <xref linkend="bib.hlsl" />)
+do not provide a ready solution for connecting shaders from independent sources.
 The <literal>CgFX</literal> and HLSL <literal>.fx</literal> files encapsulate shading language code
 in <emphasis>techniques</emphasis> (for various graphic card capabilities)
 and within a single technique specify operations for each rendering pass.
