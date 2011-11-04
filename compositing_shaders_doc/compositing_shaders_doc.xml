@@ -338,7 +338,7 @@ which in turn makes the <literal>PositionInterpolator</literal> produce
 3D positions with increasing Y value. The positions are then used to move
 the sphere up.</para>
 
-<screen><xi:include href="simplest_animation.x3dv" parse="text"
+<screen><xi:include href="models/simplest_animation.x3dv" parse="text"
   xmlns:xi="http://www.w3.org/2001/XInclude"/></screen>
 
 <!-- Something about scripts?
