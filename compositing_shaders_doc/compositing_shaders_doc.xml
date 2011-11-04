@@ -1658,38 +1658,85 @@ in perfect specular highlights and spot light shapes.</para>
 </chapter>
 
 <chapter id="chapter.implementation">
-<title>Implementation notes</title>
+<title>Implementation</title>
 
 <para>We have implemented all the X3D extensions described in this paper
 for the <emphasis>OpenGL Shading Language</emphasis> (GLSL).
 However, we have designed our extensions
 to be applicable to other shading languages as well (like Cg or HLSL)
-and we believe they can be handled in a similar fashion.
-In particular, we have tested that the <emphasis>separate compilation units</emphasis>
-concept of GLSL, while very useful, is not necessary for proper implementation
-of our effects.
-</para>
+and we believe they can be handled in a similar fashion.</para>
 
-<!-- TODO: review, maybe uncomment:
-concept, that is specific to GLSL, is useful here:
-it forces
+<para>One unique concept of the GLSL is the
+<emphasis>separate compilation units</emphasis>.
+We found it very helpful for the shader authors, as it forces
 cleaner shader code (you cannot use undeclared functions from other
-shader parts) and it gives you better line numbers in error messages
+shader parts). It also naturally matches with our effects definition,
+as each <literal>EffectPart</literal> becomes simply one compilation unit.
+<!--
+and it gives you better line numbers in error messages
 (although a pre-processor directive like <literal>#line</literal> could also be used for
 this).
-
-and we think that the same set of plugs will be useful for them &mdash; but it's just a theory.
-An implementation of our effects for other shading languages may
-find other opportunities for plugs.
-In particular, we have tested that the <emphasis>separate compilation units</emphasis>
-of GLSL are not necessary for a correct implementation of our effects.
-We also believe that most of our plugs (like <quote>do something in object space</quote>,
-<quote>do something in eye space</quote>) are generic enough to be usable
-with all shading languages.
 -->
+However, we have also tested that this is not needed for the correct
+implementation of our effects. So implementation based on Cg or HLSL
+should be as easily possible, it just will not enforce the clean separation
+of effect parts.
+</para>
 
-<para>
-Our approach does not cause any speed loss. Effects code is just
+<section id="section.pseudo_code">
+<title>Pseudo-code of the implementation</title>
+
+<para>Here we present a pseudo-code implementation of a shader generator,
+that creates a complete shader source code suitable for each shape.
+It takes into account standard rendering features (X3D light sources,
+textures and such), custom shaders (by X3D nodes like
+<literal>ComposedShader</literal>) and our shaders effects
+(by <literal>Effect</literal> nodes).</para>
+
+<screen>type
+  TShaderType = (geometry, vertex, fragment);
+  TShaderSource = array [TShaderType] of a string list;
+
+TODO
+</screen>
+
+</section>
+
+<section id="section.pool">
+<title>Pool of shaders</title>
+
+<para>An implementation should limit the number of shaders created this way,
+to avoid initializing new shader for each shape. This can be achieved
+by creating a common pool of shaders to be used.
+For each newly created shader configuration, a unique hash value
+is calculated and the shader is added to the pool.
+When a new shader is needed, we first look for it in the pool
+(using the hash value of the desired configuration), and if we find it
+&mdash; we reuse it (increasing the reference count). Only if the shader
+is not found, we create a new one. This is quite simple and fast to do,
+and it provides a perfect sharing of shaders.</para>
+
+<para>The hash value could be calculated based solely on the final string
+of the shader, but this is too slow in our experience &mdash;
+as it means that all the string operations have to be repeated before
+we even know the hash. So in practice it's much faster to calculate
+the hash value looking at all the parameters that affect the generated
+shader source, including all the participating <literal>Effect</literal> and <literal>ComposedShader</literal>
+nodes, as well as the standard X3D lights sources, textures,
+fog values and so on.</para>
+
+<para>For applications when some subset of needed shaders if known in advance,
+the pool of shaders may be already initialized to contain some shaders
+with artificial non-zero use count. This way, some shader configuration
+are always kept initialized and ready to be used.</para>
+
+</section>
+
+<section id="section.speed">
+<title>Speed</title>
+
+<para>Very nice thing about our effects framework is that
+it does not cause any speed loss. Effects code is just
 combined into the final shader code, without any transformations that
 could make it slower. Our process of <quote>combining</quote> effects is essentially
 adding function calls around. Fortunately, a function call has no speed
@@ -1698,6 +1745,8 @@ such that functions can always be inlined (there is no recursion allowed,
 and parameter qualifiers have simple interpretation),
 and as far as we know they are actually always inlined by existing
 shading language compilers.</para>
+
+</section>
 
 </chapter>
 
