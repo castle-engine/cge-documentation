@@ -1697,8 +1697,158 @@ textures and such), custom shaders (by X3D nodes like
   TShaderType = (geometry, vertex, fragment);
   TShaderSource = array [TShaderType] of a string list;
 
-TODO
+/* Detect defined PLUG_xxx functions within PlugValue,
+   insert calls to them into given CompleteCode,
+   insert forward declarations of their calls into CompleteCode too,
+   insert the PlugValue (which should be variable and functions declarations)
+   into code of FinalShader (determined by EffectPartType). */
+/* TODO: since PlugValue is added to the FinalShader,
+   when do we actually have more than 1 piece of code on LightShader
+   or TextureShader? */
+procedure Plug(const EffectPartType: TShaderType; PlugValue: string;
+  CompleteCode: TShaderSource = nil);
+
+  if CompleteCode = nil then
+    CompleteCode := FinalShader;
+  Code := CompleteCode[EffectPartType];
+
+  while you can find PLUG_xxx PlugName inside PlugValue do
+  begin
+    PlugName := found xxx
+    PlugDeclaredParameters := found PLUG_xxx function declaration of parameters
+
+    /* Rename found PLUG_xxx to plugged_&lt;unique&gt;.
+       This way:
+       - it will not be mistaken for PLUG_xxx to be inserted 2nd time.
+       - it's unique, so you can override multiple times the same PLUG_xxx */
+    ProcedureName := 'plugged_' + IntToStr(PlugIdentifiers);
+    StringReplaceAllTo1st(PlugValue, 'PLUG_' + PlugName, ProcedureName, false);
+    Inc(PlugIdentifiers);
+
+    PlugForwardDeclaration := 'void ' + ProcedureName + PlugDeclaredParameters + ';' + NL;
+
+    // TODO simplify begin --------------------------
+
+    AnyOccurences := false;
+    for CodeIndex := 0 to Code.Count - 1 do
+    begin
+      CodeSearchBegin := 1;
+      AnyOccurencesInThisCodeIndex := false;
+      while FindPlugOccurence(CommentBegin, Code[CodeIndex], CodeSearchBegin, PBegin, PEnd) do
+      begin
+        Parameter := Trim(CopyPos(Code[CodeIndex], PBegin + Length(CommentBegin), PEnd - 1));
+        InsertIntoCode(CodeIndex, PBegin, ProcedureName + Parameter + ';' + NL);
+
+        { do not find again the same plug comment by FindPlugOccurence }
+        CodeSearchBegin := PEnd;
+
+        AnyOccurencesInThisCodeIndex := true;
+        AnyOccurences := true;
+      end;
+
+      if AnyOccurencesInThisCodeIndex then
+        PlugDirectly(Code, CodeIndex, '/* PLUG-DECLARATIONS */', PlugForwardDeclaration, true);
+    end;
+
+    if (not AnyOccurences) and WarnMissingPlugs then
+      OnWarning(wtMinor, 'VRML/X3D', Format('Plug name "%s" not declared', [PlugName]));
+  end;
+
+  // TODO simplify end --------------------------
+
+  { regardless if any (and how many) plug points were found,
+    always insert PlugValue into CodeForPlugValue }
+  FinalShader[EffectPartType].Add(PlugValue);
+
+/* Add user effects to Code.
+   TODO: meaning of Code = nil. */
+procedure EnableEffects(Effects: TMFNode; const Code: TShaderSource = nil);
+  for each Effect := node on the Effects list
+    if Effect.enabled and (Effect.language matches renderer shader language) then
+      for each EffectPart := Effect.parts
+        Plug(EffectPart.type, EffectPart.url, Code);
+
+FinalShader := new TShaderSource;
+set FinalShader to standard simple shader source code,
+  to render standard 3D object with no lights, no textures, no effects.
+  It contains magic PLUG_ comments to allow inserting all the features
+  next. The actual vertex and fragment initial code used by our engine
+  may be found on
+  http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.vs
+  and
+  http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.fs
+  ;
+
+if a complete shader code is assigned to given shape,
+  following <xref linkend="bib.x3d_shaders" />,
+  like a <literal>ComposedShader</literal> node, then
+  set FinalShader to this shader code;
+
+LightShaders := empty list of TShaderSource;
+TextureShaders := empty list of TShaderSource;
+
+for each light source affecting this shape:
+  LightShader := new TShaderSource;
+  as the 1st fragment part (for Phong shading) or
+    the 1st vertex part (for Gouraud shading) of the LightShader,
+    add a shader code that contains a function PLUG_add_light_contribution_side
+    calculating given light contribution.
+    The actual initial code used by our engine may be found on
+    http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template_add_light.glsl
+    ;
+  /* add Effect nodes specific to this light source.
+     LightShader will contain both initial 1st part, and subsequent
+     effect code, so standard light source PLUGs as well as custom
+     PLUGs inside light source Effect nodes can be used. */
+  EnableEffects(light node.Effects, LightShader);
+  LightShaderContribution := extract (get and delete) from LightShader
+    the 1st fragment part (for Phong shading) or
+    the 1st vertex part (for Gouraud shading). This step extracts back
+    the initial code (now possibly enhanced by calls to user effects)
+    you added before.
+  /* insert the call to our PLUG_add_light_contribution_side
+     from the FinalShader. Everything is connected now: final shader
+     calls PLUG_add_light_contribution_side, and PLUG_add_light_contribution_side
+     calls user effects on light sources.  */
+  Plug(stFragment, LightShaderContribution);
+  /* add user effects code to the final code,
+     making the FinalShader contains everything necessary. */
+  FinalShader.Append(LightShader);
+
+for each texture affecting this shape:
+  /* similar approach as for the light source is used */
+  TextureShader := new TShaderSource;
+  as the 1st fragment part of TextureShader, add a code to actually apply
+    calculate the texture color. This code should be inserted to the final
+    shader at PLUG_texture_apply place. In turn, this code also defines
+    plugs to be overridden by texture effects specific for this texture,
+    like PLUG_texture_color.
+  EnableEffects(texture node.Effects, TextureShader);
+  TextureContribution := extract from TextureShader the 1st fragment part,
+    now enhanced with calls to user texture effects;
+  Plug(stFragment, TextureContribution);
+  FinalShader.Append(TextureShader);
+
+EnableEffects(appearance node.Effects);
+
+for each group node containing this shape:
+  EnableEffects(group node.Effects);
+
+/* if the "separate compilation units" feature is not available,
+   then simply concatenate all the parts into one large string */
+if shader language is not GLSL then
+  for each type := TShaderPart
+    FinalShader[type].CompleteCode := FinalShader[type].Parts[*];
+
+compile and link the FinalShader.
 </screen>
+
+<!--
+<para>As this is only a pseudo-code, many optimizations are possible.
+The largest optimization, that also complicates this code
+a little, is to calculate only hash at the first stage,
+and construct actual strings only in the second stage.
+-->
 
 </section>
 
@@ -1723,11 +1873,19 @@ we even know the hash. So in practice it's much faster to calculate
 the hash value looking at all the parameters that affect the generated
 shader source, including all the participating <literal>Effect</literal> and <literal>ComposedShader</literal>
 nodes, as well as the standard X3D lights sources, textures,
-fog values and so on.</para>
+fog values and so on. Only once we know that we really need the actual
+source code of the shader (to create), then we construct the complete source.
+This means that our pseudo-code is a little more complicated in reality:
+some operations are in fact delayed. For example, at the first stage
+over the light sources we only update the hash value and remember
+the light source parameters. If the actual source code is needed,
+only then do we actually construct the shader code using the remembered light source
+parameters.
+</para>
 
 <para>For applications when some subset of needed shaders if known in advance,
 the pool of shaders may be already initialized to contain some shaders
-with artificial non-zero use count. This way, some shader configuration
+with artificial non-zero use count. This way, some shader configurations
 are always kept initialized and ready to be used.</para>
 
 </section>
