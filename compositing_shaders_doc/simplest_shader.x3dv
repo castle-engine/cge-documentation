@@ -1,0 +1,18 @@
+#X3D V3.2 utf8
+PROFILE Interchange
+Shape {
+  appearance Appearance {
+    shaders ComposedShader {
+      language "GLSL"
+      parts ShaderPart {
+        type "FRAGMENT"
+        url "data:text/plain,
+          void main(void)
+          {
+            gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+          }"
+      }
+    }
+  }
+  geometry Sphere { radius 2 }
+}
