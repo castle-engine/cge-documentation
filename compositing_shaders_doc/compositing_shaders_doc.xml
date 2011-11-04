@@ -238,58 +238,38 @@ shading language processing inside the application.</para>
 <chapter id="chapter.x3d">
 <title>What is X3D?</title>
 
-<para>Simply put, X3D is a format for 3D models. It's quite large,
-and some of it's areas are quite complex, and as such
-it resembles a declarative programming language (for example,
-there are prototypes and external prototypes to define new language nodes).
-The language is standardized, with open and precise specification
-available to everyone (<xref linkend="bib.x3d" />).</para>
+<para>X3D <xref linkend="bib.x3d" /> is a language to describe 3D worlds.
+The precise specification of the language is open to everyone.
+In effect, many applications can handle X3D and cooperate with each other.
+For example, you can create an X3D file using any popular 3D modeller
+(like <emphasis>Blender</emphasis>) and then load it into any X3D browser
+(like our <emphasis>view3dscene</emphasis>, see <xref linkend="bib.castleengine" />).</para>
 
-<para>X3D specifies various nodes and fields, with well-defined meaning,
-to declare common 3D objects and operations
-(like 3D triangle meshes, with materials, textures and such;
-operations include e.g. grouping, with transformations and such).
-Many nodes are suitable for interactive operating and scripting
-(sensors for keyboard, mouse and other inputs,
-scripts for processing the results of some operations
-and triggering other operations). Prototypes are available
+<para>Many common 3D features, like triangle meshes with materials and textures,
+and easy to express. Yet the whole X3D standard is quite large,
+including advanced 3D concepts like NURBS,
+cube mapping, multi-texturing, particle effects, skinned humanoid animation,
+spatial sound, physics.</para>
+
+<para>The scene is represented as a graph of <emphasis>nodes</emphasis>.
+In the simple cases, the scene is just a tree of nodes.
+In a general case, it can be a directed graph of nodes, with cycles possible.
+<!-- Mention DEF/USE keywords. -->
+The X3D specification lists the available node types and their fields.
+It is also possible to define new full-featured node types using <emphasis>prototypes</emphasis>.</para>
+<!-- More about protos?
+Prototypes are available
 for defining new node types, and external prototypes are available
 to load prototypes from other files.
 This provides you opportunities to define whole libraries of new objects,
 cooperating with each other, much alike libraries and modules
-for functions and classes in normal programming languages.</para>
-
-<para><emphasis>Short history</emphasis>: The predecessor of X3D is called VRML.
-Initial VRML version, VRML 1.0, was based on a subset of even older format,
-Inventor. Later VRML version, VRML 2.0 (called also VRML 97 due to it's release
-date), changed the syntax a lot and added a lot of new features for
-interactive 3D worlds, with rich graphic effects.
-X3D version numbers start from 3.0, to emphasize that X3D is
-a natural progression from the VRML. The current version of X3D is 3.2,
-with X3D 3.3 in the process of being finalized.</para>
-
-<para>A lot of the 3D software handles various VRML and X3D versions,
-and commonly calls the format just "VRML/X3D".</para>
-
-<para>X3D allows to encode the nodes graph in various formats.
-The most classic is a text file format, that requires a specialized parser,
-and is called nowadays "classic (VRML) encoding". The commonly used now
-is an XML encoding. There is also a binary encoding, following standard
-methods to binary encode XML.</para>
-
-<!--
-\begin{itemize}
-  \item \textbf{Extensible 3D}: language to describe 3D worlds.
-  \item Open (full specifications on~\texttt{http://www.web3d.org/}), popular standard.
-  \item Easy to express all typical 3D world features.
-  \item In simple cases, a~tree of nodes.
-    In a~general case, a~directed graph of nodes, cycles possible.
-  \item Each node has a~set of fields, some fields contain in turn children nodes.
-\end{itemize}
-
+for functions and classes in normal programming languages.
 -->
 
-<para>An example of simple X3D file in classic encoding:</para>
+<para>An example of a simple X3D file in
+the <quote>classic</quote> encoding follows.
+You can save it as a file with extension <literal>.x3dv</literal>
+and open with any X3D browser.</para>
 
 <screen>#X3D V3.2 utf8
 PROFILE Interchange
@@ -298,8 +278,11 @@ Shape {
 }
 </screen>
 
-<para>The same example in the XML encoding (DTD and XML schema declarations
-are usually added here, but we omitted them for brevity):</para>
+<para>Example below shows the same X3D content encoded using the XML format.
+Note that we omitted  <!--the optional (but adviced)-->
+DTD and XML schema declarations for brevity.
+Again, you can open this file with any X3D browser
+(be sure to save it with <literal>.x3d</literal> extension).</para>
 
 <!--
 &lt;!DOCTYPE X3D PUBLIC
@@ -320,46 +303,69 @@ are usually added here, but we omitted them for brevity):</para>
 &lt;/X3D&gt;
 </screen>
 
-<!--
-\begin{frame}{X3D has a~lot features}
+<!-- More about encodings, and binary encoding?
+<para>X3D allows to encode the nodes graph in various formats.
+The most classic is a text file format, that requires a specialized parser,
+and is called nowadays "classic (VRML) encoding". The commonly used now
+is an XML encoding. There is also a binary encoding, following standard
+methods to binary encode XML.</para>
+-->
 
-That's why we chose to integrate our concept with X3D.
+<para>To enable basic animation and interactive behavior, X3D introduces
+the concept of <emphasis>events</emphasis> and <emphasis>routes</emphasis>.
+Many nodes have an ability to <emphasis>send events</emphasis>, notifying
+about something. There are even special nodes called <emphasis>sensors</emphasis>
+with the sole purpose of sending events when something happens.
+For example <emphasis>mouse sensors</emphasis>, that report user clicking and dragging
+on the scene. Independently, many nodes can also <emphasis>receive events</emphasis>,
+which allows to instruct the node to do something (for example,
+start the animation).
+The X3D author can declare <emphasis>routes</emphasis> that connect
+given node's <emphasis>output event</emphasis> (a socket used to send an event) to another node's
+<emphasis>input event</emphasis> (a socket used to receive an event).
+For example, <quote>open a door
+when the handle is pressed</quote>.</para>
 
-Besides standard rendering features (indexed geometries with materials
-and~animations), the~X3D specification includes many
-advanced 3D visualization stuff. For example:
+<!-- This turns X3D into a declarative programming
+language: author merely declares a route between the two sockets,
+and the X3D browser will take care to actually propagate the event
+and perform appriate action when necessary.</para>
+-->
 
-\begin{itemize}
-  \item NURBS,
-  \item advanced texturing (cube maps, 2D and~3D textures, multi-texturing),
-  \item particle effects,
-  \item physics,
-  \item skinned humanoid animation.
-\end{itemize}
-\end{frame}
+<para>Below is an example of a simple interactive animation.
+When you click on a sphere, the <literal>TimeSensor</literal> starts ticking,
+which in turn makes the <literal>PositionInterpolator</literal> produce
+3D positions with increasing Y value. The positions are then used to move
+the sphere up.</para>
 
-% TODO- remove, instead more slides about our invention?
-\begin{frame}{X3D as a~programming language}
+<screen><xi:include href="simplest_animation.x3dv" parse="text"
+  xmlns:xi="http://www.w3.org/2001/XInclude"/></screen>
 
-There are some aspects of X3D that make it more interesting,
-more like ``(declarative) programming language'' than just ``3D~model format'':
-
-\begin{itemize}
-  \item DEF/USE: references, for all nodes.
-  \item Events: sending and~receiving events.
-%    declarative analogy to calling a~method in imperative programming.
-    E.g.~open a~door when user presses a~handled.
-  \item Prototypes: define new nodes,
-  %pełnowartościowe,
-    by combining existing ones.
+<!-- Something about scripts?
+<para>The behavior of X3D scene can also be enhanced by scripting
+languages.</para>
   \item Scripts: integration with script languages (like JavaScript) easy.
     %% Script remains a~``black box'' for~X3D. At the~same time
     %% in X3D we define exactly what parts of the~scene are accessed.
      %  np.~JavaScript. U mnie &mdash; z~własnym prostym językiem skryptowym
      % oraz ze skompilowanym kodem w~ObjectPascalu.
      % Więcej nowinek w~vrml\_engine\_doc, sekcja "advanced features".
-\end{itemize}
-\end{frame}
+-->
+
+<!--
+<para><emphasis>Short history</emphasis>: The predecessor of X3D was called
+<emphasis>VRML</emphasis>.
+Initial VRML version, <emphasis>VRML 1.0</emphasis>, was based
+on a subset of an even older format,
+<emphasis>Inventor</emphasis>. Later VRML version, <emphasis>VRML 2.0</emphasis>
+(called also <emphasis>VRML 97</emphasis> due to it's release
+date), changed the syntax a lot and added many new features for
+interactive 3D worlds.
+X3D version numbers start from 3.0, to emphasize that X3D is
+a natural progression from the VRML. The current version of X3D is 3.2,
+with X3D 3.3 in the process of being finalized.
+A lot of the software handles both VRML and X3D,
+and commonly calls the format just <emphasis>VRML/X3D</emphasis>.</para>
 -->
 
 <!--
@@ -1806,6 +1812,13 @@ goes to all of you!
   <author><othername>Instant Reality</othername></author>.
   <title><emphasis>NoiseTexture</emphasis></title>.
   <bibliomisc>See <ulink url="http://doc.instantreality.org/documentation/nodetype/NoiseTexture/" />.</bibliomisc>
+</bibliomixed>
+
+<bibliomixed id="bib.castleengine">
+  <abbrev>Castle Game Engine</abbrev>
+  <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
+  <bibliomisc>The engine webpage, with information and downloads of our tools (like <literal>view3dscene</literal>):
+    <ulink url="http://castle-engine.sourceforge.net/" />.</bibliomisc>
 </bibliomixed>
 
 </bibliography>
