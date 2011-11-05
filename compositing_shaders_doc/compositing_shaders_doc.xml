@@ -1698,13 +1698,11 @@ textures and such), custom shaders (by X3D nodes like
   TShaderSource = array [TShaderType] of a string list;
 
 /* Detect defined PLUG_xxx functions within PlugValue,
-   insert calls to them into given CompleteCode,
-   insert forward declarations of their calls into CompleteCode too,
+   let Code := CompleteCode[EffectPartType],
+   insert calls to them into given Code,
+   insert forward declarations of their calls into Code too,
    insert the PlugValue (which should be variable and functions declarations)
-   into code of FinalShader (determined by EffectPartType). */
-/* TODO: since PlugValue is added to the FinalShader,
-   when do we actually have more than 1 piece of code on LightShader
-   or TextureShader? */
+     as another part of the Code. */
 procedure Plug(const EffectPartType: TShaderType; PlugValue: string;
   CompleteCode: TShaderSource = nil);
 
@@ -1757,11 +1755,12 @@ procedure Plug(const EffectPartType: TShaderType; PlugValue: string;
   // TODO simplify end --------------------------
 
   { regardless if any (and how many) plug points were found,
-    always insert PlugValue into CodeForPlugValue }
-  FinalShader[EffectPartType].Add(PlugValue);
+    always insert PlugValue into Code. This way EffectPart with a library
+    of utility functions (no PLUG_xxx) also works. }
+  Code.Add(PlugValue);
 
-/* Add user effects to Code.
-   TODO: meaning of Code = nil. */
+/* Add user effects to Code. Code = nil means that the FinalShader code
+   (for the given shape) is used. */
 procedure EnableEffects(Effects: TMFNode; const Code: TShaderSource = nil);
   for each Effect := node on the Effects list
     if Effect.enabled and (Effect.language matches renderer shader language) then
