@@ -1706,6 +1706,9 @@ textures and such), custom shaders (by X3D nodes like
 procedure Plug(const EffectPartType: TShaderType; PlugValue: string;
   CompleteCode: TShaderSource = nil);
 
+  // TODO: maybe remove special EffectPartType and CompleteCode,
+  // just have Code?
+
   if CompleteCode = nil then
     CompleteCode := FinalShader;
   Code := CompleteCode[EffectPartType];
