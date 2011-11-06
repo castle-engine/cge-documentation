@@ -1691,24 +1691,59 @@ that creates a complete shader source code suitable for each shape.
 It takes into account standard rendering features (X3D light sources,
 textures and such), custom shaders (by X3D nodes like
 <literal>ComposedShader</literal>) and our shaders effects
-(by <literal>Effect</literal> nodes).</para>
+(by <literal>Effect</literal> nodes). All effects are properly added
+together to the final shader code.</para>
+
+<para>First define a helper function <literal>Plug</literal>.
+It deals with strings and string lists, doing the low-level
+work of making the plug functions get called.
+We will search inside the <literal>PlugValue</literal> for
+<literal>PLUG_xxx</literal> functions.
+Then we will search inside the <literal>CompleteCode</literal>
+as well as the final shader code for the matching
+<literal>/* PLUG: xxx ... */</literal> comments.
+Appropriate calls and forward declarations will be inserted,
+and the modified <literal>PlugValue</literal> will be inserted
+to the <literal>CompleteCode</literal> as well.
+</para>
 
 <screen>type
   TShaderType = (geometry, vertex, fragment);
   TShaderSource = array [TShaderType] of a string list;
 
-/* Detect defined PLUG_xxx functions within PlugValue,
-   let Code := CompleteCode[EffectPartType],
-   insert calls to them into given Code,
-   insert forward declarations of their calls into Code too,
-   insert the PlugValue (which should be variable and functions declarations)
-     as another part of the Code. */
 procedure Plug(const EffectPartType: TShaderType; PlugValue: string;
   CompleteCode: TShaderSource = nil);
 
-  // TODO: maybe remove special EffectPartType and CompleteCode,
-  // just have Code?
+var
+  PlugName, ProcedureName, PlugForwardDeclaration: string;
 
+  function LookForPlugDeclaration(CodeForPlugDeclaration: TCastleStringList): boolean;
+  var
+    AnyOccurencesInThisCodeIndex: boolean;
+    CodeIndex: Integer;
+    Parameter: string;
+  begin
+    Result := false;
+    for CodeIndex := 0 to CodeForPlugDeclaration.Count - 1 do
+    begin
+      AnyOccurencesInThisCodeIndex := false;
+      while you can find an occurence of '/* PLUG: ' + PlugName + ' '
+        inside the CodeForPlugDeclaration[CodeIndex]:
+      begin
+        Parameter := Trim(CopyPos(CodeForPlugDeclaration[CodeIndex], PBegin + Length(CommentBegin), PEnd - 1));
+        InsertIntoCode(CodeForPlugDeclaration, CodeIndex, PBegin, ProcedureName + Parameter + ';' + NL);
+
+        AnyOccurencesInThisCodeIndex := true;
+        Result := true;
+      end;
+
+      if AnyOccurencesInThisCodeIndex then
+        insert the forward declaration of the call into
+          CodeForPlugDeclaration[CodeIndex], at the place of /* PLUG-DECLARATIONS */ inside
+    end;
+  end;
+
+begin
   if CompleteCode = nil then
     CompleteCode := FinalShader;
   Code := CompleteCode[EffectPartType];
@@ -1718,59 +1753,57 @@ procedure Plug(const EffectPartType: TShaderType; PlugValue: string;
     PlugName := found xxx
     PlugDeclaredParameters := found PLUG_xxx function declaration of parameters
 
-    /* Rename found PLUG_xxx to plugged_&lt;unique&gt;.
-       This way:
-       - it will not be mistaken for PLUG_xxx to be inserted 2nd time.
-       - it's unique, so you can override multiple times the same PLUG_xxx */
+    { Rename found PLUG_xxx to plugged_&lt;unique&gt;.
+      This way:
+      - it will not be mistaken for PLUG_xxx to be inserted 2nd time.
+      - it's unique, so you can override multiple times the same PLUG_xxx }
     ProcedureName := 'plugged_' + IntToStr(PlugIdentifiers);
     StringReplaceAllTo1st(PlugValue, 'PLUG_' + PlugName, ProcedureName, false);
     Inc(PlugIdentifiers);
 
     PlugForwardDeclaration := 'void ' + ProcedureName + PlugDeclaredParameters + ';' + NL;
 
-    // TODO simplify begin --------------------------
-
-    AnyOccurences := false;
-    for CodeIndex := 0 to Code.Count - 1 do
-    begin
-      CodeSearchBegin := 1;
-      AnyOccurencesInThisCodeIndex := false;
-      while FindPlugOccurence(CommentBegin, Code[CodeIndex], CodeSearchBegin, PBegin, PEnd) do
-      begin
-        Parameter := Trim(CopyPos(Code[CodeIndex], PBegin + Length(CommentBegin), PEnd - 1));
-        InsertIntoCode(CodeIndex, PBegin, ProcedureName + Parameter + ';' + NL);
-
-        { do not find again the same plug comment by FindPlugOccurence }
-        CodeSearchBegin := PEnd;
-
-        AnyOccurencesInThisCodeIndex := true;
-        AnyOccurences := true;
-      end;
-
-      if AnyOccurencesInThisCodeIndex then
-        PlugDirectly(Code, CodeIndex, '/* PLUG-DECLARATIONS */', PlugForwardDeclaration, true);
-    end;
+    AnyOccurences := LookForPlugDeclaration(Code);
+    { If the plug declaration not found in Code, then try to find it in
+      the final shader. This happens if your Code is special for given
+      light/texture effect, and you try to use a plug that
+      is not special to the light/texture effect. For example,
+      using PLUG_vertex_object_space inside a X3DTextureNode.effects. }
+    if (not AnyOccurences) and
+       (Code &lt;&gt; Source[EffectPartType]) then
+      AnyOccurences := LookForPlugDeclaration(Source[EffectPartType]);
 
     if (not AnyOccurences) and WarnMissingPlugs then
       OnWarning(wtMinor, 'VRML/X3D', Format('Plug name "%s" not declared', [PlugName]));
   end;
 
-  // TODO simplify end --------------------------
-
   { regardless if any (and how many) plug points were found,
     always insert PlugValue into Code. This way EffectPart with a library
     of utility functions (no PLUG_xxx) also works. }
   Code.Add(PlugValue);
+end;
+</screen>
 
-/* Add user effects to Code. Code = nil means that the FinalShader code
-   (for the given shape) is used. */
-procedure EnableEffects(Effects: TMFNode; const Code: TShaderSource = nil);
+<para>Using the <literal>Plug</literal> function,
+we can write a helper function that handles <literal>effects</literal>
+list for any X3D node. The <literal>EnableEffects</literal>
+will add user effects to the given Code (or to the final shader code,
+if Code is nil).</para>
+
+<screen>procedure EnableEffects(Effects: TMFNode; const Code: TShaderSource = nil);
+begin
   for each Effect := node on the Effects list
     if Effect.enabled and (Effect.language matches renderer shader language) then
       for each EffectPart := Effect.parts
         Plug(EffectPart.type, EffectPart.url, Code);
+end;
+</screen>
 
-FinalShader := new TShaderSource;
+<para>Finally, we can use the above helpers to actually construct
+the final shader code, where all the effects (including effects special
+to lights and textures) are correctly applied.</para>
+
+<screen>FinalShader := new TShaderSource;
 set FinalShader to standard simple shader source code,
   to render standard 3D object with no lights, no textures, no effects.
   It contains magic PLUG_ comments to allow inserting all the features
@@ -1844,6 +1877,12 @@ if shader language is not GLSL then
 
 compile and link the FinalShader.
 </screen>
+
+<para>The full, actual source code of this operation is available
+in our engine sources, see the unit glrenderershader.pas.
+See http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glrenderershader.pas .
+It's used by glrenderer.pas, in particular by glrenderer_meshrenderer.inc .
+</para>
 
 <!--
 <para>As this is only a pseudo-code, many optimizations are possible.
