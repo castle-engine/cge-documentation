@@ -36,3 +36,4 @@ upload: clean default
 	cd output/xsl/ && tar czvf ../../output.tar.gz *
 	scp $(SCP_OPTIONS) output.tar.gz $(SF_CONNECT)
 	./sf_upload_finalize.sh $(SF_USERNAME) $(SF_PATH)
+	rm -f output.tar.gz
