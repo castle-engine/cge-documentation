@@ -1717,21 +1717,24 @@ procedure Plug(const EffectPartType: TShaderType; PlugValue: string;
 var
   PlugName, ProcedureName, PlugForwardDeclaration: string;
 
-  function LookForPlugDeclaration(CodeForPlugDeclaration: TCastleStringList): boolean;
+  function LookForPlugDeclaration(
+    CodeForPlugDeclaration: string list): boolean;
   var
     AnyOccurencesInThisCodeIndex: boolean;
     CodeIndex: Integer;
-    Parameter: string;
+    Parameters: string;
   begin
     Result := false;
     for CodeIndex := 0 to CodeForPlugDeclaration.Count - 1 do
     begin
       AnyOccurencesInThisCodeIndex := false;
-      while you can find an occurence of '/* PLUG: ' + PlugName + ' '
+      while you can find an occurrence of /* PLUG: PlugName (...) */
         inside the CodeForPlugDeclaration[CodeIndex]:
       begin
-        Parameter := Trim(CopyPos(CodeForPlugDeclaration[CodeIndex], PBegin + Length(CommentBegin), PEnd - 1));
-        InsertIntoCode(CodeForPlugDeclaration, CodeIndex, PBegin, ProcedureName + Parameter + ';' + NL);
+        Parameters := call parameters inside the /* PLUG: PlugName (...) */
+        inside into the CodeForPlugDeclaration a call to
+          ProcedureName, with calculated Parameters,
+          at the place where you found /* PLUG: PlugName (...) */
 
         AnyOccurencesInThisCodeIndex := true;
         Result := true;
@@ -1739,7 +1742,9 @@ var
 
       if AnyOccurencesInThisCodeIndex then
         insert the forward declaration of the call into
-          CodeForPlugDeclaration[CodeIndex], at the place of /* PLUG-DECLARATIONS */ inside
+          CodeForPlugDeclaration[CodeIndex],
+          at the place of /* PLUG-DECLARATIONS */ inside
+          (or the beginning, if no /* PLUG-DECLARATIONS */)
     end;
   end;
 
@@ -1757,24 +1762,26 @@ begin
       This way:
       - it will not be mistaken for PLUG_xxx to be inserted 2nd time.
       - it's unique, so you can override multiple times the same PLUG_xxx }
-    ProcedureName := 'plugged_' + IntToStr(PlugIdentifiers);
-    StringReplaceAllTo1st(PlugValue, 'PLUG_' + PlugName, ProcedureName, false);
-    Inc(PlugIdentifiers);
+    ProcedureName := generate new unique procedure name,
+      for example by using 'plugged_' + some unique integer;
+    replace inside PlugValue all occurrences of 'PLUG_' + PlugName
+      with ProcedureName;
 
-    PlugForwardDeclaration := 'void ' + ProcedureName + PlugDeclaredParameters + ';' + NL;
+    PlugForwardDeclaration := 'void ' + ProcedureName +
+      PlugDeclaredParameters + ';' + newline;
 
-    AnyOccurences := LookForPlugDeclaration(Code);
+    AnyOccurrences := LookForPlugDeclaration(Code);
     { If the plug declaration not found in Code, then try to find it in
       the final shader. This happens if your Code is special for given
       light/texture effect, and you try to use a plug that
       is not special to the light/texture effect. For example,
       using PLUG_vertex_object_space inside a X3DTextureNode.effects. }
-    if (not AnyOccurences) and
+    if (not AnyOccurrences) and
        (Code &lt;&gt; Source[EffectPartType]) then
-      AnyOccurences := LookForPlugDeclaration(Source[EffectPartType]);
+      AnyOccurrences := LookForPlugDeclaration(Source[EffectPartType]);
 
-    if (not AnyOccurences) and WarnMissingPlugs then
-      OnWarning(wtMinor, 'VRML/X3D', Format('Plug name "%s" not declared', [PlugName]));
+    if not AnyOccurrences then
+      make a warning 'Plug name ' PlugName ' not declared';
   end;
 
   { regardless if any (and how many) plug points were found,
@@ -1792,9 +1799,9 @@ if Code is nil).</para>
 
 <screen>procedure EnableEffects(Effects: TMFNode; const Code: TShaderSource = nil);
 begin
-  for each Effect := node on the Effects list
+  for each Effect := node on the Effects list do
     if Effect.enabled and (Effect.language matches renderer shader language) then
-      for each EffectPart := Effect.parts
+      for each EffectPart := node on the Effect.parts list do
         Plug(EffectPart.type, EffectPart.url, Code);
 end;
 </screen>
@@ -1818,9 +1825,6 @@ if a complete shader code is assigned to given shape,
   following <xref linkend="bib.x3d_shaders" />,
   like a <literal>ComposedShader</literal> node, then
   set FinalShader to this shader code;
-
-LightShaders := empty list of TShaderSource;
-TextureShaders := empty list of TShaderSource;
 
 for each light source affecting this shape:
   LightShader := new TShaderSource;
@@ -1869,10 +1873,10 @@ EnableEffects(appearance node.Effects);
 for each group node containing this shape:
   EnableEffects(group node.Effects);
 
-/* if the "separate compilation units" feature is not available,
-   then simply concatenate all the parts into one large string */
+{ if the "separate compilation units" feature is not available,
+  then simply concatenate all the parts into one large string }
 if shader language is not GLSL then
-  for each type := TShaderPart
+  for each type := TShaderPart do
     FinalShader[type].CompleteCode := FinalShader[type].Parts[*];
 
 compile and link the FinalShader.
@@ -1896,11 +1900,13 @@ and construct actual strings only in the second stage.
 <section id="section.pool">
 <title>Pool of shaders</title>
 
-<para>An implementation should limit the number of shaders created this way,
-to avoid initializing new shader for each shape. This can be achieved
-by creating a common pool of shaders to be used.
-For each newly created shader configuration, a unique hash value
-is calculated and the shader is added to the pool.
+<para>Straightforward use of the pseudo-code above means that you
+create new shader for each rendered shape. This works correctly,
+but is very time and memory consuming for large scenes.
+A good implementation should try to reuse the shaders.
+This can be achieved by keeping a <emphasis>pool of available shaders</emphasis>.
+For each newly created shader, we calculate a hash value (reflecting
+the whole shader configuration) and insert this shader into the pool.
 When a new shader is needed, we first look for it in the pool
 (using the hash value of the desired configuration), and if we find it
 &mdash; we reuse it (increasing the reference count). Only if the shader
@@ -1908,26 +1914,28 @@ is not found, we create a new one. This is quite simple and fast to do,
 and it provides a perfect sharing of shaders.</para>
 
 <para>The hash value could be calculated based solely on the final string
-of the shader, but this is too slow in our experience &mdash;
+of the shader. However, this is too slow in our experience &mdash;
 as it means that all the string operations have to be repeated before
 we even know the hash. So in practice it's much faster to calculate
 the hash value looking at all the parameters that affect the generated
 shader source, including all the participating <literal>Effect</literal> and <literal>ComposedShader</literal>
 nodes, as well as the standard X3D lights sources, textures,
-fog values and so on. Only once we know that we really need the actual
-source code of the shader (to create), then we construct the complete source.
-This means that our pseudo-code is a little more complicated in reality:
-some operations are in fact delayed. For example, at the first stage
-over the light sources we only update the hash value and remember
-the light source parameters. If the actual source code is needed,
-only then do we actually construct the shader code using the remembered light source
+fog values and so on. Only if we know that we really need to create new shader,
+then we calculate the actual shader source code and compile it.
+This means that our pseudo-code gets a little more complicated:
+most operations are in fact delayed. For example, at the first stage
+we only iterate over the light sources to update the hash value and remember
+the light source parameters. Later, if the actual source code is needed,
+we actually construct the shader code using the remembered light source
 parameters.
 </para>
 
-<para>For applications when some subset of needed shaders if known in advance,
-the pool of shaders may be already initialized to contain some shaders
-with artificial non-zero use count. This way, some shader configurations
-are always kept initialized and ready to be used.</para>
+<para>An additional advantage of the <quote>pool of shaders</quote>
+appears when some subset of the needed shaders is known in the advance.
+In such case, an application may initialize the pool
+to contain some shaders with artificial non-zero use count.
+This way, some shader configurations
+are always kept initialized and ready to be used immediately.</para>
 
 </section>
 
