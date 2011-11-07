@@ -26,12 +26,6 @@
 
 <xsl:param name="ulink.hyphenate.chars" select="'/.'"></xsl:param>
 
-<!-- Make page break in FO on <?page-break?> in DocBook source.
-  Based on [http://sourceware.org/ml/docbook-apps/2003-q1/msg01210.html] -->
-<xsl:template match="processing-instruction('page-break')">
-  <fo:block break-after="page"/>
-</xsl:template>
-
 <xsl:param name="shade.verbatim" select="1"></xsl:param>
 
 <!-- Make font for <screen> in PDF a little smaller.
@@ -62,34 +56,6 @@
   </xsl:attribute>
   -->
 </xsl:attribute-set>
-
-<!-- Make line break on <?lb?> in DocBook source.
-  From [http://sourceware.org/ml/docbook/2004-04/msg00031.html]
-  which is based on DocBook Def Guide -->
-<xsl:template match="processing-instruction('lb')">
-  <fo:block>
-    <xsl:text> </xsl:text>
-  </fo:block>
-</xsl:template>
-
-<!-- Insert alpha character with appropriate font-family
-  (otherwise it's not visible in PDF output).
-  The suggestion from this comes from fop FAQ, see also
-  [http://xmlgraphics.apache.org/fop/fo/fonts.fo.pdf].
-
-  font-style="normal" is needed because I use this within
-  phrase role="math" where normally I have italic font,
-  and Symbol font family doesn't have an italic version. -->
-<xsl:template match="processing-instruction('alpha')">
-  <fo:inline font-family="Symbol" font-style="normal">&#x03B1;</fo:inline>
-</xsl:template>
-
-<!-- This makes variablelist and glosslist look better.
-  This also workarounds FOP footnotes bug (footnotes from lists do not
-  work, but from normal blocks (as the one produced with
-  variablelist.as.blocks) work OK). -->
-<xsl:param name="variablelist.as.blocks">1</xsl:param>
-<xsl:param name="glosslist.as.blocks">1</xsl:param>
 
 <!-- <xsl:template match="phrase[@role= 'polish-characters']"> -->
 <!--   <fo:inline font-family="DejaVuSerif"> -->

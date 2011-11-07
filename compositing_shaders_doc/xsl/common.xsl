@@ -8,15 +8,7 @@
      harmless, but clutter the output). -->
 <xsl:param name="draft.mode">no</xsl:param>
 
-<!-- The default value points to http:// file, which disallows
-     me to generate doc when offline. -->
-<xsl:param name="draft.watermark.image">/usr/share/xml/docbook/stylesheet/nwalsh/images/draft.png</xsl:param>
-
 <xsl:param name="section.autolabel" select="1"></xsl:param>
-
-<!-- <xsl:template match="phrase[@role = 'math']"> -->
-<!--   <xsl:call-template name="inline.italicseq"/> -->
-<!-- </xsl:template> -->
 
 <xsl:param name="section.label.includes.component.label" select="1"></xsl:param>
 
