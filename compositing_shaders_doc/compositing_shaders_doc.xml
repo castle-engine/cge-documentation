@@ -1889,7 +1889,10 @@ for each texture affecting this shape:
   { similar approach as for the light source is used }
   TextureShader := new TShaderSource
   as the 1st fragment part of TextureShader, add a code to actually apply
-    calculate the texture color. This code should be inserted to the final
+    calculate the texture color. This should take the sample from a texture
+    using appropriate function, and apply it following the X3D multi-texture
+    mode (multiply, add and such).
+    This code should be inserted to the final
     shader at PLUG_texture_apply place. In turn, this code also defines
     plugs to be overridden by texture effects specific for this texture,
     like PLUG_texture_color.
