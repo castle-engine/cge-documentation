@@ -1693,7 +1693,7 @@ cleaner shader code (you cannot use undeclared functions from other
 shader parts). It also naturally matches with our effects definition,
 as each <literal>EffectPart</literal> becomes simply one compilation unit.
 <!--
-and it gives you better line numbers in error messages
+and it gives us better line numbers in error messages
 (although a pre-processor directive like <literal>#line</literal> could also be used for
 this).
 -->
@@ -1776,12 +1776,12 @@ it has been processed, and correctly added to the <literal>CompleteCode</literal
     &foreach; S: string &in; CodeForPlugDeclaration &do;
     &begin;
       AnyOccurrencesHere &assign; false
-      &while; you can find an occurrence
+      &while; we can find an occurrence
         of /* PLUG: PlugName (...) */ inside S &do;
       &begin;
         insert into S a call to ProcedureName,
         with parameters specified inside the /* PLUG: PlugName (...) */,
-        right before the place where you found /* PLUG: PlugName (...) */
+        right before the place where we found /* PLUG: PlugName (...) */
 
         AnyOccurrencesHere &assign; true
         Result &assign; true
@@ -1801,10 +1801,10 @@ it has been processed, and correctly added to the <literal>CompleteCode</literal
     CompleteCode &assign; FinalShader
   Code &assign; CompleteCode[EffectPartType]
 
-  &while; you can find PLUG_xxx inside PlugValue &do;
+  &while; we can find PLUG_xxx inside PlugValue &do;
   &begin;
-    PlugName &assign; found plug name, the "xxx" inside PLUG_xxx
-    PlugDeclaredParameters &assign; declaration of parameters at PLUG_xxx function
+    PlugName &assign; the plug name we found, the "xxx" inside PLUG_xxx
+    PlugDeclaredParameters &assign; parameters declared at PLUG_xxx function
 
     <emphasis>{ Rename found PLUG_xxx to something unique. }</emphasis>
     ProcedureName &assign; generate new unique procedure name,
@@ -1818,11 +1818,12 @@ it has been processed, and correctly added to the <literal>CompleteCode</literal
 
     AnyOccurrences &assign; LookForPlugDeclaration(Code)
 
-    <emphasis>{ If the plug declaration not found in Code, then try to find it in
-      the final shader. This happens if your Code is special for given
-      light/texture effect, and you try to use a plug that
-      is not special to the light/texture effect. For example,
-      using PLUG_vertex_object_space inside a X3DTextureNode.effects. }</emphasis>
+    <emphasis>{ If the plug declaration is not found in Code, then try to find it
+      in the final shader. This happens if Code is special for given
+      light/texture effect, but PLUG_xxx is not special to the
+      light/texture effect (it is applicable to the whole shape as well).
+      For example, using PLUG_vertex_object_space inside
+      the X3DTextureNode.effects. }</emphasis>
     &if; &not; AnyOccurrences &and;
        Code &lt;&gt; Source[EffectPartType] &then;
       AnyOccurrences &assign; LookForPlugDeclaration(Source[EffectPartType])
@@ -1897,9 +1898,9 @@ We use it at this step.</para>
 code to also contain plug declarations, like <literal>/* PLUG_xx ... */</literal>.
 The same plug names as our default names may be used
 (like <literal>texture_apply</literal> and so on),
-in which case the same user effects will be useful with your custom shader.
+in which case the same user effects will be useful with our custom shader.
 With certain care, even internal effects
-(like shadow maps) may be added to your custom shader template this way.</para>
+(like shadow maps) may be added to our custom shader template this way.</para>
 
 <para>Alternatively, the <literal>ComposedShader</literal> may have
 a completely different approach to rendering. Then it may expose
@@ -2040,7 +2041,7 @@ and effects for all groups containing this shape, are applied.</para>
 plugs, like <literal>light_scale</literal>. That's simply because
 we have already added all the lighting and texturing shading code
 to the <literal>FinalShader</literal>. Overriding <literal>light_scale</literal>
-at this point means that you can scale the contribution of every light
+at this point means that we can scale the contribution of every light
 by the same function.</para>
 
 <para>At the end, <literal>FinalShader</literal> is just a collection
@@ -2070,7 +2071,7 @@ and construct actual strings only in the second stage.
 <section id="section.pool">
 <title>Pool of shaders</title>
 
-<para>Straightforward use of the pseudo-code above means that you
+<para>Straightforward use of the pseudo-code above means that we
 create new shader for each rendered shape. This works correctly,
 but is very time and memory consuming for large scenes.
 A good implementation should try to reuse the shaders.
