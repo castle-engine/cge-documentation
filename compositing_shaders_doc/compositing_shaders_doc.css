@@ -46,3 +46,5 @@ div.figure {
   width: 450px;
 }
 
+/* fo_vertical_space should not appear in HTML. */
+p.fo_vertical_space { display: none; }

@@ -126,10 +126,31 @@
   <xsl:attribute name="background-color">#FAFAFA</xsl:attribute>
   <xsl:attribute name="border">0.5pt solid black</xsl:attribute>
   <xsl:attribute name="padding">0.05in</xsl:attribute>
+
+  <!-- We want larger padding around <screen>, to make it nicely stand out.
+       Usually we want it from all sides (vertical and horizontal),
+       but for <screen> inside an <orderedlist> we want to be able to disable
+       vertical padding (as it causes ugly look then, list number baseline
+       is shifted).
+
+       This allows you to use db-no-vertical-padding processing instruction
+       inside <screen> to disable vertical padding.
+
+       Not used after all.
+
+  <xsl:attribute name="padding">
+    <xsl:choose>
+      <xsl:when test="processing-instruction('db-no-vertical-padding')">0in 0.05in 0in 0.05in</xsl:when>
+      <xsl:otherwise>0.05in</xsl:otherwise>
+    </xsl:choose>
+  </xsl:attribute>
+  -->
 </xsl:attribute-set>
 
 <!-- Without this, tables in FO have internal frames, even when frame="none"
      was used. -->
 <xsl:param name="table.cell.border.style">none</xsl:param>
+
+<xsl:param name="callout.graphics.path">/usr/share/xml/docbook/stylesheet/nwalsh/images/callouts/</xsl:param>
 
 </xsl:stylesheet>

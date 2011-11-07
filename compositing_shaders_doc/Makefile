@@ -9,6 +9,10 @@ html_post = mkdir -p $(1)admonitions/ && \
   cp -f /usr/share/xml/docbook/stylesheet/nwalsh/images/*.png \
         /usr/share/xml/docbook/stylesheet/nwalsh/images/*.gif \
         $(1)admonitions/ && \
+  mkdir -p $(1)images/callouts/ && \
+  cp -f /usr/share/xml/docbook/stylesheet/nwalsh/images/callouts/*.png \
+    $(1)images/callouts/ && \
+  cp -f images/html/*.png $(1)images/ && \
   cp -f $(BASE_DOCUMENT_NAME).css $(1) && \
   mkdir -p $(1)images/ && \
   cp -f images/html/*.png $(1)images/ && \

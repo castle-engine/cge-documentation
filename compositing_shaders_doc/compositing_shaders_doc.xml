@@ -1723,6 +1723,9 @@ We also add <emphasis>external function declarations</emphasis> at appropriate p
 For languages other than GLSL, they will simply become <emphasis>forward
 function declarations</emphasis> when all the parts are concatenated.</para>
 
+<section id="section.helpers">
+<title>Helper functions</title>
+
 <para>First we define a function <literal>Plug</literal>.
 It is a low-level, helper function, dealing with strings and string lists.
 It is responsible for actual text processing that will make the plug functions
@@ -1853,95 +1856,205 @@ processing it and adding to the given <literal>CompleteCode</literal>
 &end;
 </screen>
 
+</section>
+
+<section id="section.together">
+<title>Final algorithm</title>
+
 <para>Finally, using the above functions,
 we actually construct the final shader code for given shape.
 All the effects (including effects special to lights and textures)
-are correctly applied.</para>
+are correctly applied by the algorithm below.</para>
 
 <screen role="pseudocode">FinalShader &assign; new TShaderSource
+set FinalShader to basic rendering code
+</screen>
 
-set FinalShader to a standard simple shader source code,
-  to render standard 3D object with no lights, no textures, no effects.
-  It should contain magic PLUG_ comments to allow inserting all the features
-  in the following steps.
-  The actual vertex and fragment initial code used by our engine
-  may be found on
-  http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.vs
-  and
-  http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.fs
+<para>At the beginning, <literal>FinalShader</literal> it set to
+a simple code that renders 3D object with no lights, no textures and no effects.
+This code contains magic <literal>/* PLUG_xx ... */</literal>
+comments to enhance it in the following steps.</para>
 
-&if; a complete shader code is assigned to the given shape,
-  following <xref linkend="bib.x3d_shaders" />,
-  like a <literal>ComposedShader</literal> node, &then;
-  set FinalShader to this shader code
+<para>The real vertex and fragment GLSL code used by our engine
+at this step may be found in engine sources. See
+<ulink url="http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.vs" />
+for vertex shader and
+<ulink url="http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.fs" />
+for fragment shader.
+The geometry shader is initially empty.</para>
 
-&foreach; light source affecting this shape &do;
+<screen role="pseudocode">&if; a complete custom shader code is provided &then;
+  FinalShader &assign; custom shader code
+</screen>
+
+<para>The X3D file may contain shader code that should replace
+the default shaders, following <xref linkend="bib.x3d_shaders" />
+specification. For example, a <literal>ComposedShader</literal> node
+may be present with a complete GLSL code.
+We use it at this step.</para>
+
+<para>This step trivially allows the <literal>ComposedShader</literal>
+code to also contain plug declarations, like <literal>/* PLUG_xx ... */</literal>.
+The same plug names as our default names may be used
+(like <literal>texture_apply</literal> and so on),
+in which case the same user effects will be useful with your custom shader.
+With certain care, even internal effects
+(like shadow maps) may be added to your custom shader template this way.</para>
+
+<para>Alternatively, the <literal>ComposedShader</literal> may have
+a completely different approach to rendering. Then it may expose
+a completely different set of plug names, reflecting a different
+set of parameters to control for the authors.</para>
+
+<screen role="pseudocode">&foreach; Light in shape.Lights &do;
   LightShader &assign; new TShaderSource
-  as the 1st fragment part (for Phong shading) or
-    the 1st vertex part (for Gouraud shading) of the LightShader,
-    add a shader code that contains a function PLUG_add_light_contribution_side
-    calculating given light contribution.
-    This should be tuned to light type (spot, directional, point),
-    and optimized for other parameters (e.g. no attenuation?
-    spot with constant intensity?).
-    The actual initial code used by our engine may be found on
-    http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template_add_light.glsl
-  <emphasis>{ add Effect nodes specific to this light source to LightShader.
-    LightShader will contain both the initial 1st part, and subsequent
-    effect code, so standard light source PLUGs as well as custom
-    PLUGs inside light source Effect nodes can be used. }</emphasis>
-  EnableEffects(light node.Effects, LightShader)
-  LightShaderContribution &assign; extract (get and delete) from LightShader
-    the 1st fragment part (for Phong shading) or
-    the 1st vertex part (for Gouraud shading). This step extracts back
-    the initial code (now possibly enhanced by calls to user effects)
-    you added before. It still needs to be processed by the Plug function.
-  <emphasis>{ insert the call to our PLUG_add_light_contribution_side
-    from the FinalShader. Everything is connected now: final shader
-    calls PLUG_add_light_contribution_side, and PLUG_add_light_contribution_side
-    calls user effects on light sources. }</emphasis>
-  Plug(fragment, LightShaderContribution)
-  <emphasis>{ add user effects code to the final code,
-    making the FinalShader contain everything necessary. }</emphasis>
-  FinalShader.Append(LightShader)
+  <co id="co.init_light_shader" linkends="callout.init_light_shader" /> set LightShader to basic lighting code (optimized for this Light)
+  <co id="co.light_effects" linkends="callout.light_effects" /> EnableEffects(Light.Effects, LightShader)
+  <co id="co.light_extract" linkends="callout.light_extract" /> LightShaderContribution &assign; LightShader.Extract basic lighting code
+  <co id="co.light_merge" linkends="callout.light_merge" /> Plug(fragment, LightShaderContribution)
+  <co id="co.light_finalize" linkends="callout.light_finalize" /> FinalShader.Add(LightShader)
+</screen>
 
-&foreach; texture affecting this shape &do;
-  <emphasis>{ similar approach as for the light source is used }</emphasis>
+<para>A little care is needed to correctly add light sources.
+Remember that lights may have user-defined effects that should
+be applied only to the specific light sources. That's why
+we temporarily keep the shader code specific to a given light source
+in a separate <literal>LightShader</literal> variable.</para>
+
+<calloutlist>
+  <callout arearefs="co.init_light_shader" id="callout.init_light_shader">
+    <para>The light source calculation is linked
+    with the final shader also using our plugs.
+    We initially add to <literal>LightShader</literal>
+    a function called <literal>PLUG_add_light_contribution_side</literal>
+    that takes care of calculating light contribution, following normal
+    X3D light equations. This function should be optimized for the given
+    light type (spot, directional, point) and light parameters
+    (for example, lights without an attenuation factor or an infinite radius
+    or zero specular term may be optimized at this point).
+    If we want <emphasis>Phong shading</emphasis>, this function
+    should be added as the first string of the <emphasis>LightShader[fragment]</emphasis>.
+    If we want <emphasis>Gouraud shading</emphasis>, it should go
+    to <emphasis>LightShader[vertex]</emphasis> instead.</para>
+
+    <para>The actual initial GLSL light shader code used by our engine at this step
+    may be found in our engine sources, see
+    <ulink url="http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template_add_light.glsl" />.</para>
+
+    <!-- Need to add artificial vertical space to make the FO output look Ok.
+         By default, calloutlist has no vertical space between items,
+         which is bad for us (our calloutlist contains whole paragraphs).
+         See "callout list items should honor list.item.spacing variable",
+         https://sourceforge.net/tracker/index.php?func=detail&aid=3160341&group_id=21935&atid=373747 -->
+    <para role="fo_vertical_space"></para>
+  </callout>
+
+  <callout arearefs="co.light_effects" id="callout.light_effects">
+    <para>Next we apply <literal>Effect</literal> nodes specific to this light source.
+    After this, <literal>LightShader</literal> contains both the initial code
+    and user effects code. Doing it this way means that the standard
+    light source plugs (like <literal>light_scale</literal>)
+    as well as custom plugs (defined in one <literal>Effect</literal> node
+    and used by following <literal>Effect</literal> nodes)
+    work correctly.</para>
+
+    <para role="fo_vertical_space"></para>
+  </callout>
+
+  <callout arearefs="co.light_extract" id="callout.light_extract">
+    <para>After applying user effects, we extract (get and delete)
+    from <literal>LightShader</literal> our initial code.
+    It may be modified now, since calls to user effects are now present inside.</para>
+
+    <para role="fo_vertical_space"></para>
+  </callout>
+
+  <callout arearefs="co.light_merge" id="callout.light_merge">
+    <para>The extracted <literal>LightShaderContribution</literal>
+    must now be connected with the <literal>FinalShader</literal>
+    code. This can be done by a simple call to the <literal>Plug</literal>
+    function, which will notice the <literal>PLUG_add_light_contribution_side</literal>
+    present inside <literal>LightShaderContribution</literal>.
+    After this operation, everything is connected: final shader
+    calls <literal>PLUG_add_light_contribution_side</literal>, and
+    <literal>PLUG_add_light_contribution_side</literal>
+    calls user effects on the light source.</para>
+
+    <para role="fo_vertical_space"></para>
+  </callout>
+
+  <callout arearefs="co.light_finalize" id="callout.light_finalize">
+    <para>Finally, directly add the remaining code to be linked
+    together with the <literal>FinalShader</literal>.</para>
+
+    <para role="fo_vertical_space"></para>
+  </callout>
+</calloutlist>
+
+<screen role="pseudocode">&foreach; Texture in shape.Textures &do;
   TextureShader &assign; new TShaderSource
-  as the 1st fragment part of TextureShader, add a code to actually apply
-    calculate the texture color. This should take the sample from a texture
-    using appropriate function, and apply it following the X3D multi-texture
-    mode (multiply, add and such).
-    This code should be inserted to the final
-    shader at PLUG_texture_apply place. In turn, this code also defines
-    plugs to be overridden by texture effects specific for this texture,
-    like PLUG_texture_color.
-  EnableEffects(texture node.Effects, TextureShader)
-  TextureContribution &assign; extract from TextureShader the 1st fragment part,
-    now enhanced with calls to user texture effects
-  Plug(fragment, TextureContribution)
-  FinalShader.Append(TextureShader)
+  set TextureShader to basic code (optimized for this Texture)
+  EnableEffects(Texture.Effects, TextureShader)
+  TextureApply &assign; TextureShader.Extract basic texturing code
+  Plug(fragment, TextureApply)
+  FinalShader.Add(TextureShader)
+</screen>
 
-EnableEffects(appearance node.Effects)
+<para>Texture effects require a similar approach as light effects,
+to correctly catch all ways how plugs may be used.</para>
+
+<para>We start by creating a default shader code that applies the texture,
+knowing the texture type (2D, 3D, cube map), texture mode (multiply,
+add and such) and other properties. It should follow all X3D texturing
+and multi-texturing requirements. The code should define a function
+named <literal>PLUG_texture_apply</literal> that can be later connected
+to the final shader. It should also declare plug named <literal>texture_color</literal>,
+that can be used by user effects for this texture.</para>
+
+<!--
+<para>We have deliberately omitted here some details,
+that in practice may cause the lighting and texture effects
+implementation to differ a little more. Please see our engine sources
+for an actual implementation,
+<!- - They are generally
+forced by unoptimal or buggy implementation of some GLSL features
+on older graphic cards,
+For example, the option to have two-sided lighting working with
+an optimal speed even on old GPU cards caused us to complicate light effects
+application.
+The texture effects have some special cases to work with the <emphasis>parallax
+bump mapping</emphasis>, which shifts the 2D textures.</para>
+</para>
+-->
+
+<screen role="pseudocode">EnableEffects(appearance node.Effects)
 
 &foreach; group node containing this shape &do;
   EnableEffects(group node.Effects)
-
-<emphasis>{ if the "separate compilation units" feature is not available,
-  then simply concatenate all the parts into one large string
-  as necessary.
-  If necessary, concatenate also three shader types. }</emphasis>
-&if; shader language is &not; GLSL &then;
-  &foreach; type in TShaderPart &do;
-    CompleteFinalShader[type] &assign; FinalShader[vertex][...]
-
-compile and link the FinalShader or CompleteFinalShader.
 </screen>
 
+<para>Effects specific to a given shape,
+and effects for all groups containing this shape, are applied.</para>
+
+<para>The effects at this point may override also lights and textures
+plugs, like <literal>light_scale</literal>. That's simply because
+we have already added all the lighting and texturing shading code
+to the <literal>FinalShader</literal>. Overriding <literal>light_scale</literal>
+at this point means that you can scale the contribution of every light
+by the same function.</para>
+
+<para>At the end, <literal>FinalShader</literal> is just a collection
+of strings forming a shading language source code.
+For GLSL, each string is naturally a <quote>separate compilation unit</quote>,
+and can be compiled separately.
+For other shading languages, the parts may be simply concatenated together
+as necessary.</para>
+
 <para>The full, actual source code of this operation is available
-in our engine sources, see the unit glrenderershader.pas.
-See http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glrenderershader.pas .
-It's used by unit glrenderer.pas, in particular by glrenderer_meshrenderer.inc .
+in our engine sources, see the unit GLRendererShader.
+Source code is on <ulink url="http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glrenderershader.pas" />.
+<!--This unit is used by GLRenderer unit.
+, in particular by glrenderer_meshrenderer.inc .-->
 </para>
 
 <!--
@@ -1950,6 +2063,7 @@ The largest optimization, that also complicates this code
 a little, is to calculate only hash at the first stage,
 and construct actual strings only in the second stage.
 -->
+</section>
 
 </section>
 
