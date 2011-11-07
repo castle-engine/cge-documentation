@@ -79,9 +79,12 @@
 </xsl:template>
 
 <!-- Make <phrase role="symbol"> use the symbol font, that has some
-     special characters. -->
+     special characters. Also force font-style="normal",
+     because I often use this inside italic text,
+     and Symbol font family doesn't have an italic version
+     (causes some warnings from FOP). -->
 <xsl:template match="phrase[@role='symbol']">
-  <fo:inline font-family="Symbol">
+  <fo:inline font-family="Symbol" font-style="normal">
     <xsl:apply-templates/>
   </fo:inline>
 </xsl:template>
