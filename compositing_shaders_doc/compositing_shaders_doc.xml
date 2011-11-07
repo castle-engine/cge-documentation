@@ -1853,7 +1853,7 @@ processing it and adding to the given <literal>CompleteCode</literal>
     &if; Effect.enabled &and;
        Effect.language matches renderer shader language &then;
       &foreach; EffectPart &in; Effect.parts &do;
-        Plug(EffectPart.type, GetUrlContents(EffectPart.url), CompleteCode)
+        Plug(EffectPart.type, GetUrl(EffectPart.url), CompleteCode)
 &end;
 </screen>
 
