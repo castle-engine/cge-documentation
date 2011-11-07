@@ -1680,44 +1680,64 @@ in perfect specular highlights and spot light shapes.</para>
 <chapter id="chapter.implementation">
 <title>Implementation</title>
 
-<para>We have implemented all the X3D extensions described in this paper
-for the <emphasis>OpenGL Shading Language</emphasis> (GLSL).
-However, we have designed our extensions
-to be applicable to other shading languages as well (like Cg or HLSL)
-and we believe they can be handled in a similar fashion.</para>
+<para>We have implemented everything described in this paper
+in our open-source (LGPL) 3D game engine,
+see <xref linkend="bib.castleengine" />.</para>
 
-<para>One unique concept of the GLSL is the
-<emphasis>separate compilation units</emphasis>.
-We found it very helpful for the shader authors, as it forces
-cleaner shader code (you cannot use undeclared functions from other
-shader parts). It also naturally matches with our effects definition,
-as each <literal>EffectPart</literal> becomes simply one compilation unit.
+<para>Our current implementation supports only one shading
+language: <emphasis>GLSL</emphasis>,
+the <emphasis>OpenGL Shading Language</emphasis>.
+As our engine is cross-platform and focused on OpenGL, this is
+the most natural shading language for us.
+However, we have designed our extensions
+to be applicable to other shading languages (like <emphasis>Cg</emphasis> and
+<emphasis>HLSL</emphasis>) as well.<!--
+And we believe they can be handled in a very similar fashion.--></para>
+
+<para>One notable concept of GLSL
+is the <emphasis>separate compilation units</emphasis>.
+It means that a code can be split into
+many units which are parsed and compiled separately,
+and only linked together. This allows to write cleaner shader code
+(you cannot use undeclared functions from other shader parts).
+It also naturally matches with our effects definition,
+as each <literal>EffectPart</literal> becomes simply one compilation unit.</para>
+
+<para>A similar feature is found in many other
+programming languages, under the names of <quote>units</quote> or <quote>modules</quote>.
+But it is not available in two other popular <emphasis>shading</emphasis>
+languages: <emphasis>Cg</emphasis> and <emphasis>HLSL</emphasis>.
 <!--
 and it gives us better line numbers in error messages
 (although a pre-processor directive like <literal>#line</literal> could also be used for
 this).
 -->
-However, we have also tested that this is not needed for the correct
-implementation of our effects. So implementation based on Cg or HLSL
-should be easily possible. It will not enforce the clean separation
+To make sure that our idea is applicable to these shading languages,
+we have explicitly tested that even without
+the <emphasis>separate compilation units</emphasis>,
+our implementation still works without problems.
+<!--So implementation based on Cg or HLSL
+should be definitely possible.-->
+<!-- It will not enforce the clean separation
 of effect parts &mdash; but that's just a lack of Cg and HLSL.
+-->
 </para>
 
 <section id="section.pseudo_code">
-<title>Pseudo-code of the implementation</title>
+<title>Outline of the implementation</title>
 
-<para>We present a pseudo-code implementation of a shader generator,
-that creates a complete shader source code suitable for each shape.
+<para>We present a pseudo-code
+that generates a complete shader source for rendering a given shape.
 It takes into account standard rendering features (X3D light sources,
 textures and such), custom shaders (by X3D nodes like
-<literal>ComposedShader</literal>) and our shaders effects
+<literal>ComposedShader</literal>) and our shaders' effects
 (by <literal>Effect</literal> nodes). All effects are properly added
 together to the final shader code.</para>
 
 <para>We keep the final shader code as three arrays of strings.
 Each array keeps code for a specific shader type: geometry, vertex and fragment.
 Each string corresponds to a compilation unit for GLSL,
-for other shading languages the strings can just be concatenated at the end.
+for other shading languages the strings can be just concatenated at the end.
 To make the plugs actually work, we add calls to their functions.
 We also add <emphasis>external function declarations</emphasis> at appropriate places.
 For languages other than GLSL, they will simply become <emphasis>forward
@@ -1726,9 +1746,9 @@ function declarations</emphasis> when all the parts are concatenated.</para>
 <section id="section.helpers">
 <title>Helper functions</title>
 
-<para>First we define a function <literal>Plug</literal>.
-It is a low-level, helper function, dealing with strings and string lists.
-It is responsible for actual text processing that will make the plug functions
+<para>First define a function <literal>Plug</literal>.
+<!-- It is a low-level, helper function, dealing with strings and string lists. -->
+It is responsible for actual text processing that makes the plug functions
 correctly called. The argument <literal>PlugValue</literal>
 is scanned for all <literal>PLUG_xxx</literal> function definitions.
 The argument <literal>CompleteCode</literal>, as well as the
@@ -1829,7 +1849,7 @@ it has been processed, and correctly added to the <literal>CompleteCode</literal
       AnyOccurrences &assign; LookForPlugDeclaration(Source[EffectPartType])
 
     &if; &not; AnyOccurrences &then;
-      Warning 'Plug name ' PlugName ' not declared'
+      Warning('Plug name ' + PlugName + ' not declared')
   &end;
 
   <emphasis>{ regardless if any (and how many) plug points were found,
@@ -1841,7 +1861,7 @@ it has been processed, and correctly added to the <literal>CompleteCode</literal
 
 <para>Using the <literal>Plug</literal> function,
 we can create the <literal>EnableEffects</literal> function.
-It handles <literal>effects</literal> list, correctly
+It handles the <literal>effects</literal> list, correctly
 processing it and adding to the given <literal>CompleteCode</literal>
 (or to the final shader code, if <literal>CompleteCode</literal> is not assigned).</para>
 
@@ -1873,11 +1893,11 @@ set FinalShader to basic rendering code
 
 <para>At the beginning, <literal>FinalShader</literal> it set to
 a simple code that renders 3D object with no lights, no textures and no effects.
-This code contains magic <literal>/* PLUG_xx ... */</literal>
-comments to enhance it in the following steps.</para>
+The code contains magic <literal>/* PLUG_xxx ... */</literal>
+comments, which will allow to enhance it in the following steps.</para>
 
-<para>The real vertex and fragment GLSL code used by our engine
-at this step may be found in engine sources. See
+<para>The real GLSL vertex and fragment code used by our engine
+at this step may be found in our engine sources. See
 <ulink url="http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.vs" />
 for vertex shader and
 <ulink url="http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.fs" />
@@ -1895,36 +1915,36 @@ may be present with a complete GLSL code.
 We use it at this step.</para>
 
 <para>This step trivially allows the <literal>ComposedShader</literal>
-code to also contain plug declarations, like <literal>/* PLUG_xx ... */</literal>.
+code to also contain plug declarations, like <literal>/* PLUG_xxx ... */</literal>.
 The same plug names as our default names may be used
 (like <literal>texture_apply</literal> and so on),
-in which case the same user effects will be useful with our custom shader.
-With certain care, even internal effects
-(like shadow maps) may be added to our custom shader template this way.</para>
+in which case the same user effects will be useful with the custom shader.
+This even allows the browser to add some internal effects
+(like shadow maps) to the custom shader template.</para>
 
 <para>Alternatively, the <literal>ComposedShader</literal> may have
 a completely different approach to rendering. Then it may expose
 a completely different set of plug names, reflecting a different
-set of parameters to control for the authors.</para>
+set of parameters to control. <!-- for the authors.--></para>
 
-<screen role="pseudocode">&foreach; Light in shape.Lights &do;
+<screen role="pseudocode">&foreach; Light &in; shape.Lights &do;
   LightShader &assign; new TShaderSource
   <co id="co.init_light_shader" linkends="callout.init_light_shader" /> set LightShader to basic lighting code (optimized for this Light)
   <co id="co.light_effects" linkends="callout.light_effects" /> EnableEffects(Light.Effects, LightShader)
-  <co id="co.light_extract" linkends="callout.light_extract" /> LightShaderContribution &assign; LightShader.Extract basic lighting code
+  <co id="co.light_extract" linkends="callout.light_extract" /> LightShaderContribution &assign; LightShader.ExtractFirst
   <co id="co.light_merge" linkends="callout.light_merge" /> Plug(fragment, LightShaderContribution)
   <co id="co.light_finalize" linkends="callout.light_finalize" /> FinalShader.Add(LightShader)
 </screen>
 
 <para>A little care is needed to correctly add light sources.
 Remember that lights may have user-defined effects that should
-be applied only to the specific light sources. That's why
+be applied only to the specific light source. That's why
 we temporarily keep the shader code specific to a given light source
 in a separate <literal>LightShader</literal> variable.</para>
 
 <calloutlist>
   <callout arearefs="co.init_light_shader" id="callout.init_light_shader">
-    <para>The light source calculation is linked
+    <para>The light source contribution will be linked
     with the final shader also using our plugs.
     We initially add to <literal>LightShader</literal>
     a function called <literal>PLUG_add_light_contribution_side</literal>
@@ -1992,17 +2012,17 @@ in a separate <literal>LightShader</literal> variable.</para>
   </callout>
 </calloutlist>
 
-<screen role="pseudocode">&foreach; Texture in shape.Textures &do;
+<screen role="pseudocode">&foreach; Texture &in; shape.Textures &do;
   TextureShader &assign; new TShaderSource
   set TextureShader to basic code (optimized for this Texture)
   EnableEffects(Texture.Effects, TextureShader)
-  TextureApply &assign; TextureShader.Extract basic texturing code
+  TextureApply &assign; TextureShader.ExtractFirst
   Plug(fragment, TextureApply)
   FinalShader.Add(TextureShader)
 </screen>
 
 <para>Texture effects require a similar approach as light effects,
-to correctly catch all ways how plugs may be used.</para>
+to correctly catch all the ways how plugs may be used.</para>
 
 <para>We start by creating a default shader code that applies the texture,
 knowing the texture type (2D, 3D, cube map), texture mode (multiply,
@@ -2081,17 +2101,17 @@ the whole shader configuration) and insert this shader into the pool.
 When a new shader is needed, we first look for it in the pool
 (using the hash value of the desired configuration), and if we find it
 &mdash; we reuse it (increasing the reference count). Only if the shader
-is not found, we create a new one. This is quite simple and fast to do,
+is not found, we create a new one. This is quite simple to do,
 and it provides a perfect sharing of shaders.</para>
 
 <para>The hash value could be calculated based solely on the final string
 of the shader. However, this is too slow in our experience &mdash;
-as it means that all the string operations have to be repeated before
-we even know the hash. So in practice it's much faster to calculate
-the hash value looking at all the parameters that affect the generated
+as it means that all the string operations have to be performed before
+we even know the hash. It's much faster to calculate
+the hash value looking at all the parameters that will affect the generated
 shader source, including all the participating <literal>Effect</literal> and <literal>ComposedShader</literal>
 nodes, as well as the standard X3D lights sources, textures,
-fog values and so on. Only if we know that we really need to create new shader,
+fog parameters and so on. Only when we really need to create a new shader,
 then we calculate the actual shader source code and compile it.
 This means that our pseudo-code gets a little more complicated:
 most operations are in fact delayed. For example, at the first stage
@@ -2102,7 +2122,9 @@ parameters.
 </para>
 
 <para>An additional advantage of the <quote>pool of shaders</quote>
-appears when some subset of the needed shaders is known in the advance.
+appears when a subset of the needed shaders is known in the advance.
+<!-- TODO: For example, ... what's a good example?
+  Our thunder from lets_take_a_walk demo? -->
 In such case, an application may initialize the pool
 to contain some shaders with artificial non-zero use count.
 This way, some shader configurations
