@@ -5,7 +5,10 @@
      into two lines (C+ and +). -->
 <!ENTITY cpp "C&#xFEFF;+&#xFEFF;+" >
 
-<!-- larr looks bad with symbol font, increases line height -->
+<!-- Don't use larr for now. It looks bad with symbol font
+     (increases line height, which is badly visible in the middle of <screen>).
+     Making the font smaller doesn't help (at 8pt it still messes line height,
+     at 6pt line height is Ok but arrow is too low...). -->
 <!-- ENTITY assign "<phrase role='symbol'>&larr;</phrase>"  -->
 <!ENTITY assign "<emphasis role='bold'>:=</emphasis>">
 
@@ -1954,9 +1957,9 @@ in a separate <literal>LightShader</literal> variable.</para>
     (for example, lights without an attenuation factor or an infinite radius
     or zero specular term may be optimized at this point).
     If we want <emphasis>Phong shading</emphasis>, this function
-    should be added as the first string of the <emphasis>LightShader[fragment]</emphasis>.
+    should be added as the first string of the <literal>LightShader[fragment]</literal>.
     If we want <emphasis>Gouraud shading</emphasis>, it should go
-    to <emphasis>LightShader[vertex]</emphasis> instead.</para>
+    to <literal>LightShader[vertex]</literal> instead.</para>
 
     <para>The actual initial GLSL light shader code used by our engine at this step
     may be found in our engine sources, see
