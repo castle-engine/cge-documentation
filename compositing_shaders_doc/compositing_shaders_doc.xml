@@ -1679,14 +1679,14 @@ this).
 -->
 However, we have also tested that this is not needed for the correct
 implementation of our effects. So implementation based on Cg or HLSL
-should be as easily possible, it just will not enforce the clean separation
-of effect parts.
+should be easily possible. It will not enforce the clean separation
+of effect parts &mdash; but that's just a lack of Cg and HLSL.
 </para>
 
 <section id="section.pseudo_code">
 <title>Pseudo-code of the implementation</title>
 
-<para>Here we present a pseudo-code implementation of a shader generator,
+<para>We present a pseudo-code implementation of a shader generator,
 that creates a complete shader source code suitable for each shape.
 It takes into account standard rendering features (X3D light sources,
 textures and such), custom shaders (by X3D nodes like
@@ -1694,24 +1694,50 @@ textures and such), custom shaders (by X3D nodes like
 (by <literal>Effect</literal> nodes). All effects are properly added
 together to the final shader code.</para>
 
-<para>First define a helper function <literal>Plug</literal>.
-It deals with strings and string lists, doing the low-level
-work of making the plug functions get called.
-We will search inside the <literal>PlugValue</literal> for
-<literal>PLUG_xxx</literal> functions.
-Then we will search inside the <literal>CompleteCode</literal>
-as well as the final shader code for the matching
-<literal>/* PLUG: xxx ... */</literal> comments.
-Appropriate calls and forward declarations will be inserted,
-and the modified <literal>PlugValue</literal> will be inserted
-to the <literal>CompleteCode</literal> as well.
+<para>We keep the final shader code as three arrays of strings.
+Each array keeps code for a specific shader type: geometry, vertex and fragment.
+Each string corresponds to a compilation unit for GLSL,
+for other shading languages the strings can just be concatenated at the end.
+To make the plugs actually work, we add calls to their functions.
+We also add <emphasis>external function declarations</emphasis> at appropriate places.
+For languages other than GLSL, they will simply become <emphasis>forward
+function declarations</emphasis> when all the parts are concatenated.</para>
+
+<para>First we define a function <literal>Plug</literal>.
+It is a low-level, helper function, dealing with strings and string lists.
+It is responsible for actual text processing that will make the plug functions
+correctly called. The argument <literal>PlugValue</literal>
+is scanned for all <literal>PLUG_xxx</literal> function definitions.
+The argument <literal>CompleteCode</literal>, as well as the
+final (for given shape) shader source code <literal>FinalShader</literal>,
+are searched for the matching <literal>/* PLUG: xxx ... */</literal> comments.
+<literal>CompleteCode</literal> argument is actually useful only
+to handle effects specific to a given texture or light source,
+in other cases it may be left unassigned which is equivalent to just
+setting <literal>CompleteCode</literal> to equal <literal>FinalShader</literal>.</para>
+
+<para>Appropriate calls and forward declarations are inserted to the
+<literal>CompleteCode</literal>. In the process, all handled
+<literal>PLUG_xxx</literal> functions inside <literal>PlugValue</literal>
+are also renamed to unique names, since a single plug may be overridden
+by many effects. The modified <literal>PlugValue</literal>
+is inserted to the <literal>CompleteCode</literal> as well.
+Effectively, the caller can usually <quote>forget</quote>
+about the <literal>PlugValue</literal> value afterwards &mdash;
+it has been processed, and correctly added to the <literal>CompleteCode</literal>.
 </para>
 
 <screen>type
   TShaderType = (geometry, vertex, fragment);
   TShaderSource = array [TShaderType] of a string list;
 
-procedure Plug(const EffectPartType: TShaderType; PlugValue: string;
+var
+  { shader for the whole shape }
+  FinalShader: TShaderSource;
+
+procedure Plug(
+  EffectPartType: TShaderType;
+  PlugValue: string;
   CompleteCode: TShaderSource = nil);
 
 var
@@ -1720,48 +1746,47 @@ var
   function LookForPlugDeclaration(
     CodeForPlugDeclaration: string list): boolean;
   var
-    AnyOccurencesInThisCodeIndex: boolean;
+    AnyOccurrencesHere: boolean;
     CodeIndex: Integer;
     Parameters: string;
   begin
     Result := false;
-    for CodeIndex := 0 to CodeForPlugDeclaration.Count - 1 do
+    for S := each string in the CodeForPlugDeclaration list do
     begin
-      AnyOccurencesInThisCodeIndex := false;
+      AnyOccurrencesHere := false;
       while you can find an occurrence of /* PLUG: PlugName (...) */
-        inside the CodeForPlugDeclaration[CodeIndex]:
+        inside S do
       begin
-        Parameters := call parameters inside the /* PLUG: PlugName (...) */
-        inside into the CodeForPlugDeclaration a call to
-          ProcedureName, with calculated Parameters,
-          at the place where you found /* PLUG: PlugName (...) */
+        Parameters := call parameters inside the /* PLUG: PlugName (...) */;
+        insert into S a call to ProcedureName,
+          with calculated Parameters,
+          at the place where you found /* PLUG: PlugName (...) */;
 
-        AnyOccurencesInThisCodeIndex := true;
+        AnyOccurrencesHere := true;
         Result := true;
       end;
 
-      if AnyOccurencesInThisCodeIndex then
-        insert the forward declaration of the call into
-          CodeForPlugDeclaration[CodeIndex],
+      if AnyOccurrencesHere then
+        insert the PlugForwardDeclaration into S,
           at the place of /* PLUG-DECLARATIONS */ inside
-          (or the beginning, if no /* PLUG-DECLARATIONS */)
+          (or at the beginning, if no /* PLUG-DECLARATIONS */)
     end;
   end;
 
+var
+  Code: string list;
+  AnyOccurrences: boolean;
 begin
   if CompleteCode = nil then
     CompleteCode := FinalShader;
   Code := CompleteCode[EffectPartType];
 
-  while you can find PLUG_xxx PlugName inside PlugValue do
+  while you can find PLUG_xxx inside PlugValue do
   begin
-    PlugName := found xxx
-    PlugDeclaredParameters := found PLUG_xxx function declaration of parameters
+    PlugName := found plug name, the "xxx" inside PLUG_xxx;
+    PlugDeclaredParameters := declaration of parameters at PLUG_xxx function;
 
-    { Rename found PLUG_xxx to plugged_&lt;unique&gt;.
-      This way:
-      - it will not be mistaken for PLUG_xxx to be inserted 2nd time.
-      - it's unique, so you can override multiple times the same PLUG_xxx }
+    { Rename found PLUG_xxx to something unique. }
     ProcedureName := generate new unique procedure name,
       for example by using 'plugged_' + some unique integer;
     replace inside PlugValue all occurrences of 'PLUG_' + PlugName
@@ -1786,42 +1811,46 @@ begin
 
   { regardless if any (and how many) plug points were found,
     always insert PlugValue into Code. This way EffectPart with a library
-    of utility functions (no PLUG_xxx) also works. }
+    of utility functions (no PLUG_xxx inside) also works. }
   Code.Add(PlugValue);
 end;
 </screen>
 
 <para>Using the <literal>Plug</literal> function,
-we can write a helper function that handles <literal>effects</literal>
-list for any X3D node. The <literal>EnableEffects</literal>
-will add user effects to the given Code (or to the final shader code,
-if Code is nil).</para>
+we can create the <literal>EnableEffects</literal> function.
+It handles <literal>effects</literal> list, correctly
+processing it and adding to the given <literal>CompleteCode</literal>
+(or to the final shader code, if <literal>CompleteCode</literal> is not assigned).</para>
 
-<screen>procedure EnableEffects(Effects: TMFNode; const Code: TShaderSource = nil);
+<screen>procedure EnableEffects(
+  Effects: list of Effect nodes;
+  CompleteCode: TShaderSource = nil);
 begin
-  for each Effect := node on the Effects list do
+  for Effect := each node on the Effects list do
     if Effect.enabled and (Effect.language matches renderer shader language) then
-      for each EffectPart := node on the Effect.parts list do
-        Plug(EffectPart.type, EffectPart.url, Code);
+      for EffectPart := each node on the Effect.parts list do
+        Plug(EffectPart.type, EffectPart.url, CompleteCode);
 end;
 </screen>
 
-<para>Finally, we can use the above helpers to actually construct
-the final shader code, where all the effects (including effects special
-to lights and textures) are correctly applied.</para>
+<para>Finally, using the above functions,
+we actually construct the final shader code for given shape.
+All the effects (including effects special to lights and textures)
+are correctly applied.</para>
 
 <screen>FinalShader := new TShaderSource;
-set FinalShader to standard simple shader source code,
+set FinalShader to a standard simple shader source code,
   to render standard 3D object with no lights, no textures, no effects.
-  It contains magic PLUG_ comments to allow inserting all the features
-  next. The actual vertex and fragment initial code used by our engine
+  It should contain magic PLUG_ comments to allow inserting all the features
+  in the following steps.
+  The actual vertex and fragment initial code used by our engine
   may be found on
   http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.vs
   and
   http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.fs
   ;
 
-if a complete shader code is assigned to given shape,
+if a complete shader code is assigned to the given shape,
   following <xref linkend="bib.x3d_shaders" />,
   like a <literal>ComposedShader</literal> node, then
   set FinalShader to this shader code;
@@ -1835,27 +1864,27 @@ for each light source affecting this shape:
     The actual initial code used by our engine may be found on
     http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template_add_light.glsl
     ;
-  /* add Effect nodes specific to this light source.
-     LightShader will contain both initial 1st part, and subsequent
-     effect code, so standard light source PLUGs as well as custom
-     PLUGs inside light source Effect nodes can be used. */
+  { add Effect nodes specific to this light source to LightShader.
+    LightShader will contain both the initial 1st part, and subsequent
+    effect code, so standard light source PLUGs as well as custom
+    PLUGs inside light source Effect nodes can be used. }
   EnableEffects(light node.Effects, LightShader);
   LightShaderContribution := extract (get and delete) from LightShader
     the 1st fragment part (for Phong shading) or
     the 1st vertex part (for Gouraud shading). This step extracts back
     the initial code (now possibly enhanced by calls to user effects)
-    you added before.
-  /* insert the call to our PLUG_add_light_contribution_side
-     from the FinalShader. Everything is connected now: final shader
-     calls PLUG_add_light_contribution_side, and PLUG_add_light_contribution_side
-     calls user effects on light sources.  */
-  Plug(stFragment, LightShaderContribution);
-  /* add user effects code to the final code,
-     making the FinalShader contains everything necessary. */
+    you added before. It still needs to be processed by the Plug function.
+  { insert the call to our PLUG_add_light_contribution_side
+    from the FinalShader. Everything is connected now: final shader
+    calls PLUG_add_light_contribution_side, and PLUG_add_light_contribution_side
+    calls user effects on light sources. }
+  Plug(fragment, LightShaderContribution);
+  { add user effects code to the final code,
+    making the FinalShader contain everything necessary. }
   FinalShader.Append(LightShader);
 
 for each texture affecting this shape:
-  /* similar approach as for the light source is used */
+  { similar approach as for the light source is used }
   TextureShader := new TShaderSource;
   as the 1st fragment part of TextureShader, add a code to actually apply
     calculate the texture color. This code should be inserted to the final
@@ -1865,7 +1894,7 @@ for each texture affecting this shape:
   EnableEffects(texture node.Effects, TextureShader);
   TextureContribution := extract from TextureShader the 1st fragment part,
     now enhanced with calls to user texture effects;
-  Plug(stFragment, TextureContribution);
+  Plug(fragment, TextureContribution);
   FinalShader.Append(TextureShader);
 
 EnableEffects(appearance node.Effects);
@@ -1874,18 +1903,20 @@ for each group node containing this shape:
   EnableEffects(group node.Effects);
 
 { if the "separate compilation units" feature is not available,
-  then simply concatenate all the parts into one large string }
+  then simply concatenate all the parts into one large string
+  as necessary.
+  If necessary, concatenate also three shader types. }
 if shader language is not GLSL then
-  for each type := TShaderPart do
-    FinalShader[type].CompleteCode := FinalShader[type].Parts[*];
+  for type := each TShaderPart do
+    CompleteFinalShader[type] := FinalShader[vertex][...];
 
-compile and link the FinalShader.
+compile and link the FinalShader or CompleteFinalShader.
 </screen>
 
 <para>The full, actual source code of this operation is available
 in our engine sources, see the unit glrenderershader.pas.
 See http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glrenderershader.pas .
-It's used by glrenderer.pas, in particular by glrenderer_meshrenderer.inc .
+It's used by unit glrenderer.pas, in particular by glrenderer_meshrenderer.inc .
 </para>
 
 <!--
