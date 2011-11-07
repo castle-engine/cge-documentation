@@ -1896,7 +1896,7 @@ set FinalShader to basic rendering code
 
 <para>At the beginning, <literal>FinalShader</literal> it set to
 a simple code that renders 3D object with no lights, no textures and no effects.
-The code contains magic <literal>/* PLUG_xxx ... */</literal>
+The code contains magic <literal>/* PLUG: xxx ... */</literal>
 comments, which will allow to enhance it in the following steps.</para>
 
 <para>The real GLSL vertex and fragment code used by our engine
@@ -1918,7 +1918,7 @@ may be present with a complete GLSL code.
 We use it at this step.</para>
 
 <para>This step trivially allows the <literal>ComposedShader</literal>
-code to also contain plug declarations, like <literal>/* PLUG_xxx ... */</literal>.
+code to also contain plug declarations, like <literal>/&#xFEFF;* PLUG: xxx ... */</literal>.
 The same plug names as our default names may be used
 (like <literal>texture_apply</literal> and so on),
 in which case the same user effects will be useful with the custom shader.
