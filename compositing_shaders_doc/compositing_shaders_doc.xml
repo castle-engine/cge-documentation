@@ -182,7 +182,7 @@ on a particular object.
 <figure id="figure.bump_mapping_shadows">
   <title>Japanese shrine model with more and more effects applied.
 The model is based on <ulink url="http://opengameart.org/content/shrine-shinto-japan"/>.</title>
-  <titleabbrev>Japanese shrine model with more and more effects applied.
+  <titleabbrev>Japanese shrine model with more and more effects applied
 </titleabbrev>
 
 <informaltable frame="none">
@@ -1062,7 +1062,7 @@ needed by user.
 --></para>
 
 <figure id="figure.toon_and_fresnel">
-  <title>Toon and Fresnel effects combined.</title>
+  <title>Toon and Fresnel effects combined</title>
   <mediaobject>
   <imageobject role="html"> <imagedata format="PNG" fileref="images/fresnel_and_toon.png" /> </imageobject>
   <imageobject role="fo">   <imagedata format="PNG" fileref="images/fresnel_and_toon.png" width="3in" contentwidth="3in" /> </imageobject>
@@ -1106,7 +1106,7 @@ so it simply works for all shapes. See <xref linkend="figure.fog" />.</para>
 
 <para role="figure_2_column">
 <figure id="figure.fog">
-  <title>Volumetric fog with animated density.</title>
+  <title>Volumetric fog with animated density</title>
 
 <informaltable frame="none">
   <tgroup cols="2" align="center">
@@ -1173,7 +1173,7 @@ MFNode [] <emphasis role="bold">effects</emphasis> [] # Effect
 </screen>
 
 <figure id="figure.fancy_spot">
-  <title>Textured spot light with shadow.</title>
+  <title>Textured spot light with shadow</title>
   <mediaobject>
   <imageobject role="html"> <imagedata format="PNG" fileref="images/fancy_light_spot_shape.png" /> </imageobject>
   <imageobject role="fo">   <imagedata format="PNG" fileref="images/fancy_light_spot_shape.png" width="3in" contentwidth="3in" /> </imageobject>
@@ -1317,7 +1317,7 @@ does automatically for you, that is what color is passed
 to the first <literal>texture_color</literal> plug.</para>
 
 <figure id="figure.shader_texture_edge_detection">
-  <title>ShaderTexture doing an edge detection operation on a normal ImageTexture.</title>
+  <title>ShaderTexture doing an edge detection operation on a normal ImageTexture</title>
   <mediaobject>
   <imageobject role="html"> <imagedata format="PNG" fileref="images/shader_texture_edge_detection.png" /> </imageobject>
   <imageobject role="fo">   <imagedata format="PNG" fileref="images/shader_texture_edge_detection.png" width="3in" contentwidth="3in" /> </imageobject>
@@ -1340,7 +1340,7 @@ the pixel resolution of the underlying texture.
 </para>
 
 <figure id="figure.shader_texture_no_filtering_problems">
-  <title>Texture effects are not concerned with the texture resolution.</title>
+  <title>Texture effects are not concerned with the texture resolution</title>
   <mediaobject>
   <imageobject role="html"> <imagedata format="PNG" fileref="images/shader_texture_no_filtering_problems.png" /> </imageobject>
   <imageobject role="fo">   <imagedata format="PNG" fileref="images/shader_texture_no_filtering_problems.png" width="3in" contentwidth="3in" /> </imageobject>
@@ -1541,7 +1541,7 @@ passing the current time from an X3D <literal>TimeSensor</literal> allows to mak
 animated effects.</para>
 
 <figure id="figure.terrain">
-  <title>ElevationGrid with 3 textures mixed (based on the point height) inside the shader.</title>
+  <title>ElevationGrid with 3 textures mixed (based on the point height) inside the shader</title>
   <mediaobject>
   <imageobject role="html"> <imagedata format="PNG" fileref="images/terrain.png" /> </imageobject>
   <imageobject role="fo">   <imagedata format="PNG" fileref="images/terrain.png" width="3in" contentwidth="3in" /> </imageobject>
@@ -1556,7 +1556,7 @@ may be implemented on GPU by a simple prototype using the <literal>ShaderTexture
 </para>
 
 <figure id="figure.noise">
-  <title>3D and 2D smooth noise on GPU, wrapped in a ShaderTexture.</title>
+  <title>3D and 2D smooth noise on GPU, wrapped in a ShaderTexture</title>
   <mediaobject>
   <imageobject role="html"> <imagedata format="PNG" fileref="images/noise.png" /> </imageobject>
   <imageobject role="fo">   <imagedata format="PNG" fileref="images/noise.png" width="3in" contentwidth="3in" /> </imageobject>
@@ -1600,7 +1600,7 @@ in real-time.</para>
 
 <para role="figure_2_column">
 <figure id="figure.water">
-  <title>Water using our effects framework.</title>
+  <title>Water using our effects framework</title>
 
 <informaltable frame="none">
   <tgroup cols="2" align="center">
@@ -1654,7 +1654,7 @@ See <xref linkend="figure.flowers" />.
 </para>
 
 <figure id="figure.flowers">
-  <title>Flowers bending under the wind, transformed on GPU in object space.</title>
+  <title>Flowers bending under the wind, transformed on GPU in object space</title>
   <mediaobject>
   <imageobject role="html"> <imagedata format="PNG" fileref="images/flowers.png" /> </imageobject>
   <imageobject role="fo">   <imagedata format="PNG" fileref="images/flowers.png" width="3in" contentwidth="3in" /> </imageobject>
