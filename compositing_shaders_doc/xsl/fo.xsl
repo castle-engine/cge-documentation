@@ -8,11 +8,8 @@
 
 <xsl:import href="common.xsl"/>
 
-<!-- Do not show Polish titlepage anymore. Our <colophon> mentions
-     that it was originally my master's thesis, with some details
-     and link to the original PDF version at http://www.ii.uni.wroc.pl/~anl/MGR/.
-     So no point in this Polish page anymore. -->
-<!-- <xsl:include href="fo-titlepage/mytitlepage.xsl"/> -->
+<!-- Our titlepage customization -->
+<xsl:include href="fo-titlepage/mytitlepage.xsl"/>
 
 <xsl:param name="admon.graphics" select="1"/>
 <xsl:param name="admon.graphics.path">/usr/share/xml/docbook/stylesheet/nwalsh/images/</xsl:param>
