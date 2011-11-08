@@ -48,3 +48,8 @@ div.figure {
 
 /* fo_vertical_space should not appear in HTML. */
 p.fo_vertical_space { display: none; }
+
+/* make space between callouts smaller */
+div.calloutlist p {
+  margin-bottom: 0em; margin-top: 1em;
+}
