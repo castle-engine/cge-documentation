@@ -699,8 +699,10 @@ composable shaders for GPU.</para>
 <para>In this work, we deliberately decided not to introduce a new shading language.
 One of the problems with introducing a new language is that it is
 <quote>yet another language to learn</quote> for developers and users.
+<!--
 Unless a new language becomes a de-facto standard,
 obsoleting other languages in the same domain, which is hard.
+-->
 For developers of 3D rendering applications, there's an additional
 effort with integrating the new language with a renderer,
 which often is not a trivial task.
