@@ -119,6 +119,12 @@
 <xsl:param name="paper.type" select="'A4'"></xsl:param>
 <xsl:param name="body.font.master">11</xsl:param>
 
+<!-- This will set title font to serif (by default it's sans-serif in DocBook).
+     Not sure which is better - - - default for TeX is serif titles,
+     but many books use sans-serif for titles.
+     Maybe stay with DocBook default for now here. -->
+<!-- <xsl:param name="title.font.family">serif</xsl:param> -->
+
 <!-- A little larger top/bottom margins, make text nicely separated
      from header/footer. Other papers also seem to have larger margins
      than what DocBook generates by default. -->
