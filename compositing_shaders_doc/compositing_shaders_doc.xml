@@ -1327,7 +1327,7 @@ to the first <literal>texture_color</literal> plug.</para>
 </section>
 
 <section id="section.filtering">
-<title>Texture filtering</title>
+<title>Texture resolution doesn't matter</title>
 
 <para>The shader effects for textures are calculated at each screen fragment,
 not at each texel. So the effects are not concerned with the texture size
