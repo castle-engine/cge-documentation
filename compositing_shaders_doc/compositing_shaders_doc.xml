@@ -2260,6 +2260,19 @@ qualifiers:</para>
     shader compiler for additional optimizations.</para></listitem>
 </itemizedlist>
 
+<!--
+We think that the same set of plugs will be useful for them &mdash; but it's just a theory.
+An implementation of our effects for other shading languages may
+find other opportunities for plugs.
+We also believe that most of our plugs (like <quote>do something in object space</quote>,
+<quote>do something in eye space</quote>) are generic enough to be usable
+with all shading languages.
+-->
+
+<!--
+We have initially feared that we will need too many plugs, and each specific effect will need a new plug. Fortunately, in practice, it turns out that a relatively small set of generic plugs (like vertex-in-object-space, vertex-in-eye-space an such) performs very well. We have implemented many different final 3D effects using our effects approach (some examples are mentioned in the previous section), and we consider this set of effects as a good basis, suitable for many effects.
+-->
+
 <section id="section.vertex_plugs">
 <title>Vertex shader plugs</title>
 
