@@ -27,6 +27,11 @@
 <!ENTITY and "<emphasis role='bold'>and</emphasis>">
 <!ENTITY not "<emphasis role='bold'>not</emphasis>">
 <!ENTITY while "<emphasis role='bold'>while</emphasis>">
+
+<!-- common names -->
+<!ENTITY glsl "<emphasis>GLSL</emphasis>">
+<!ENTITY hlsl "<emphasis>HLSL</emphasis>">
+<!ENTITY cg "<emphasis>Cg</emphasis>">
 ]>
 
 <!--
@@ -427,9 +432,9 @@ but they are not important for our simple introduction to shaders.</para></footn
 </para>
 
 <para>The most popular real-time shading languages right now are
-OpenGL <literal>GLSL</literal> <xref linkend="bib.glsl" />,
-NVidia <literal>Cg</literal> <xref linkend="bib.cg" /> and
-Direct 3D <literal>HLSL</literal> <xref linkend="bib.hlsl" />.
+OpenGL &glsl; <xref linkend="bib.glsl" />,
+NVidia &cg; <xref linkend="bib.cg" /> and
+Direct 3D &hlsl; <xref linkend="bib.hlsl" />.
 They are used for the same purposes and offer practically the same possibilities.
 <!--For the sake of this simple introduction, we will not go into discussion
 about their differences, advantages and disadvantages against each other.-->
@@ -438,12 +443,12 @@ for compositing shaders described in this paper, support all three of these
 languages.</para>
 
 <para>The current implementation of our extensions
-supports only the <literal>GLSL</literal> (<emphasis>OpenGL Shading Language</emphasis>),
+supports only the &glsl; (<emphasis>OpenGL Shading Language</emphasis>),
 which is probably the most natural to use in an engine based on OpenGL.
-As such, most of our examples in this paper will show <literal>GLSL</literal>.
+As such, most of our examples in this paper will show &glsl;.
 </para>
 
-<para>Example GLSL vertex shader and accompanying fragment shader:</para>
+<para>Example &glsl; vertex shader and accompanying fragment shader:</para>
 
 <screen><emphasis>/* vertex shader */</emphasis>
 void main(void)
@@ -470,10 +475,10 @@ void main(void)
 <para>The shader source code should be processed and passed to the rendering
 3D library, like OpenGL, that in turn will pass it to the hardware (GPU).
 <!--
-Shading languages other than GLSL may require an additional compilation
+Shading languages other than &glsl; may require an additional compilation
 step
 This is an easy but sometimes
-In case of GLSL, the shader code is just passed directly to the appropriate
+In case of &glsl;, the shader code is just passed directly to the appropriate
 OpenGL calls, that take care of preparing it for the execution on GPU.
 In case of other shading languages, some additional work may be required
 to compile the shader and then pass this compiled version to the final
@@ -488,7 +493,7 @@ gives us a simple way to attach a shader source code to a 3D shape.
 The X3D browser will do all the necessary job of handling the shader
 to the underlying libraries and hardware.</para>
 
-<para>A simple working example showing X3D with GLSL shader code:</para>
+<para>A simple working example showing X3D with &glsl; shader code:</para>
 
 <screen>#X3D V3.2 utf8
 PROFILE Interchange
@@ -588,11 +593,11 @@ Shader replaces the~calculations, ComposedShader approach, facts:
 <title>Motivation and previous work</title>
 
 <para>The popular real-time shading languages
-(OpenGL <literal>GLSL</literal> <xref linkend="bib.glsl" />,
-NVidia <literal>Cg</literal> <xref linkend="bib.cg" /> and
-Direct 3D <literal>HLSL</literal> <xref linkend="bib.hlsl" />)
+(OpenGL &glsl; <xref linkend="bib.glsl" />,
+NVidia &cg; <xref linkend="bib.cg" /> and
+Direct 3D &hlsl; <xref linkend="bib.hlsl" />)
 do not provide a ready solution for connecting shaders from independent sources.
-The <literal>CgFX</literal> and HLSL <literal>.fx</literal> files encapsulate shading language code
+The <literal>CgFX</literal> and &hlsl; <literal>.fx</literal> files encapsulate shading language code
 in <emphasis>techniques</emphasis> (for various graphic card capabilities)
 and within a single technique specify operations for each rendering pass.
 In neither case can we simply connect multiple shader source code files
@@ -680,7 +685,7 @@ with user shaders, by introducing a new shader language.
 <!-- TODO: use this, uncomment
   This has
   advantages (hides the differences between GPU shading languages like
-  <literal>GLSL</literal> and <literal>HLSL</literal>), but also
+  &glsl; and &hlsl;), but also
   On the other hand, we do not introduce
   a new shader language, which is both an advantage (easy implementation,
   easier to learn) and disadvantage (we do not hide differences e.g. between
@@ -799,13 +804,13 @@ Shape {
 </screen>
 
 <para>Our extensions to X3D are marked with the bold font in the example above.
-The GLSL code inside our extensions is marked with the italic font.
+The &glsl; code inside our extensions is marked with the italic font.
 <!--
-GLSL function names starting with <literal>PLUG_</literal> are special,
+&glsl; function names starting with <literal>PLUG_</literal> are special,
 they will be automatically called at the appropriate place with appropriate
 parameters from the final (automatically generated and used) shader.
 -->
-The special GLSL function name <literal>PLUG_texture_apply</literal>
+The special &glsl; function name <literal>PLUG_texture_apply</literal>
 indicates that we use the <literal>texture_apply</literal> plug.
 This particular plug is called right after applying the textures,
 and is the simplest way to <quote>just modify the pixel color</quote>.
@@ -856,7 +861,7 @@ and when it is called.</para>
     but then you have to write all this <quote>boilerplate</quote> code to also deal
     with all the possible lighting and textures configurations.
     Well, the renderer is still useful to calculate nice tangent vectors,
-    although an authoring program could generate GLSL attributes for them as well.</para>
+    although an authoring program could generate &glsl; attributes for them as well.</para>
 
     <para>
     Same thing with shadow maps, they only plug to the <literal>light_scale</literal>
@@ -869,7 +874,7 @@ and when it is called.</para>
 We have been talking above about the <quote>renderer internal shaders</quote>,
 but the truth is a little more flexible.
 When you place a standard shader node
-(like a <literal>ComposedShader</literal> node for GLSL shaders) on the
+(like a <literal>ComposedShader</literal> node for &glsl; shaders) on the
 <literal>Appearance.shaders</literal> list,
 then it replaces the internal renderer shaders.
 If you define the same (or compatible) plugs inside your shader,
@@ -952,7 +957,7 @@ While this may seem like an arbitrary limitation,
 this reflects how shader parts are declared in
 -->
 shading languages with
-separate namespaces for vertex and fragment parts (like GLSL).
+separate namespaces for vertex and fragment parts (like &glsl;).
 A single part may declare many variables and functions,
 but it must be completely contained within a given shader type.
 </para>
@@ -988,14 +993,14 @@ and they didn't really offer a simpler implementation, so we dropped this idea.
 The current approach, to find the declarations of <literal>PLUG_xxx</literal> functions
 inside a complete shader code, is easy to implement and results in clean
 shader code of the effects. It also allows us to naturally use
-the separate compilation units in case of GLSL.</para>
+the separate compilation units in case of &glsl;.</para>
 
 <para>
 Detecting special <literal>PLUG_</literal> function names inside the shader code
 is trivial, and it turned out to be the best approach to design our effects.
 This means that each effect code is clean, and can be compiled separately
 from others. It allows us to naturally use
-the <emphasis>separate compilation units</emphasis> in case of GLSL implementation.</para>
+the <emphasis>separate compilation units</emphasis> in case of &glsl; implementation.</para>
 -->
 
 </section>
@@ -1404,7 +1409,7 @@ implementation of our plugs.</para>
 
 <para>Additionally, a forward or external declaration of the called function
 may need to be inserted into the effect&nbsp;<emphasis>X</emphasis>. That is because&nbsp;<emphasis>Y</emphasis>
-may be in a separate compilation unit (in case of GLSL),
+may be in a separate compilation unit (in case of &glsl;),
 or just defined lower in the code. In simple cases, such forward or external
 declarations can be inserted right at the beginning of effect&nbsp;<emphasis>X</emphasis> code.
 </para>
@@ -1688,16 +1693,16 @@ in our open-source (LGPL) 3D game engine,
 see <xref linkend="bib.castleengine" />.</para>
 
 <para>Our current implementation supports only one shading
-language: <emphasis>GLSL</emphasis>,
+language: &glsl;,
 the <emphasis>OpenGL Shading Language</emphasis>.
 As our engine is cross-platform and focused on OpenGL, this is
 the most natural shading language for us.
 However, we have designed our extensions
-to be applicable to other shading languages (like <emphasis>Cg</emphasis> and
-<emphasis>HLSL</emphasis>) as well.<!--
+to be applicable to other shading languages (like &cg; and
+&hlsl;) as well.<!--
 And we believe they can be handled in a very similar fashion.--></para>
 
-<para>One notable concept of GLSL
+<para>One notable concept of &glsl;
 is the <emphasis>separate compilation units</emphasis>.
 It means that a code can be split into
 many units which are parsed and compiled separately,
@@ -1709,7 +1714,7 @@ as each <literal>EffectPart</literal> becomes simply one compilation unit.</para
 <para>A similar feature is found in many other
 programming languages, under the names of <quote>units</quote> or <quote>modules</quote>.
 But it is not available in two other popular <emphasis>shading</emphasis>
-languages: <emphasis>Cg</emphasis> and <emphasis>HLSL</emphasis>.
+languages: &cg; and &hlsl;.
 <!--
 and it gives us better line numbers in error messages
 (although a pre-processor directive like <literal>#line</literal> could also be used for
@@ -1719,10 +1724,10 @@ To make sure that our idea is applicable to these shading languages,
 we have explicitly tested that even without
 the <emphasis>separate compilation units</emphasis>,
 our implementation still works without problems.
-<!--So implementation based on Cg or HLSL
+<!--So implementation based on &cg; or &hlsl;
 should be definitely possible.-->
 <!-- It will not enforce the clean separation
-of effect parts &mdash; but that's just a lack of Cg and HLSL.
+of effect parts &mdash; but that's just a lack of &cg; and &hlsl;.
 -->
 </para>
 
@@ -1739,11 +1744,11 @@ together to the final shader code.</para>
 
 <para>We keep the final shader code as three arrays of strings.
 Each array keeps code for a specific shader type: geometry, vertex and fragment.
-Each string corresponds to a compilation unit for GLSL,
+Each string corresponds to a compilation unit for &glsl;,
 for other shading languages the strings can be just concatenated at the end.
 To make the plugs actually work, we add calls to their functions.
 We also add <emphasis>external function declarations</emphasis> at appropriate places.
-For languages other than GLSL, they will simply become <emphasis>forward
+For languages other than &glsl;, they will simply become <emphasis>forward
 function declarations</emphasis> when all the parts are concatenated.</para>
 
 <section id="section.helpers">
@@ -1897,7 +1902,7 @@ a simple code that renders 3D object with no lights, no textures and no effects.
 The code contains magic <literal>/* PLUG: xxx ... */</literal>
 comments, which will allow to enhance it in the following steps.</para>
 
-<para>The real GLSL vertex and fragment code used by our engine
+<para>The real &glsl; vertex and fragment code used by our engine
 at this step may be found in our engine sources. See
 <ulink url="http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.vs" />
 for vertex shader and
@@ -1912,7 +1917,7 @@ The geometry shader is initially empty.</para>
 <para>The X3D file may contain shader code that should replace
 the default shaders, following <xref linkend="bib.x3d_shaders" />
 specification. For example, a <literal>ComposedShader</literal> node
-may be present with a complete GLSL code.
+may be present with a complete &glsl; code.
 We use it at this step.</para>
 
 <para>This step trivially allows the <literal>ComposedShader</literal>
@@ -1959,7 +1964,7 @@ in a separate <literal>LightShader</literal> variable.</para>
     If we want <emphasis>Gouraud shading</emphasis>, it should go
     to <literal>LightShader[vertex]</literal> instead.</para>
 
-    <para>The actual initial GLSL light shader code used by our engine at this step
+    <para>The actual initial &glsl; light shader code used by our engine at this step
     may be found in our engine sources, see
     <ulink url="http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template_add_light.glsl" />.</para>
 
@@ -2059,7 +2064,7 @@ by the same function.</para>
 
 <para>At the end, <literal>FinalShader</literal> is just a collection
 of strings forming a shading language source code.
-For GLSL, each string is naturally a <quote>separate compilation unit</quote>,
+For &glsl;, each string is naturally a <quote>separate compilation unit</quote>,
 and can be compiled separately.
 For other shading languages, the parts may be simply concatenated together
 as necessary.</para>
@@ -2101,8 +2106,7 @@ then we do not apply the texture in a usual way. Instead, we call
 the <literal>Plug</literal> function to augment the specific light source shader
 with a shadow check, like this:</para>
 
-<screen role="pseudocode">
-&if; Texture is GeneratedShadowMap &and;
+<screen role="pseudocode">&if; Texture is GeneratedShadowMap &and;
    Texture.light affects the shape &then;
   Plug(fragment,
     'uniform sampler2DShadow shadowMap01;
@@ -2204,7 +2208,7 @@ to implement and allows the authors to directly use the existing GPU shading
 languages.
 We propose a number of extensions to the X3D,
 an open standard for 3D data, to make our effects available for 3D
-content authors. We have implemented our approach for the GLSL shading language.
+content authors. We have implemented our approach for the &glsl; shading language.
 </para>
 
 </chapter>
