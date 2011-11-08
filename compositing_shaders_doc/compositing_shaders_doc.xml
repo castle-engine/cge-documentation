@@ -2036,21 +2036,10 @@ named <literal>PLUG_texture_apply</literal> that can be later connected
 to the final shader. It should also declare plug named <literal>texture_color</literal>,
 that can be used by user effects for this texture.</para>
 
-<!--
-<para>We have deliberately omitted here some details,
+<para>We deliberately omit here some details,
 that in practice may cause the lighting and texture effects
-implementation to differ a little more. Please see our engine sources
-for an actual implementation,
-<!- - They are generally
-forced by unoptimal or buggy implementation of some GLSL features
-on older graphic cards,
-For example, the option to have two-sided lighting working with
-an optimal speed even on old GPU cards caused us to complicate light effects
-application.
-The texture effects have some special cases to work with the <emphasis>parallax
-bump mapping</emphasis>, which shifts the 2D textures.</para>
-</para>
--->
+application to differ a little more. One such detail will be explained
+in the <xref linkend="section.shadows_from_multiple_lights" />.</para>
 
 <screen role="pseudocode">EnableEffects(appearance node.Effects, FinalShader)
 
@@ -2089,6 +2078,56 @@ a little, is to calculate only hash at the first stage,
 and construct actual strings only in the second stage.
 -->
 </section>
+
+</section>
+
+<section id="section.shadows_from_multiple_lights">
+<title>Correct shadows from multiple light sources</title>
+
+<para>A texture may be a shadow map projected from a light source.
+In our paper <xref linkend="bib.castleengine.shadowmaps" />
+we have noted that the shadow should scale only the appropriate
+light source contribution. This allows to observe correct shadows
+from multiple light sources.
+This means that shadow map textures
+must be used in a different stage of the calculation than normal
+textures.</para>
+
+<para>Our plugs idea allows to do this, in a clean and concise way.
+At the place where <literal>TextureShader</literal> is created in the pseudo-code
+from the previous section, we treat shadow maps specially.
+If the light source corresponding to the shadow map affects our shape
+then we do not apply the texture in a usual way. Instead, we call
+the <literal>Plug</literal> function to augment the specific light source shader
+with a shadow check, like this:</para>
+
+<screen role="pseudocode">
+&if; Texture is GeneratedShadowMap &and;
+   Texture.light affects the shape &then;
+  Plug(fragment,
+    'uniform sampler2DShadow shadowMap01;
+     void PLUG_light_scale(inout float scale, ...)
+     {
+       scale *= shadow2DProj(shadowMap01, shadowMap01TexCoord).r;
+     }', LightShader);
+</screen>
+
+<para>The simple call to <literal>shadow2DProj</literal>
+may be replaced with a variant
+of the <emphasis>Percentage Closer Filtering</emphasis>
+(see <xref linkend="bib.pcf" />).</para>
+
+<para>The calculation of light effects has to be complicated a little
+to make it work.
+In our simple pseudo-code, we added the effects to the <literal>LightShader</literal>
+(by <literal>EnableEffects(Light.Effects, LightShader)</literal>)
+and then we immediately folded <literal>LightShader</literal> into the
+<literal>FinalShader</literal>. Now, we need to remember the
+separate <literal>LightShader</literal> for a longer time,
+in case it should be augmented with a shadow map.
+Alternatively, we could search
+for corresponding shadow maps at the moment
+when <literal>LightShader</literal> is created.</para>
 
 </section>
 
@@ -2340,6 +2379,20 @@ goes to all of you!
   <author><othername>Instant Reality</othername></author>.
   <title><emphasis>NoiseTexture</emphasis></title>.
   <bibliomisc>See <ulink url="http://doc.instantreality.org/documentation/nodetype/NoiseTexture/" />.</bibliomisc>
+</bibliomixed>
+
+<bibliomixed id="bib.pcf">
+  <abbrev>GPU Gems PCF</abbrev>
+  <bibliomset relation='article'>
+    Michael Bunnell and Fabio Pellacini.
+    <title role='article'>Shadow Map Antialiasing</title>.
+    Chapter 11 of:
+  </bibliomset>
+  <bibliomset relation='journal'>
+    <title>GPU Gems</title>.
+    <pubdate>2004</pubdate>.
+  </bibliomset>
+  <bibliomisc>Available online on <ulink url="http://http.developer.nvidia.com/GPUGems/gpugems_ch11.html" />.</bibliomisc>
 </bibliomixed>
 
 <bibliomixed id="bib.castleengine">
