@@ -5,6 +5,10 @@ HTML_NOCHUNKS_XSL := xsl/html_nochunks.xsl
 FO_XSL := xsl/fo.xsl
 FOP_JAVA_MAX_HEAP_SIZE := 512M
 
+# needed to recognize DejaVuSerif fonts,
+# needed in turn for Polish chars on titlepage
+FOP_OPTIONS := -c fop/fonts/fop_config.xml
+
 html_post = mkdir -p $(1)admonitions/ && \
   cp -f /usr/share/xml/docbook/stylesheet/nwalsh/images/*.png \
         /usr/share/xml/docbook/stylesheet/nwalsh/images/*.gif \
