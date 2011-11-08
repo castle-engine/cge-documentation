@@ -687,17 +687,39 @@ In our approach, we allow the authors to write direct shading
 language code quickly and the integration is built inside appropriate X3D nodes.</para>
 
 <para>AnySL <xref linkend="bib.anysl" /> allows to integrate internal renderer shaders
-with user shaders, by introducing a new shader language.
-<!-- TODO: use this, uncomment
-  This has
-  advantages (hides the differences between GPU shading languages like
-  &glsl; and &hlsl;), but also
-  On the other hand, we do not introduce
-  a new shader language, which is both an advantage (easy implementation,
-  easier to learn) and disadvantage (we do not hide differences e.g. between
-  ).
+with user shaders, by introducing a new shader language.</para>
+<!--
   We strive to do something more and allow effortless
   integration between many user shaders.
+-->
+
+<para>Spark <xref linkend="bib.spark" /> is a recent work presenting a new language to develop
+composable shaders for GPU.</para>
+
+<para>In this work, we deliberately decided not to introduce a new shading language.
+One of the problems with introducing a new language is that it is
+<quote>yet another language to learn</quote> for developers and users.
+Unless a new language becomes a de-facto standard,
+obsoleting other languages in the same domain, which is hard.
+For developers of 3D rendering applications, there's an additional
+effort with integrating the new language with a renderer,
+which often is not a trivial task.
+This creates a practical problem for new languages &mdash; because
+they are not popular, it's even harder for them to become popular.
+<!-- Together, this makes adoption of any new language slow. -->
+Of course, a new language has also the possibility to introduce new features,
+and <quote>win</quote> developers this way.
+But we think that existing shading languages,
+like &glsl;, are already <!--sufficiently--> comfortable for
+a lot of practical purposes.
+That's, in a nutshell, our motivation behind <emphasis>extending</emphasis>
+an existing shading language, instead of inventing a new one.
+
+<!--
+We do not introduce
+a new shader language, which is both an advantage (easy implementation,
+easier to learn) and disadvantage (we do not hide differences e.g. between
+).
 
   We also try to be simpler as we do not
   introduce any new shading language. On the other hand, the disadvantage
@@ -707,8 +729,6 @@ with user shaders, by introducing a new shader language.
 -->
 </para>
 
-<para>Spark <xref linkend="bib.spark" /> is a recent work presenting a new language to develop
-composable shaders for GPU.</para>
 
 <para><xref linkend="bib.web3d2010.declarativeshader" /> presents a declarative approach
 to an advanced shader in X3D. However, it only allows a fixed set
@@ -2176,8 +2196,11 @@ parameters.
 
 <para>An additional advantage of the <quote>pool of shaders</quote>
 appears when a subset of the needed shaders is known in the advance.
-<!-- TODO: For example, ... what's a good example?
-  Our thunder from lets_take_a_walk demo? -->
+For example, imagine an evening outdoor scene, with a storm in the distance.
+The lighting cracks the sky occasionaly, making everything temporarily bright.
+In technical words, the scene has highly dynamic lighting,
+and the shaders for various lighting conditions must be swapped instantly,
+to keep the simulation smooth.
 In such case, an application may initialize the pool
 to contain some shaders with artificial non-zero use count.
 This way, some shader configurations
