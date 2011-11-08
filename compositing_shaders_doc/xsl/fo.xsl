@@ -119,4 +119,9 @@
 
 <xsl:param name="callout.graphics.path">/usr/share/xml/docbook/stylesheet/nwalsh/images/callouts/</xsl:param>
 
+<!-- By default, normal text is indented to the left. This looks...
+     interesting, but I prefer normal look. -->
+<xsl:param name="body.start.indent">0pt</xsl:param>
+<xsl:param name="title.margin.left">0pt</xsl:param>
+
 </xsl:stylesheet>
