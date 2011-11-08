@@ -1753,14 +1753,15 @@ function declarations</emphasis> when all the parts are concatenated.</para>
 <!-- It is a low-level, helper function, dealing with strings and string lists. -->
 It is responsible for actual text processing that makes the plug functions
 correctly called. The argument <literal>PlugValue</literal>
-is scanned for all <literal>PLUG_xxx</literal> function definitions.
-The argument <literal>CompleteCode</literal>, as well as the
-final (for given shape) shader source code <literal>FinalShader</literal>,
-are searched for the matching <literal>/* PLUG: xxx ... */</literal> comments.
-<literal>CompleteCode</literal> argument is actually useful only
-to handle effects specific to a given texture or light source,
-in other cases it may be left unassigned which is equivalent to just
-setting <literal>CompleteCode</literal> to equal <literal>FinalShader</literal>.</para>
+is scanned for all <literal>PLUG_xxx</literal> function definitions.</para>
+
+<para>The argument <literal>CompleteCode</literal> is
+searched for the matching <literal>/* PLUG: xxx ... */</literal> comments.
+The final shader (for given shape) in <literal>FinalShader</literal>
+is also searched for the <literal>/* PLUG: xxx ... */</literal> comments.
+In practice, <literal>CompleteCode</literal> given here is either the <literal>FinalShader</literal>
+<!--(for shape and group effects) -->
+or the shader for a specific texture or light source.</para>
 
 <para>Appropriate calls and forward declarations are inserted to the
 <literal>CompleteCode</literal>. In the process, all handled
@@ -1784,7 +1785,7 @@ it has been processed, and correctly added to the <literal>CompleteCode</literal
 &procedure; Plug(
   EffectPartType: TShaderType;
   PlugValue: string;
-  CompleteCode: TShaderSource = nil);
+  CompleteCode: TShaderSource);
 
 &var;
   PlugName, ProcedureName, PlugForwardDeclaration: string;
@@ -1820,8 +1821,6 @@ it has been processed, and correctly added to the <literal>CompleteCode</literal
 &var;
   Code: string list;
 &begin;
-  &if; CompleteCode = nil &then;
-    CompleteCode &assign; FinalShader
   Code &assign; CompleteCode[EffectPartType]
 
   &while; we can find PLUG_xxx inside PlugValue &do;
@@ -1865,12 +1864,11 @@ it has been processed, and correctly added to the <literal>CompleteCode</literal
 <para>Using the <literal>Plug</literal> function,
 we can create the <literal>EnableEffects</literal> function.
 It handles the <literal>effects</literal> list, correctly
-processing it and adding to the given <literal>CompleteCode</literal>
-(or to the final shader code, if <literal>CompleteCode</literal> is not assigned).</para>
+processing it and adding to the given <literal>CompleteCode</literal>..</para>
 
 <screen role="pseudocode">&procedure; EnableEffects(
   Effects: list of Effect nodes;
-  CompleteCode: TShaderSource = nil);
+  CompleteCode: TShaderSource);
 &begin;
   &foreach; Effect &in; Effects &do;
     &if; Effect.enabled &and;
@@ -1934,9 +1932,9 @@ set of parameters to control. <!-- for the authors.--></para>
   LightShader &assign; new TShaderSource
   <co id="co.init_light_shader" linkends="callout.init_light_shader" /> set LightShader to basic lighting code (optimized for this Light)
   <co id="co.light_effects" linkends="callout.light_effects" /> EnableEffects(Light.Effects, LightShader)
-  <co id="co.light_extract" linkends="callout.light_extract" /> LightShaderContribution &assign; LightShader.ExtractFirst
-  <co id="co.light_merge" linkends="callout.light_merge" /> Plug(fragment, LightShaderContribution)
-  <co id="co.light_finalize" linkends="callout.light_finalize" /> FinalShader.Add(LightShader)
+  <co id="co.light_extract" linkends="callout.light_extract" /> LightContribution &assign; LightShader.ExtractFirst
+  <co id="co.light_merge" linkends="callout.light_merge" /> Plug(fragment, LightContribution, FinalShader)
+  <co id="co.light_finalize" linkends="callout.light_finalize" /> FinalShader &assign; FinalShader + LightShader
 </screen>
 
 <para>A little care is needed to correctly add light sources.
@@ -1994,11 +1992,11 @@ in a separate <literal>LightShader</literal> variable.</para>
   </callout>
 
   <callout arearefs="co.light_merge" id="callout.light_merge">
-    <para>The extracted <literal>LightShaderContribution</literal>
+    <para>The extracted <literal>LightContribution</literal>
     must now be connected with the <literal>FinalShader</literal>
     code. This can be done by a simple call to the <literal>Plug</literal>
     function, which will notice the <literal>PLUG_add_light_contribution_side</literal>
-    present inside <literal>LightShaderContribution</literal>.
+    present inside <literal>LightContribution</literal>.
     After this operation, everything is connected: final shader
     calls <literal>PLUG_add_light_contribution_side</literal>, and
     <literal>PLUG_add_light_contribution_side</literal>
@@ -2008,8 +2006,11 @@ in a separate <literal>LightShader</literal> variable.</para>
   </callout>
 
   <callout arearefs="co.light_finalize" id="callout.light_finalize">
-    <para>Finally, directly add the remaining code to be linked
-    together with the <literal>FinalShader</literal>.</para>
+    <para>Finally, add the remaining code to be linked
+    together with the <literal>FinalShader</literal>.
+    This step simply adds the strings from one list to the other,
+    with no processing.
+    </para>
 
     <para role="fo_vertical_space"></para>
   </callout>
@@ -2019,9 +2020,9 @@ in a separate <literal>LightShader</literal> variable.</para>
   TextureShader &assign; new TShaderSource
   set TextureShader to basic code (optimized for this Texture)
   EnableEffects(Texture.Effects, TextureShader)
-  TextureApply &assign; TextureShader.ExtractFirst
-  Plug(fragment, TextureApply)
-  FinalShader.Add(TextureShader)
+  TextureApplication &assign; TextureShader.ExtractFirst
+  Plug(fragment, TextureApplication, FinalShader)
+  FinalShader &assign; FinalShader + TextureShader
 </screen>
 
 <para>Texture effects require a similar approach as light effects,
@@ -2051,10 +2052,10 @@ bump mapping</emphasis>, which shifts the 2D textures.</para>
 </para>
 -->
 
-<screen role="pseudocode">EnableEffects(appearance node.Effects)
+<screen role="pseudocode">EnableEffects(appearance node.Effects, FinalShader)
 
 &foreach; group node containing this shape &do;
-  EnableEffects(group node.Effects)
+  EnableEffects(group node.Effects, FinalShader)
 </screen>
 
 <para>Effects specific to a given shape,
