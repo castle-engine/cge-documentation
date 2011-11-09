@@ -2458,26 +2458,37 @@ texturing is applied.</para>
 <bibliography id="bibliography">
 <title>References</title>
 
-<bibliomixed id="bib.x3d">
-  <abbrev>X3D</abbrev>
-  <author><othername>Web3D Consortium</othername></author>.
-  <title><emphasis>Extensible 3D (X3D) Graphics Standard</emphasis></title>.
-  <pubdate>2008</pubdate>.
-  <bibliomisc>ISO/IEC 19775-1.2:2008. See <ulink url="http://web3d.org/x3d/specifications/" />.</bibliomisc>
-</bibliomixed>
+<!-- Keep sorted by abbrev.
+     (I could as well sort automatically, see
+     http://www.sagehill.net/docbookxsl/SortBiblio.html ,
+     but maintaining it by hand is actually no work and this way I can see
+     it the same in sources.) -->
 
-<bibliomixed id="bib.x3d_shaders">
-  <abbrev>X3D Shaders</abbrev>
+<bibliomixed id="bib.anysl">
+  <abbrev>AnySL</abbrev>
   <bibliomset relation='article'>
-    <abbrev>X3D Shaders</abbrev>
-    Gonçalo Nuno Moutinho de Carvalho, Tony Gill and Tony Parisi.
-    <title role='article'>X3D programmable shaders</title>.
+    Ralf Karrenberg, Dmitri Rubinstein, Philipp Slusallek and Sebastian Hack.
+    <title role='article'>AnySL: efficient and portable shading for ray tracing</title>.
   </bibliomset>
   <bibliomset relation='journal'>
-    <title>Proceedings of the ninth international conference on 3D Web technology</title>.
-    <publishername>ACM</publishername>, <pubdate>2004</pubdate>.
+    <title>Proceedings of the Conference on High Performance Graphics</title>.
+    <publishername>Eurographics Association</publishername>, <pubdate>2010</pubdate>.
   </bibliomset>
-  <bibliomisc>Available online as part of the X3D specification, see <ulink url="http://web3d.org/x3d/specifications/ISO-IEC-19775-1.2-X3D-AbstractSpecification/Part01/components/shaders.html" /></bibliomisc>
+  <bibliomisc>See <ulink url="http://portal.acm.org/citation.cfm?id=1921479.1921495" />. See also AnySL website <ulink url="http://www.cdl.uni-saarland.de/projects/anysl/" />.</bibliomisc>
+</bibliomixed>
+
+<bibliomixed id="bib.castleengine">
+  <abbrev>Castle Game Engine</abbrev>
+  <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
+  <bibliomisc>The engine webpage, with information and downloads of our tools (like <literal>view3dscene</literal>):
+    <ulink url="http://castle-engine.sourceforge.net/" />.</bibliomisc>
+</bibliomixed>
+
+<bibliomixed id="bib.cg">
+  <abbrev>Cg</abbrev>
+  <title><emphasis>Cg - The Language for High-Performance Realtime Graphics</emphasis></title>.
+  NVidia.
+  <bibliomisc>See <ulink url="http://developer.nvidia.com/page/cg_main.html" />.</bibliomisc>
 </bibliomixed>
 
 <bibliomixed id="bib.glsl">
@@ -2494,11 +2505,18 @@ texturing is applied.</para>
   <publishername>Addison-Wesley</publishername>, <pubdate>2004</pubdate>.
 </bibliomixed>
 
-<bibliomixed id="bib.cg">
-  <abbrev>Cg</abbrev>
-  <title><emphasis>Cg - The Language for High-Performance Realtime Graphics</emphasis></title>.
-  NVidia.
-  <bibliomisc>See <ulink url="http://developer.nvidia.com/page/cg_main.html" />.</bibliomisc>
+<bibliomixed id="bib.pcf">
+  <abbrev>GPU Gems PCF</abbrev>
+  <bibliomset relation='article'>
+    Michael Bunnell and Fabio Pellacini.
+    <title role='article'>Shadow Map Antialiasing</title>.
+    Chapter 11 of:
+  </bibliomset>
+  <bibliomset relation='journal'>
+    <title>GPU Gems</title>.
+    <pubdate>2004</pubdate>.
+  </bibliomset>
+  <bibliomisc>Available online on <ulink url="http://http.developer.nvidia.com/GPUGems/gpugems_ch11.html" />.</bibliomisc>
 </bibliomixed>
 
 <bibliomixed id="bib.hlsl">
@@ -2506,6 +2524,19 @@ texturing is applied.</para>
   Microsoft.
   <title><emphasis>HLSL</emphasis></title>.
   <bibliomisc>See <ulink url="http://msdn.microsoft.com/en-us/library/bb509561\%28v=vs.85\%29.aspx" />.</bibliomisc>
+</bibliomixed>
+
+<bibliomixed id="bib.instantreality.noisetex">
+  <abbrev>NoiseTexture</abbrev>
+  <author><othername>Instant Reality</othername></author>.
+  <title><emphasis>NoiseTexture</emphasis></title>.
+  <bibliomisc>See <ulink url="http://doc.instantreality.org/documentation/nodetype/NoiseTexture/" />.</bibliomisc>
+</bibliomixed>
+
+<bibliomixed id="bib.ogre_shader">
+  <abbrev>OGRE Shader</abbrev>
+  <title><emphasis>OGRE Wiki - RT Shader System</emphasis></title>.
+  <bibliomisc>See <ulink url="http://www.ogre3d.org/tikiwiki/RT+Shader+System&amp;structure=Development" />.</bibliomisc>
 </bibliomixed>
 
 <bibliomixed id="bib.sh">
@@ -2517,25 +2548,6 @@ texturing is applied.</para>
    http://www.amazon.com/Metaprogramming-GPUs-Sh-Stefanus-Toit/dp/1568812299
    http://books.google.com/books?id=8RX4RmFRLmgC&pg=PA79&lpg=PA79&dq=ShAttrib2f&source=bl&ots=IOxd1-BQLL&sig=AIPgFRmbodNpCLWmwk-QV5JUjVo&hl=pl&ei=EylRTe7RB8qeOsiQ1aQI&sa=X&oi=book_result&ct=result&resnum=7&ved=0CEkQ6AEwBg#v=onepage&q=ShAttrib2f&f=false
   -->
-</bibliomixed>
-
-<bibliomixed id="bib.ogre_shader">
-  <abbrev>OGRE Shader</abbrev>
-  <title><emphasis>OGRE Wiki - RT Shader System</emphasis></title>.
-  <bibliomisc>See <ulink url="http://www.ogre3d.org/tikiwiki/RT+Shader+System&amp;structure=Development" />.</bibliomisc>
-</bibliomixed>
-
-<bibliomixed id="bib.anysl">
-  <abbrev>AnySL</abbrev>
-  <bibliomset relation='article'>
-    Ralf Karrenberg, Dmitri Rubinstein, Philipp Slusallek and Sebastian Hack.
-    <title role='article'>AnySL: efficient and portable shading for ray tracing</title>.
-  </bibliomset>
-  <bibliomset relation='journal'>
-    <title>Proceedings of the Conference on High Performance Graphics</title>.
-    <publishername>Eurographics Association</publishername>, <pubdate>2010</pubdate>.
-  </bibliomset>
-  <bibliomisc>See <ulink url="http://portal.acm.org/citation.cfm?id=1921479.1921495" />. See also AnySL website <ulink url="http://www.cdl.uni-saarland.de/projects/anysl/" />.</bibliomisc>
 </bibliomixed>
 
 <bibliomixed id="bib.spark">
@@ -2551,6 +2563,30 @@ texturing is applied.</para>
   <bibliomisc>See <ulink url="http://graphics.stanford.edu/papers/spark/" />.</bibliomisc>
 </bibliomixed>
 
+<bibliomixed id="bib.humus.volumetricfog">
+  <abbrev>Volumetric Fog</abbrev>
+  <firstname>Emil</firstname> <surname>Persson</surname> "Humus".
+  <title><emphasis>Volumetric Fogging 2</emphasis></title>.
+  <pubdate>2006</pubdate>.
+  <bibliomisc>See <ulink url="http://www.humus.name/index.php?page=3D&amp;ID=70" />. Nice overview also on <ulink url="http://www.evl.uic.edu/sjames/cs525/shader.html" />.</bibliomisc>
+</bibliomixed>
+
+<bibliomixed id="bib.x3d">
+  <abbrev>X3D</abbrev>
+  <author><othername>Web3D Consortium</othername></author>.
+  <title><emphasis>Extensible 3D (X3D) Graphics Standard</emphasis></title>.
+  <pubdate>2008</pubdate>.
+  <bibliomisc>ISO/IEC 19775-1.2:2008. See <ulink url="http://web3d.org/x3d/specifications/" />.</bibliomisc>
+</bibliomixed>
+
+<bibliomixed id="bib.castleengine.bumpmapping">
+  <abbrev>X3D Bump Mapping</abbrev>
+  <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
+  <title><emphasis>Bump mapping extensions</emphasis></title>.
+  <pubdate>2008</pubdate>.
+  <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_bump_mapping" /></bibliomisc>
+</bibliomixed>
+
 <bibliomixed id="bib.web3d2010.declarativeshader">
   <abbrev>X3D DeclarativeShader</abbrev>
   <bibliomset relation='article'>
@@ -2564,25 +2600,26 @@ texturing is applied.</para>
   <bibliomisc>See <ulink url="http://doi.acm.org/10.1145/1836049.1836051" />.</bibliomisc>
 </bibliomixed>
 
-<bibliomixed id="bib.x3d.volume">
-  <abbrev>X3D Volume</abbrev>
-    <bibliomset relation='article'>
-    <author><othername>Web3D Consortium</othername></author>.
-    <title role='article'>Volume rendering component</title>.
-  </bibliomset>
-  <bibliomset relation='journal'>
-    Part of the latest (not finalized yet) version of the <title>Extensible 3D (X3D) Graphics Standard</title>: X3D 3.3.
-    <pubdate>2011</pubdate>.
-  </bibliomset>
-  <bibliomisc>The text of the component is inside the proposed X3D 3.3 specification: <ulink url="http://web3d.org/x3d/specifications/ISO_IEC_PDAM1_19775_1_2008-X3D-AbstractSpecification/Part01/components/volume.html" />.</bibliomisc>
+<bibliomixed id="bib.castleengine.projectivetexturing">
+  <abbrev>X3D Projective Texturing</abbrev>
+  <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
+  <title><emphasis>Projective texture mapping</emphasis></title>.
+  <pubdate>2010</pubdate>.
+  <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions_shadow_maps.php#section_texture_projective" />.</bibliomisc>
 </bibliomixed>
 
-<bibliomixed id="bib.humus.volumetricfog">
-  <abbrev>Volumetric Fog</abbrev>
-  <firstname>Emil</firstname> <surname>Persson</surname> "Humus".
-  <title><emphasis>Volumetric Fogging 2</emphasis></title>.
-  <pubdate>2006</pubdate>.
-  <bibliomisc>See <ulink url="http://www.humus.name/index.php?page=3D&amp;ID=70" />. Nice overview also on <ulink url="http://www.evl.uic.edu/sjames/cs525/shader.html" />.</bibliomisc>
+<bibliomixed id="bib.x3d_shaders">
+  <abbrev>X3D Shaders</abbrev>
+  <bibliomset relation='article'>
+    <abbrev>X3D Shaders</abbrev>
+    Gonçalo Nuno Moutinho de Carvalho, Tony Gill and Tony Parisi.
+    <title role='article'>X3D programmable shaders</title>.
+  </bibliomset>
+  <bibliomset relation='journal'>
+    <title>Proceedings of the ninth international conference on 3D Web technology</title>.
+    <publishername>ACM</publishername>, <pubdate>2004</pubdate>.
+  </bibliomset>
+  <bibliomisc>Available online as part of the X3D specification, see <ulink url="http://web3d.org/x3d/specifications/ISO-IEC-19775-1.2-X3D-AbstractSpecification/Part01/components/shaders.html" /></bibliomisc>
 </bibliomixed>
 
 <bibliomixed id="bib.castleengine.shadowmaps">
@@ -2598,14 +2635,6 @@ texturing is applied.</para>
   <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions_shadow_maps.php" />.</bibliomisc>
 </bibliomixed>
 
-<bibliomixed id="bib.castleengine.bumpmapping">
-  <abbrev>X3D Bump Mapping</abbrev>
-  <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
-  <title><emphasis>Bump mapping extensions</emphasis></title>.
-  <pubdate>2008</pubdate>.
-  <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_bump_mapping" /></bibliomisc>
-</bibliomixed>
-
 <bibliomixed id="bib.castleengine.texcoordbounds">
   <abbrev>X3D TexCoord Bounds</abbrev>
   <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
@@ -2614,40 +2643,17 @@ texturing is applied.</para>
   <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_tex_coord_bounds" />.</bibliomisc>
 </bibliomixed>
 
-<bibliomixed id="bib.castleengine.projectivetexturing">
-  <abbrev>X3D Projective Texturing</abbrev>
-  <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
-  <title><emphasis>Projective texture mapping</emphasis></title>.
-  <pubdate>2010</pubdate>.
-  <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions_shadow_maps.php#section_texture_projective" />.</bibliomisc>
-</bibliomixed>
-
-<bibliomixed id="bib.instantreality.noisetex">
-  <abbrev>NoiseTexture</abbrev>
-  <author><othername>Instant Reality</othername></author>.
-  <title><emphasis>NoiseTexture</emphasis></title>.
-  <bibliomisc>See <ulink url="http://doc.instantreality.org/documentation/nodetype/NoiseTexture/" />.</bibliomisc>
-</bibliomixed>
-
-<bibliomixed id="bib.pcf">
-  <abbrev>GPU Gems PCF</abbrev>
-  <bibliomset relation='article'>
-    Michael Bunnell and Fabio Pellacini.
-    <title role='article'>Shadow Map Antialiasing</title>.
-    Chapter 11 of:
+<bibliomixed id="bib.x3d.volume">
+  <abbrev>X3D Volume</abbrev>
+    <bibliomset relation='article'>
+    <author><othername>Web3D Consortium</othername></author>.
+    <title role='article'>Volume rendering component</title>.
   </bibliomset>
   <bibliomset relation='journal'>
-    <title>GPU Gems</title>.
-    <pubdate>2004</pubdate>.
+    Part of the latest (not finalized yet) version of the <title>Extensible 3D (X3D) Graphics Standard</title>: X3D 3.3.
+    <pubdate>2011</pubdate>.
   </bibliomset>
-  <bibliomisc>Available online on <ulink url="http://http.developer.nvidia.com/GPUGems/gpugems_ch11.html" />.</bibliomisc>
-</bibliomixed>
-
-<bibliomixed id="bib.castleengine">
-  <abbrev>Castle Game Engine</abbrev>
-  <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
-  <bibliomisc>The engine webpage, with information and downloads of our tools (like <literal>view3dscene</literal>):
-    <ulink url="http://castle-engine.sourceforge.net/" />.</bibliomisc>
+  <bibliomisc>The text of the component is inside the proposed X3D 3.3 specification: <ulink url="http://web3d.org/x3d/specifications/ISO_IEC_PDAM1_19775_1_2008-X3D-AbstractSpecification/Part01/components/volume.html" />.</bibliomisc>
 </bibliomixed>
 
 </bibliography>
