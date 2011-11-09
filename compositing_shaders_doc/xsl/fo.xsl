@@ -89,11 +89,18 @@
 <xsl:param name="body.start.indent">0pt</xsl:param>
 <xsl:param name="title.margin.left">0pt</xsl:param>
 
-<!-- Adjust template from
-     /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/fo/inline.xsl
-     to make <abbrev> bold -->
-<xsl:template match="abbrev">
-  <xsl:call-template name="inline.boldseq"/>
+<!-- Surround <abbrev> (but only inside the bibliography list,
+     not in xrefs to bibliography entries) in bold.
+     This template comes from
+     /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/fo/biblio.xsl,
+     it's also simplified since we know we always use abbrev for label. -->
+<xsl:template name="biblioentry.label">
+  <xsl:param name="node" select="."/>
+  <fo:inline font-weight="bold">
+    <xsl:text>[</xsl:text>
+    <xsl:apply-templates select="$node/abbrev[1]"/>
+    <xsl:text>] </xsl:text>
+  </fo:inline>
 </xsl:template>
 
 </xsl:stylesheet>

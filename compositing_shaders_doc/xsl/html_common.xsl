@@ -13,4 +13,18 @@
 <xsl:param name="chunker.output.doctype-public">-//W3C//DTD HTML 4.01 Transitional//EN</xsl:param>
 <xsl:param name="chunker.output.doctype-system">http://www.w3.org/TR/html4/loose.dtd</xsl:param>
 
+<!-- Surround <abbrev> (but only inside the bibliography list,
+     not in xrefs to bibliography entries) in bold.
+     This template comes from
+     /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/biblio.xsl,
+     it's also simplified since we know we always use abbrev for label. -->
+<xsl:template name="biblioentry.label">
+  <xsl:param name="node" select="."/>
+  <b>
+    <xsl:text>[</xsl:text>
+    <xsl:apply-templates select="$node/abbrev[1]"/>
+    <xsl:text>] </xsl:text>
+  </b>
+</xsl:template>
+
 </xsl:stylesheet>
