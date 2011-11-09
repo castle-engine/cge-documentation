@@ -1241,7 +1241,7 @@ reminding author to override it.</para>
 can be explicitly specified, just like for any other texture in X3D.
 This is done by placing any <literal>X3DTextureCoordinateNode</literal>
 node inside the geometry <literal>texCoord</literal> field.
-Both explicit texture coordinate lists (<literal>TextureCoordinate</literal>
+Both explicit texture coordinate lists (<literal>TextureCoordinate</literal>,
 <literal>TextureCoordinate3D</literal>, <literal>TextureCoordinate4D</literal>)
 as well as the coordinate generator nodes
 (like <literal>TextureCoordinateGenerator</literal> and
