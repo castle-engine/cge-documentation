@@ -2265,6 +2265,8 @@ content authors. We have implemented our approach for the &glsl; shading languag
 
 </chapter>
 
+<!-- Looks ugly on an empty page of PDF. We'll put it in the engine news instead :)
+
 <chapter id="acknowledgements">
 <title>Acknowledgements</title>
 
@@ -2274,7 +2276,7 @@ with it's rendering features and extensions. A big <quote>thank you</quote>
 goes to all of you!
 </para>
 
-</chapter>
+</chapter>-->
 
 <appendix id="appendix.plugs">
 <title>Reference of available plugs</title>
