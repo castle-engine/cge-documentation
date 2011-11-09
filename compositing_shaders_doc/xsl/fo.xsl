@@ -51,12 +51,6 @@
   -->
 </xsl:attribute-set>
 
-<!-- <xsl:template match="phrase[@role= 'polish-characters']"> -->
-<!--   <fo:inline font-family="DejaVuSerif"> -->
-<!--     <xsl:apply-templates/> -->
-<!--   </fo:inline> -->
-<!-- </xsl:template> -->
-
 <xsl:template match="phrase[@role='underline']">
   <fo:inline text-decoration="underline">
     <xsl:apply-templates/>
@@ -89,25 +83,6 @@
   <xsl:attribute name="background-color">#FAFAFA</xsl:attribute>
   <xsl:attribute name="border">0.5pt solid black</xsl:attribute>
   <xsl:attribute name="padding">0.05in</xsl:attribute>
-
-  <!-- We want larger padding around <screen>, to make it nicely stand out.
-       Usually we want it from all sides (vertical and horizontal),
-       but for <screen> inside an <orderedlist> we want to be able to disable
-       vertical padding (as it causes ugly look then, list number baseline
-       is shifted).
-
-       This allows you to use db-no-vertical-padding processing instruction
-       inside <screen> to disable vertical padding.
-
-       Not used after all.
-
-  <xsl:attribute name="padding">
-    <xsl:choose>
-      <xsl:when test="processing-instruction('db-no-vertical-padding')">0in 0.05in 0in 0.05in</xsl:when>
-      <xsl:otherwise>0.05in</xsl:otherwise>
-    </xsl:choose>
-  </xsl:attribute>
-  -->
 </xsl:attribute-set>
 
 <!-- Without this, tables in FO have internal frames, even when frame="none"
@@ -118,12 +93,6 @@
 
 <xsl:param name="paper.type" select="'A4'"></xsl:param>
 <xsl:param name="body.font.master">11</xsl:param>
-
-<!-- This will set title font to serif (by default it's sans-serif in DocBook).
-     Not sure which is better - - - default for TeX is serif titles,
-     but many books use sans-serif for titles.
-     Maybe stay with DocBook default for now here. -->
-<!-- <xsl:param name="title.font.family">serif</xsl:param> -->
 
 <!-- A little larger top/bottom margins, make text nicely separated
      from header/footer. Other papers also seem to have larger margins
