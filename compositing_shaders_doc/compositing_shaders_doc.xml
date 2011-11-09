@@ -1276,9 +1276,8 @@ the <literal>defaultTexCoord</literal> field determines how they are generated:<
 </orderedlist>
 
 <para>The <literal>"BOUNDS*"</literal> names are consistent
-with another of our engine extensions. Namely, we allow
-the values <literal>"BOUNDS2D"</literal> and <literal>"BOUNDS3D"</literal>
-to be also used for the <literal>TextureCoordinateGenerator.mode</literal> field.
+with another extension of our engine. We allow
+the same values to be used in the <literal>TextureCoordinateGenerator.mode</literal> field.
 See <xref linkend="bib.castleengine.texcoordbounds" />.</para>
 
 <para>In the end, the idea is that using a <literal>ShaderTexture</literal>
@@ -2008,12 +2007,11 @@ in a separate <literal>LightShader</literal> variable.</para>
     <para>The extracted <literal>LightContribution</literal>
     must now be connected with the <literal>FinalShader</literal>
     code. This can be done by a simple call to the <literal>Plug</literal>
-    function, which will notice the <literal>PLUG_add_light_contribution_side</literal>
+    function, which will notice the <literal>PLUG_&shy;add_&shy;light_&shy;contribution_&shy;side</literal>
     present inside <literal>LightContribution</literal>.
     After this operation, everything is connected: final shader
-    calls <literal>PLUG_add_light_contribution_side</literal>, and
-    <literal>PLUG_add_light_contribution_side</literal>
-    calls user effects on the light source.</para>
+    calls <literal>PLUG_&shy;add_&shy;light_&shy;contribution_&shy;side</literal>,
+    which in turn calls user effects on the light source.</para>
 
     <para role="fo_vertical_space"></para>
   </callout>
