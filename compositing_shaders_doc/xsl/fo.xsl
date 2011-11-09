@@ -89,4 +89,11 @@
 <xsl:param name="body.start.indent">0pt</xsl:param>
 <xsl:param name="title.margin.left">0pt</xsl:param>
 
+<!-- Adjust template from
+     /usr/share/sgml/docbook/stylesheet/xsl/nwalsh/fo/inline.xsl
+     to make <abbrev> bold -->
+<xsl:template match="abbrev">
+  <xsl:call-template name="inline.boldseq"/>
+</xsl:template>
+
 </xsl:stylesheet>

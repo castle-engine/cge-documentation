@@ -53,3 +53,7 @@ p.fo_vertical_space { display: none; }
 div.calloutlist p {
   margin-bottom: 0em; margin-top: 1em;
 }
+
+/* Make <abbrev> for bibliography bold, to be easier to find in long references
+   list*/
+abbr.abbrev { font-weight: bold; }
