@@ -736,6 +736,20 @@ It merely allows the authors to use some advanced algorithms that in practice
 will be usually implemented by shaders inside the application.
 </para>
 
+<para><xref linkend="bib.x3d.volume" /> proposes a new X3D component
+for rendering volumetric data (coming from 3D textures).
+It is interesting in relation to our work, as it <!--introduces a system for-->
+allows to compose various rendering styles for visualizing volumetric data.
+Many styles of rendering are predefined
+(all the nodes descending from the <literal>X3DComposableVolumeRenderStyleNode</literal>)
+and they can be combined together by the
+<literal>ComposedVolumeStyle</literal> node.
+The effects introduced in our work could serve as a low-level implementation
+for such rendering styles, utilizing GPU shading languages.
+Each rendering style could be defined as a prototype that expands into our
+<literal>Effect</literal> node, overriding some plug receiving data about the 3D volume,
+add adding the necessary visualization.</para>
+
 <para>At the end, we would like to mention a solution from a completely
 different domain, that is surprisingly similar to ours in some ways.
 Drupal (<ulink url="http://drupal.org/" />),
@@ -2177,7 +2191,7 @@ parameters.
 <para>An additional advantage of the <quote>pool of shaders</quote>
 appears when a subset of the needed shaders is known in the advance.
 For example, imagine an evening outdoor scene, with a storm in the distance.
-The lighting cracks the sky occasionaly, making everything temporarily bright.
+The lighting cracks the sky occasionally, making everything temporarily bright.
 In technical words, the scene has highly dynamic lighting,
 and the shaders for various lighting conditions must be swapped instantly,
 to keep the simulation smooth.
@@ -2548,6 +2562,19 @@ texturing is applied.</para>
     <publishername>ACM</publishername>, <pubdate>2010</pubdate>.
   </bibliomset>
   <bibliomisc>See <ulink url="http://doi.acm.org/10.1145/1836049.1836051" />.</bibliomisc>
+</bibliomixed>
+
+<bibliomixed id="bib.x3d.volume">
+  <abbrev>X3D Volume</abbrev>
+    <bibliomset relation='article'>
+    <author><othername>Web3D Consortium</othername></author>.
+    <title role='article'>Volume rendering component</title>.
+  </bibliomset>
+  <bibliomset relation='journal'>
+    Part of the latest (not finalized yet) version of the <title>Extensible 3D (X3D) Graphics Standard</title>: X3D 3.3.
+    <pubdate>2011</pubdate>.
+  </bibliomset>
+  <bibliomisc>The text of the component is inside the proposed X3D 3.3 specification: <ulink url="http://web3d.org/x3d/specifications/ISO_IEC_PDAM1_19775_1_2008-X3D-AbstractSpecification/Part01/components/volume.html" />.</bibliomisc>
 </bibliomixed>
 
 <bibliomixed id="bib.humus.volumetricfog">
