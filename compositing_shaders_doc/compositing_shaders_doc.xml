@@ -315,22 +315,22 @@ Again, you can open this file with any X3D browser
 (be sure to save it with <literal>.x3d</literal> extension).</para>
 
 <!--
-&lt;!DOCTYPE X3D PUBLIC
+<!DOCTYPE X3D PUBLIC
   "ISO//Web3D//DTD X3D 3.2//EN"
-  "http://www.web3d.org/specifications/x3d-3.2.dtd"&gt;
-&lt;X3D version="3.2" profile="Interchange"
+  "http://www.web3d.org/specifications/x3d-3.2.dtd">
+<X3D version="3.2" profile="Interchange"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema-instance"
-  xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.2.xsd"&gt;
+  xsd:noNamespaceSchemaLocation="http://www.web3d.org/specifications/x3d-3.2.xsd">
 -->
 
-<screen>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
-&lt;X3D version="3.2" profile="Interchange"&gt;
-  &lt;Scene&gt;
-    &lt;Shape&gt;
-      &lt;Sphere radius="2" /&gt;
-    &lt;/Shape&gt;
-  &lt;/Scene&gt;
-&lt;/X3D&gt;
+<screen><![CDATA[<?xml version="1.0" encoding="UTF-8"?>
+<X3D version="3.2" profile="Interchange">
+  <Scene>
+    <Shape>
+      <Sphere radius="2" />
+    </Shape>
+  </Scene>
+</X3D>]]>
 </screen>
 
 <!-- More about encodings, and binary encoding?
