@@ -65,3 +65,13 @@
     <xsl:apply-imports/>
   </fo:block>
 </xsl:template>
+
+<!-- ======================================================================= -->
+
+<!-- A little larger top/bottom margins, make text nicely separated
+     from header/footer. Other papers also seem to have larger margins
+     than what DocBook generates by default.
+
+     (Not used after all... defaults are actually better?) -->
+<xsl:param name="body.margin.top">0.7in</xsl:param>
+<xsl:param name="body.margin.bottom">0.7in</xsl:param>

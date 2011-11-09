@@ -94,12 +94,6 @@
 <xsl:param name="paper.type" select="'A4'"></xsl:param>
 <xsl:param name="body.font.master">11</xsl:param>
 
-<!-- A little larger top/bottom margins, make text nicely separated
-     from header/footer. Other papers also seem to have larger margins
-     than what DocBook generates by default. -->
-<xsl:param name="body.margin.top">0.75in</xsl:param>
-<xsl:param name="body.margin.top">0.75in</xsl:param>
-
 <!-- By default, normal text is indented to the left. This looks...
      interesting, but I prefer normal look. -->
 <xsl:param name="body.start.indent">0pt</xsl:param>
