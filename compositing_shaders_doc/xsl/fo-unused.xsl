@@ -1,3 +1,29 @@
+<!-- Make ulink (but not other xrefs) in FO output blue.
+  Based on [http://www.sagehill.net/docbookxsl/CustomXrefs.html#CustomXrefStyle]. -->
+<xsl:attribute-set name="xref.properties">
+  <xsl:attribute name="color">
+    <xsl:choose>
+      <xsl:when test="self::ulink">blue</xsl:when>
+      <xsl:otherwise>inherit</xsl:otherwise>
+    </xsl:choose>
+  </xsl:attribute>
+</xsl:attribute-set>
+
+<!-- ======================================================================= -->
+
+<xsl:attribute-set name="xref.properties">
+  <!-- Make ulink using monospace font, looks nicer in print?
+       Resigned, we have enough monospace things in our paper? -->
+  <xsl:attribute name="font-family">
+    <xsl:choose>
+      <xsl:when test="self::ulink">monospace</xsl:when>
+      <xsl:otherwise>inherit</xsl:otherwise>
+    </xsl:choose>
+  </xsl:attribute>
+</xsl:attribute-set>
+
+<!-- ======================================================================= -->
+
 <!-- Make <phrase role="polish-characters"> use font with Polish characters. -->
 <xsl:template match="phrase[@role= 'polish-characters']">
   <fo:inline font-family="DejaVuSerif">

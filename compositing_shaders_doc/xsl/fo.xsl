@@ -23,8 +23,7 @@
 <xsl:param name="shade.verbatim" select="1"></xsl:param>
 
 <!-- Make font for <screen> in PDF a little smaller.
-  Based on [http://www.dpawson.co.uk/docbook/styling/fo.html],
-  question 16. -->
+     Based on [http://www.dpawson.co.uk/docbook/styling/fo.html], question 16. -->
 <xsl:attribute-set name="monospace.verbatim.properties"
   use-attribute-sets="verbatim.properties">
   <xsl:attribute name="font-family">
@@ -37,18 +36,9 @@
 </xsl:attribute-set>
 
 <!-- Make all links in FO output blue.
-  Based on
-  [http://www.sagehill.net/docbookxsl/CustomXrefs.html#CustomXrefStyle]. -->
+     Based on [http://www.sagehill.net/docbookxsl/CustomXrefs.html#CustomXrefStyle]. -->
 <xsl:attribute-set name="xref.properties">
   <xsl:attribute name="color">blue</xsl:attribute>
-  <!--
-  <xsl:attribute name="color">
-    <xsl:choose>
-      <xsl:when test="self::ulink">blue</xsl:when>
-      <xsl:otherwise>inherit</xsl:otherwise>
-    </xsl:choose>
-  </xsl:attribute>
-  -->
 </xsl:attribute-set>
 
 <xsl:template match="phrase[@role='underline']">
