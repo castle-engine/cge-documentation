@@ -22,10 +22,6 @@
   </xsl:attribute>
 </xsl:attribute-set>
 
-<!-- Note: if you decide to use it,
-     remember to fix the look of "GNU GPL" ulink. That's the only
-     place where I used <ulink> with content. -->
-
 <!-- ======================================================================= -->
 
 <!-- Make <phrase role="polish-characters"> use font with Polish characters. -->

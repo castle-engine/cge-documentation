@@ -65,10 +65,11 @@
   </copyright>
   <legalnotice><para>You can redistribute and/or modify
     this document under the terms of the
-    <ulink url="http://www.gnu.org/licenses/gpl.html">GNU General Public
-    License</ulink> as published by
-    the Free Software Foundation; either version 2 of the License, or
-    (at your option) any later version.</para>
+    <emphasis>GNU General Public License</emphasis>
+    as published by the Free Software Foundation.
+    Either version 2 of the License, or (at your option) any later version.
+    The license text may be found on
+    <ulink url="http://www.gnu.org/licenses/gpl.html" />.</para>
   </legalnotice>
 </bookinfo>
 
@@ -1262,7 +1263,7 @@ as well as the coordinate generator nodes
 <literal>ProjectedTextureCoordinate</literal>) are allowed.
 Note that projective texture mapping
 by the <literal>ProjectedTextureCoordinate</literal>
-is also our X3D extension, see <xref linkend="bib.castleengine.projectivetexturing" />.</para>
+is also our X3D extension, see <xref linkend="bib.castleengine.shadowmaps" />.</para>
 
 <para>When the texture coordinates are not given,
 the <literal>defaultTexCoord</literal> field determines how they are generated:</para>
@@ -2600,6 +2601,8 @@ texturing is applied.</para>
   <bibliomisc>See <ulink url="http://doi.acm.org/10.1145/1836049.1836051" />.</bibliomisc>
 </bibliomixed>
 
+<!-- This is already part of bib.castleengine.shadowmaps.
+
 <bibliomixed id="bib.castleengine.projectivetexturing">
   <abbrev>X3D Projective Texturing</abbrev>
   <firstname>Michalis</firstname> <surname>Kamburelis</surname>.
@@ -2607,6 +2610,7 @@ texturing is applied.</para>
   <pubdate>2010</pubdate>.
   <bibliomisc>See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions_shadow_maps.php#section_texture_projective" />.</bibliomisc>
 </bibliomixed>
+-->
 
 <bibliomixed id="bib.x3d_shaders">
   <abbrev>X3D Shaders</abbrev>
