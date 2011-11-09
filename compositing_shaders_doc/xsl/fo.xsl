@@ -15,9 +15,7 @@
 <xsl:param name="admon.graphics.path">/usr/share/xml/docbook/stylesheet/nwalsh/images/</xsl:param>
 <xsl:param name="admon.graphics.extension" select="'.svg'"></xsl:param>
 
-<!-- xsl:param name="ulink.show" select="0"></xsl:param> -->
 <xsl:param name="ulink.hyphenate">&#x200B;</xsl:param>
-
 <xsl:param name="ulink.hyphenate.chars" select="'/.'"></xsl:param>
 
 <xsl:param name="shade.verbatim" select="1"></xsl:param>
