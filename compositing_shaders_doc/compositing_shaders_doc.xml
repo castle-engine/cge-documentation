@@ -2491,7 +2491,7 @@ texturing is applied.</para>
   <abbrev>Cg</abbrev>
   <title><emphasis>Cg - The Language for High-Performance Realtime Graphics</emphasis></title>.
   NVidia.
-  <bibliomisc>See <ulink url="http://developer.nvidia.com/page/cg_main.html" />.</bibliomisc>
+  <bibliomisc>See <ulink url="http://developer.nvidia.com/cg-toolkit" />.</bibliomisc>
 </bibliomixed>
 
 <bibliomixed id="bib.glsl">
@@ -2526,7 +2526,7 @@ texturing is applied.</para>
   <abbrev>HLSL</abbrev>
   Microsoft.
   <title><emphasis>HLSL</emphasis></title>.
-  <bibliomisc>See <ulink url="http://msdn.microsoft.com/en-us/library/bb509561\%28v=vs.85\%29.aspx" />.</bibliomisc>
+  <bibliomisc>See <ulink url="http://msdn.microsoft.com/en-us/library/bb509561(v=vs.85).aspx" />.</bibliomisc>
 </bibliomixed>
 
 <bibliomixed id="bib.instantreality.noisetex">
