@@ -966,7 +966,7 @@ X3D <emphasis>Programmable shaders</emphasis> component <xref linkend="bib.x3d_s
 SFString [] <emphasis role="bold">type</emphasis> "VERTEX"
   # Like ShaderPart.type:
   # allowed values are
-  # FRAGMENT | VERTEX | GEOMETRY.
+  # VERTEX | GEOMETRY | FRAGMENT.
 
 MFString [] <emphasis role="bold">url</emphasis> []
   # The source code, like ShaderPart.url.
@@ -1765,7 +1765,7 @@ textures and such), custom shaders (by X3D nodes like
 together to the final shader code.</para>
 
 <para>We keep the final shader code as three arrays of strings.
-Each array keeps code for a specific shader type: geometry, vertex and fragment.
+Each array keeps code for a specific shader type: vertex, geometry and fragment.
 Each string corresponds to a compilation unit for &glsl;,
 for other shading languages the strings can be just concatenated at the end.
 To make the plugs actually work, we add calls to their functions.
@@ -1802,7 +1802,7 @@ it has been processed, and correctly added to the <literal>CompleteCode</literal
 </para>
 
 <screen role="pseudocode">&type;
-  TShaderType = (geometry, vertex, fragment);
+  TShaderType = (vertex, geometry, fragment);
   TShaderSource = array [TShaderType] of a string list;
 
 &var;
