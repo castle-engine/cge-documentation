@@ -16,7 +16,7 @@
         </fo:block>
 
         <fo:block space-before="40pt">
-          <fo:external-graphic src="url(images/cellular_texturing_title.png)" width="4.0in" height="auto" content-width="4.0in" content-height="auto" content-type="content-type:image/png"/>
+          <fo:external-graphic src="url(images/cellular_texturing_title.png)" width="5.in" height="auto" content-width="5.in" content-height="auto" content-type="content-type:image/png"/>
         </fo:block>
 
         <fo:block font-weight="normal" font-size="17.28pt" space-before="80pt">

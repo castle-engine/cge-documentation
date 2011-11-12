@@ -11,6 +11,7 @@
 <!ENTITY hsize3space "12.96pt"> <!-- 0.75 * hsize3 -->
 <!ENTITY hsize4space "15.552pt"> <!-- 0.75 * hsize4 -->
 <!ENTITY hsize5space "18.6624pt"> <!-- 0.75 * hsize5 -->
+<!ENTITY logowidth "5.in">
 ]>
 
 <!-- A simple customization of the book title page.
@@ -41,7 +42,7 @@
         </fo:block>
 
         <fo:block space-before="40pt">
-          <fo:external-graphic src="url(images/cellular_texturing_title.png)" width="4.0in" height="auto" content-width="4.0in" content-height="auto" content-type="content-type:image/png"/>
+          <fo:external-graphic src="url(images/cellular_texturing_title.png)" width="&logowidth;" height="auto" content-width="&logowidth;" content-height="auto" content-type="content-type:image/png"/>
         </fo:block>
 
         <fo:block font-weight="normal" font-size="&hsize3;" space-before="80pt">
