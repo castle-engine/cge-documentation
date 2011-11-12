@@ -4,7 +4,7 @@
 
 <!-- This stylesheet was created by template/titlepage.xsl-->
 
-<xsl:template name="book.titlepage.before.recto"><fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" font-family="DejaVuSans" text-align="center" hyphenate="false">
+<xsl:template name="book.titlepage.before.recto"><fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" font-family="DejaVuSerif" text-align="center" hyphenate="false">
         <fo:block><xsl:text/></fo:block> 
 
         <fo:block font-weight="bold" font-size="24.8832pt" space-before="40pt">

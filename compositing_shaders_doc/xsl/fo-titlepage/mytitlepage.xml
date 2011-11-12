@@ -30,7 +30,7 @@
     <!-- The first titlepage is just specified directly in XML-FO,
          that's easiest -->
     <t:titlepage-before t:side="recto">
-      <fo:block font-family="DejaVuSans" text-align="center" hyphenate="false" >
+      <fo:block font-family="DejaVuSerif" text-align="center" hyphenate="false" >
         <fo:block><xsl:text /></fo:block> <!-- to make first space-before work -->
 
         <fo:block font-weight="bold" font-size="&hsize5;" space-before="40pt">
