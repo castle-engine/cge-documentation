@@ -15,7 +15,7 @@
           Michalis Kamburelis
         </fo:block>
 
-        <fo:block space-before="40pt">
+        <fo:block space-before="80pt">
           <fo:external-graphic src="url(images/cellular_texturing_title.png)" width="5.in" height="auto" content-width="5.in" content-height="auto" content-type="content-type:image/png"/>
         </fo:block>
 
