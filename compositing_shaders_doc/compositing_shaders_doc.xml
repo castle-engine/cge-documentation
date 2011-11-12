@@ -1332,6 +1332,99 @@ should be as comfortable as any other texture node.</para>
 
 </section>
 
+<section id="section.example_shader_texture">
+<title>Example of a procedural texture</title>
+
+<para>As an example, we present an outline of a procedural texture
+code using the <emphasis>cellular texturing</emphasis> idea.
+This is a nice approach to computing segmented textures, resembling
+various combinations of Voronoi diagrams.
+We override the <literal>PLUG_texture_color</literal>
+to calculate a <emphasis>feature point</emphasis> that is closest in 3D space
+to our current texture coordinate. The distance to this feature point,
+combined with the distance to the next-closest feature point, can be combined
+to achieve interesting visual effects.</para>
+
+<screen>ShaderTexture {
+  effects Effect {
+    language "GLSL"
+    parts EffectPart {
+      type "FRAGMENT"
+      url "data:text/plain,
+        <emphasis role="bold">#version 120
+
+        void PLUG_texture_color(inout vec4 texture_color,
+          const in vec4 tex_coord)
+        {
+          const int count = ...;
+          const vec3 feature_points[count] = vec3[count](...);
+          const vec3 feature_colors[count] = vec3[count](...);
+
+          float[count] distances;
+          int closest0, closest1;
+          for (int i = 0; i &lt; count; i ++)
+          {
+            distances[i] = distance(vec3(tex_coord), feature_points[i]);
+            /*
+            ...
+            Update closest0 to indicate index of the closest feature point,
+            that is distances[closest0] is smallest among all distances.
+            Update closest1 to index of the 2nd-closest feature point.
+            */
+          }
+
+          texture_color.rgb = pow(distances[closest1] -
+            distances[closest0], 0.3) * 2.0 * feature_colors[closest0];
+        }</emphasis>"
+    }
+  }
+  defaultTexCoord "BOUNDS3D"
+}
+</screen>
+
+<para>Note that this is a very simple approach to implementing
+<emphasis>cellular texturing</emphasis>. Much more optimal implementation
+is possible, and there are many variations that achieve different visual appeal.
+See our engine demo models (<ulink url="http://castle-engine.sourceforge.net/demo_models.php" />)
+for a complete and working implementation.</para>
+
+<para>Figure <xref linkend="figure.cellular_texturing" /> shows this texture
+used in various settings.
+It can be combined with other textures without any effort
+&mdash; in this case, we show it combined with a cube map texture
+that simulates a mirror.</para>
+
+<para role="figure_2_column">
+<figure id="figure.cellular_texturing">
+  <title>Cellular texturing</title>
+<informaltable frame="none">
+  <tgroup cols="2" align="center">
+  <colspec colnum='1' colname='col1' colwidth='1*'/>
+  <colspec colnum='2' colname='col2' colwidth='1*'/>
+
+  <tbody>
+    <row><entry>
+      <mediaobject>
+      <imageobject role="html"> <imagedata format="PNG" fileref="images/cellular_texturing_0.png" /> </imageobject>
+      <imageobject role="fo">   <imagedata format="PNG" fileref="images/cellular_texturing_0.png" width="&figure_width_2col;" contentwidth="&figure_width_2col;" /> </imageobject>
+      </mediaobject>
+      Cellular texturing.
+    </entry>
+    <entry>
+      <mediaobject>
+      <imageobject role="html"> <imagedata format="PNG" fileref="images/cellular_texturing_mirror_fun.png" /> </imageobject>
+      <imageobject role="fo">   <imagedata format="PNG" fileref="images/cellular_texturing_mirror_fun.png" width="&figure_width_2col;" contentwidth="&figure_width_2col;" /> </imageobject>
+      </mediaobject>
+      Cellular texturing mixed with a mirror by cube environment mapping.
+    </entry></row>
+  </tbody>
+  </tgroup>
+</informaltable>
+</figure>
+</para>
+
+</section>
+
 <section id="section.when_use_shader_texture">
 <title>When to use the ShaderTexture</title>
 
