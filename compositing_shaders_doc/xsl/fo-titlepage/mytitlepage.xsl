@@ -7,7 +7,7 @@
 <xsl:template name="book.titlepage.before.recto"><fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" font-family="DejaVuSans" text-align="center" hyphenate="false">
         <fo:block><xsl:text/></fo:block> 
 
-        <fo:block font-weight="bold" font-size="24.8832pt" space-before="160pt">
+        <fo:block font-weight="bold" font-size="24.8832pt" space-before="40pt">
           Compositing Shaders in X3D
         </fo:block>
 
@@ -15,7 +15,11 @@
           Michalis Kamburelis
         </fo:block>
 
-        <fo:block font-weight="normal" font-size="17.28pt" space-before="180pt">
+        <fo:block space-before="40pt">
+          <fo:external-graphic src="url(images/cellular_texturing_sphere.png)" width="4.0in" height="auto" content-width="4.0in" content-height="auto" content-type="content-type:image/png"/>
+        </fo:block>
+
+        <fo:block font-weight="normal" font-size="17.28pt" space-before="80pt">
           Ph.D. Thesis
         </fo:block>
 
