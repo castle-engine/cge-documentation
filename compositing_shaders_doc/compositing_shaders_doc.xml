@@ -25,6 +25,7 @@
 <!ENTITY function "<emphasis role='bold'>function</emphasis>">
 <!ENTITY in "<emphasis role='bold'>in</emphasis>">
 <!ENTITY and "<emphasis role='bold'>and</emphasis>">
+<!ENTITY or "<emphasis role='bold'>or</emphasis>">
 <!ENTITY not "<emphasis role='bold'>not</emphasis>">
 <!ENTITY while "<emphasis role='bold'>while</emphasis>">
 
@@ -433,6 +434,11 @@ There are some operations that change this simple correspondence,
 but they are not important for our simple introduction to shaders.</para></footnote>
 -->
 </para>
+
+<para>An optional <emphasis>geometry shader</emphasis> may
+also change the primitives between the vertex and fragment processing.
+We will talk about geometry shaders more in
+<xref linkend="chapter.geometry_shaders" />.</para>
 
 <para>The most popular real-time shading languages right now are
 OpenGL &glsl; <xref linkend="bib.glsl" />,
@@ -1488,6 +1494,248 @@ the pixel resolution of the underlying texture.
 
 </chapter>
 
+<chapter id="chapter.geometry_shaders">
+<title>Extensions for geometry shaders</title>
+
+<para><emphasis>Geometry shaders</emphasis> are an optional stage of 3D rendering.
+A geometry shader program is executed once for each primitive,
+like a single triangle. It works between the <emphasis>vertex</emphasis>
+and <emphasis>fragment shader</emphasis> &mdash; it knows all the outputs
+from the vertex shader, and is responsible for passing them to the rasterizer.
+Geometry shader can use the information about given primitive
+(vertex positions and attributes) and can generate other primitives.
+A single geometry shader may generate any number of primitives,
+so it is possible to <quote>explode</quote> a single input primitive
+into a number of others (or delete some original primitives based on some criteria).
+The type of the output primitive may be different than input &mdash;
+for example, triangles may be changed into points or the other way around.</para>
+
+<para>More details and examples of using the geometry shaders together
+with X3D and our engine are on <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_shaders.php#section_geometry" />.
+The examples there show a basic approach of using standard
+<literal>ComposedShader</literal> node to define a geometry shader for the shape.
+Here, we investigate how our effects improve the geometry shaders.</para>
+
+<!--When we implement a new algorithm using geometry shaders,
+we have slightly different needs than
+Geometry shaders work very nicely with our effects system.
+There are some differences simply because  authoring has different
+needs.
+
+However, contrary to fragment and vertex shaders,
+geometry shaders are optional. Not every shape needs to pass through
+the geometry shaders stage.
+It is optional and simply not needed for many shapes.
+-->
+
+<!--
+. This is actually the very purpose of writing
+your own geometry shader in the first place.
+It also means that X3D authors want to control the layout
+declarations (input and output types of the geometry shader,
+and maximum number of vertex output).
+-->
+
+<para>When writing a geometry shader, we want to control the logic
+of the primitive generation, and the output primitive type.
+This means that the shader author wants to provide the main part
+of the geometry shader, that defines the <literal>main()</literal>
+entry point and necessary <literal>layout</literal> declarations.</para>
+
+<!--
+X3D author must indicate explicitly the need
+to use geometry shaders, by adding an EffectPart (within Effect)
+or a ShaderPart (within ComposedShader) containing the geometry shader main() entry point,
+and layout declarations (for GLSL >= 1.50).
+-->
+
+<para>We want to enable integration of our effects with user geometry shaders.
+It must be possible to write a flexible geometry shader code,
+that works with any internal effects and user effects
+in <literal>Effect</literal> nodes. In other words, when writing
+the geometry shaders, we don't want to hardcode what values have
+to be passed from vertex processor to the rasterizer.
+To make this possible, with every geometry shader we will link additional
+code with three functions:</para>
+
+<itemizedlist>
+  <listitem><para><literal>void geometryVertexSet(const int index)</literal>
+    &mdash; set output vertex to be equal to the input vertex of the given index.</para></listitem>
+
+  <listitem><para><literal>void geometryVertexZero()</literal>
+    &mdash; set output vertex to have all attributes zero.
+    This is really useful only before doing a series
+    of <literal>geometryVertexAdd</literal> calls.</para></listitem>
+
+  <listitem><para><literal>void geometryVertexAdd(const int index, const float scale)</literal>
+    &mdash; add to the output vertex given input vertex, scaled.</para></listitem>
+</itemizedlist>
+
+<para>The idea is that <literal>geometryVertexSet</literal>
+can be used to simply pass-through values from vertex processing to the rasterizer.
+<literal>geometryVertexSet(i)</literal> is equivalent (but possibly more efficient)
+to</para>
+
+<screen>geometryVertexZero();
+geometryVertexAdd(i, 1.0);
+</screen>
+
+<para>For example, this is a trivial pass-through geometry shader,
+that does simply nothing. Thanks to using <literal>geometryVertexSet</literal>,
+every other effect still works (without <literal>geometryVertexSet</literal>,
+various effects would break, because values would not be passed from vertex
+shaders to fragment shaders).</para>
+
+<screen>effects Effect {
+  language "GLSL"
+  parts EffectPart {
+    type "GEOMETRY"
+    url "data:text/plain,
+      #version 150
+
+      layout(triangles) in;
+      layout(triangle_strip, max_vertices = 3) out;
+
+      <emphasis role="bold">void geometryVertexSet(const int index);</emphasis>
+
+      void main()
+      {
+        for(int i = 0; i &lt; gl_in.length(); i++)
+        {
+          gl_Position = gl_in[i].gl_Position;
+          <emphasis role="bold">geometryVertexSet(i);</emphasis>
+          EmitVertex();
+        }
+        EndPrimitive();
+      }"
+  }
+}
+</screen>
+
+<para>For elaborate uses, <literal>geometryVertexAdd</literal> may be used
+to blend many input vertexes into one final output vertex.
+As another simple example, below is a geometry shader that
+replaces all triangles with a single vertex that is an average
+of three input vertex attributes.</para>
+
+<screen>effects Effect {
+  language "GLSL"
+  parts EffectPart {
+    type "GEOMETRY"
+    url "data:text/plain,
+      #version 150
+
+      layout(triangles) in;
+      layout(points, max_vertices = 1) out;
+
+      <emphasis role="bold">void geometryVertexZero();
+      void geometryVertexAdd(const int index, const float scale);</emphasis>
+
+      void main()
+      {
+        gl_Position = (
+          gl_in[0].gl_Position +
+          gl_in[1].gl_Position +
+          gl_in[2].gl_Position ) / 3.0;
+        <emphasis role="bold">geometryVertexZero();
+        geometryVertexAdd(0, 1.0 / 3.0);
+        geometryVertexAdd(1, 1.0 / 3.0);
+        geometryVertexAdd(2, 1.0 / 3.0);</emphasis>
+        EmitVertex();
+        EndPrimitive();
+      }"
+  }
+}
+</screen>
+
+<para>The <literal>geometryVertexXxx</literal> functions <quote>magically</quote>
+take into account all the values that need to be handled for
+renderer internal effects. User effects (<literal>Effect</literal> nodes)
+may have to override corresponding <literal>geometry_vertex_xxx</literal>
+plugs to also be automatically handled this way.
+</para>
+
+<para>TODO: raw
+Actually, for user effects, they will have to override
+special plugs, but more about this later.
+
+Geometry shader authors want to control the algorithm of the geometry shader. Our system can offer two things:
+- The geometry shader can define custom plugs, and allow other user effects to use these plugs. This is natural, and doesn't really require anything new from our system.
+- We have to provide a comfortable method to integrate effects (both internal renderer effects, and other user effects) with geometry shaders. This means that effect authors must have a way of declaring how their variables should be passed through or mixed in the geometry shader.
+
+  Naturally, we do it using plugs. We add plugs that can be overwritten to define how to pass-through or blend parameters of your effect in the shader. This means that some EffectPart code with type = GEOMETRY is optional: it should be used only if there is other shader code that actually enables geometry shaders. Otherwise, it can be simply ignored.
+
+  There is a small technical problem here: at least in GLSL, in case of user-defined vertex attributes, using the geometry shader means that the attribute name must change from vertex shader to fragment shader. That is because you have to declare input and output variables inside geometry shader, and they must have different names. On the other hand, when there is no geometry shader, attribute name must be exactly the same from vertex shader to fragment shader. This means that creating a vertex, fragment and geometry shader combo in which the geometry shader is optional is not possible. We give authors a conditional define HAS_GEOMETRY_SHADER available in the fragment shader, to overcome this. This way authors can do things like
+</para>
+
+<screen>#ifndef HAS_GEOMETRY_SHADER
+  #define fragment_attribute_name attribute_name
+#endif
+</screen>
+
+<para>
+inside fragment shaders, and make them working both with and without geometry shaders.
+
+  The geometry shader creator can call special geometry_set, geometry_zero, geometry_blend functions to pass-through or blend the inputs to outputs. These will take care of both renderer internal shaders and user effects (as long as user effects correctly implement PLUG_geometry_xxx).
+
+TODO: end of raw, hopefully
+</para>
+
+<para>The implementation of geometry shaders extensions is outlined
+in the <xref linkend="chapter.implementation" />.
+The code updates the <literal>HasGeometryMain</literal> boolean value.
+<literal>HasGeometryMain</literal> is <literal>true</literal>
+only if user has provided a <literal>ComposedShader</literal> node
+with geometry shader part,
+or an <literal>Effect</literal> with geometry shader and
+a <literal>main()</literal> entry.
+At the end, if <literal>HasGeometryMain</literal> is <literal>true</literal>,
+then we link geometry shader (together with our utility functions
+<literal>geometryVertexXxx</literal>). Otherwise, whole geometry shader code
+is discarded.</para>
+
+<para>To detect if <literal>Effect</literal> part contains
+a <literal>main()</literal> entry,
+we thought about introducing a boolean field like <literal>geometryMain</literal>
+for the <literal>EffectPart</literal> node.
+But actually scanning the shader code for the text <literal>main()</literal>
+(when <literal>EffectPart.type</literal> is <literal>"GEOMETRY"</literal>)
+is simpler and more natural for most cases.
+For the <literal>ShaderPart</literal> with <literal>type="GEOMETRY"</literal>,
+we assume it always contains a <literal>main()</literal>,
+since <literal>ComposedShader</literal> is always assumed to contain
+a full working shader code.</para>
+
+<para>TODO: raw
+------------------------------------------------------------------------------
+For this purpose, we introduce:
+
+void PLUG_geometry_set(const int i)
+
+Override this plug to set current geometry shader output to be equal to geometry shader input number i. If your effect defines a custom varying value (output from vertex shader, input to fragment shader) then you should override this plug, to make geometry shaders working seamlessly with your effect.
+
+void PLUG_geometry_zero(const int i)
+
+Override this plug to set current geometry shader output to be zero.
+
+void PLUG_geometry_add(const int i, const float scale)
+
+Override this plug to add to current geometry shader output value from input index i, scaled by given float value.
+
+Together, PLUG_geometry_zero and PLUG_geometry_add allow to blend a number of vertex inputs with arbitrary weights. PLUG_geometry_set allows to simply pass-through a given value from vertex to fragment shader, which is a common need. The idea is that PLUG_geometry_set(i) is an optimized shortcut for doing PLUG_geometry_zero(i) followed by PLUG_geometry_add(i, 1.0).
+------------------------------------------------------------------------------
+</para>
+
+<figure id="figure.geometry_shader_effects">
+  <title>Converting mesh into a dense line and point sets by geometry shaders</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/geometry_shader_effects.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/geometry_shader_effects.png" width="&figure_width;" contentwidth="&figure_width;" /> </imageobject>
+  </mediaobject>
+</figure>
+
+</chapter>
+
 <chapter id="chapter.custom_plugs">
 <title>Defining custom plugs</title>
 
@@ -1975,6 +2223,10 @@ it has been processed, and correctly added to the <literal>CompleteCode</literal
 &begin;
   Code &assign; CompleteCode[EffectPartType]
 
+  HasGeometryMain &assign; HasGeometryMain &or;
+    ( EffectPartType = geometry &and;
+      PlugValue contains 'main()' );
+
   &while; we can find PLUG_xxx inside PlugValue &do;
   &begin;
     PlugName &assign; the plug name we found, the "xxx" inside PLUG_xxx
@@ -2042,6 +2294,7 @@ are correctly applied by the algorithm below.</para>
 
 <screen role="pseudocode">FinalShader &assign; new TShaderSource
 set FinalShader to basic rendering code
+HasGeometryMain &assign; false
 </screen>
 
 <para>At the beginning, <literal>FinalShader</literal> it set to
@@ -2049,16 +2302,28 @@ a simple code that renders 3D object with no lights, no textures and no effects.
 The code contains magic <literal>/* PLUG: xxx ... */</literal>
 comments, which will allow to enhance it in the following steps.</para>
 
-<para>The real &glsl; vertex and fragment code used by our engine
+<para>The real &glsl; shader code used by our engine
 at this step may be found in our engine sources. See
 <ulink url="http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.vs" />
-for vertex shader and
+for the vertex shader,
 <ulink url="http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.fs" />
-for fragment shader.
-The geometry shader is initially empty.</para>
+for the fragment shader and
+<ulink url="http://svn.code.sf.net/p/castle-engine/code/trunk/castle_game_engine/src/x3d/opengl/glsl/template.gs" />
+for the geometry shader.</para>
+
+<para>Note that our default geometry shader contains only a set
+of utility functions, without a <literal>main()</literal> entry.
+It will be discarded later if no geometry shader code with a <literal>main()</literal>
+definition will be found in the user shaders.
+That is, if <literal>HasGeometryMain</literal> will remain <literal>false</literal>.
+See <xref linkend="chapter.geometry_shaders" /> for reasons of this behavior.
+</para>
 
 <screen role="pseudocode">&if; a complete custom shader code is provided &then;
-  FinalShader &assign; custom shader code
+  FinalShader[fragment] &assign; empty
+  FinalShader[vertex] &assign; empty
+  FinalShader &assign; FinalShader + custom shader code
+  HasGeometryMain &assign; custom shader code contains some "GEOMETRY" shader
 </screen>
 
 <para>The X3D file may contain shader code that should replace
@@ -2079,6 +2344,10 @@ This even allows the browser to add some internal effects
 a completely different approach to rendering. Then it may expose
 a completely different set of plug names, reflecting a different
 set of parameters to control. <!-- for the authors.--></para>
+
+<para>Note again the special treatment of geometry shaders.
+Our default geometry shader code (which should contain our utility functions)
+is always kept. We also update <literal>HasGeometryMain</literal>.</para>
 
 <screen role="pseudocode">&foreach; Light &in; shape.Lights &do;
   LightShader &assign; new TShaderSource
@@ -2207,6 +2476,14 @@ we have already added all the lighting and texturing shading code
 to the <literal>FinalShader</literal>. Overriding <literal>light_scale</literal>
 at this point means that we can scale the contribution of every light
 by the same function.</para>
+
+<screen role="pseudocode">&if; &not; HasGeometryMain &then;
+  FinalShader[geometry] &assign; empty
+</screen>
+
+<para>Discard all geometry shader code if there is no <literal>main()</literal>
+entry point for this stage. This means that we simply do not need
+to transform primitives by the geometry shader.</para>
 
 <para>At the end, <literal>FinalShader</literal> is just a collection
 of strings forming a shading language source code.
@@ -2461,7 +2738,7 @@ instead, that may result in more optimized shader.</para>
 
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_vertex_object_space</emphasis>(
   const in vec4 vertex_object,
-  inout in vec3 normal_object)
+     inout vec3 normal_object)
 </screen>
 
 <para>Process the vertex and normal in object space. You cannot change the vertex
