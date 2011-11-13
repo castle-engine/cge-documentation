@@ -101,4 +101,14 @@
   </fo:inline>
 </xsl:template>
 
+<!-- Make hard page break in FO on <?page-break?> in DocBook source.
+  Based on [http://sourceware.org/ml/docbook-apps/2003-q1/msg01210.html]
+  and [http://www.sagehill.net/docbookxsl/PageBreaking.html].
+
+  Unfortunately, soft page breaks by <?dbfo-need height="1in" ?>
+  still don't work with FOP. -->
+<xsl:template match="processing-instruction('page-break')">
+  <fo:block break-after="page"/>
+</xsl:template>
+
 </xsl:stylesheet>

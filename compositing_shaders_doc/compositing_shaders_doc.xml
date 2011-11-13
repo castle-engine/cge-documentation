@@ -149,7 +149,7 @@ to do the common job.
 <informalequation>
   <mediaobject>
   <imageobject role="html"> <imagedata format="PNG" fileref="formulas/1.png" /> </imageobject>
-  <imageobject role="fo">   <imagedata format="SVG" fileref="formulas/1.svg" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="SVG" fileref="formulas/1.svg" /> </imageobject> <!-- depth="1.5em" contentdepth="1.5em" -->
   </mediaobject>
 </informalequation>
 
@@ -178,6 +178,35 @@ of custom shader code into a calculation of a particular function.
 on a particular object.
 -->
 </para>
+
+<para>We present a system for creating effects by essentially compositing
+<!-- Reviewers say: no "compositing together", just "compositing" -->
+pieces of a shader code. All the effects defined this way effortlessly
+cooperate and can be combined with each other and with application internal
+shaders. This makes shader programs:</para>
+
+<orderedlist>
+  <listitem><para>Much easier to create. We can jump straight into the implementation
+    of our imagined algorithm in the shader.
+    We are only interested in modifying the relevant shader calculation
+    parameter. We do not need to care about the rest of the shader.</para></listitem>
+
+  <listitem><para>Much more powerful. Our effect
+    immediately cooperates with absolutely every normal feature of X3D rendering.
+    This makes the implemented effect useful for a wide range of real uses,
+    not only for a particular situation or a particular model (as it often happens
+    with specialized shader code).
+    All X3D light sources, textures, even other shader effects,
+    are correctly applied.</para></listitem>
+</orderedlist>
+
+<para>It is important that we still keep
+the full power of a chosen GPU shading language.
+We deliberately do not try to invent here a new language, or wrap existing
+language in some cumbersome limitations.
+This is most flexible for authors,
+and it also allows an easy implementation &mdash; there is no need for any complex
+shading language processing inside the application.</para>
 
 <para role="figure_2_column">
 <figure id="figure.bump_mapping_shadows">
@@ -239,35 +268,6 @@ The model is based on <ulink url="http://opengameart.org/content/shrine-shinto-j
 </informaltable>
 </figure>
 </para>
-
-<para>We present a system for creating effects by essentially compositing
-<!-- Reviewers say: no "compositing together", just "compositing" -->
-pieces of a shader code. All the effects defined this way effortlessly
-cooperate and can be combined with each other and with application internal
-shaders. This makes shader programs:</para>
-
-<orderedlist>
-  <listitem><para>Much easier to create. We can jump straight into the implementation
-    of our imagined algorithm in the shader.
-    We are only interested in modifying the relevant shader calculation
-    parameter. We do not need to care about the rest of the shader.</para></listitem>
-
-  <listitem><para>Much more powerful. Our effect
-    immediately cooperates with absolutely every normal feature of X3D rendering.
-    This makes the implemented effect useful for a wide range of real uses,
-    not only for a particular situation or a particular model (as it often happens
-    with specialized shader code).
-    All X3D light sources, textures, even other shader effects,
-    are correctly applied.</para></listitem>
-</orderedlist>
-
-<para>It is important that we still keep
-the full power of a chosen GPU shading language.
-We deliberately do not try to invent here a new language, or wrap existing
-language in some cumbersome limitations.
-This is most flexible for authors,
-and it also allows an easy implementation &mdash; there is no need for any complex
-shading language processing inside the application.</para>
 
 </chapter>
 
@@ -506,6 +506,8 @@ gives us a simple way to attach a shader source code to a 3D shape.
 The X3D browser will do all the necessary job of handling the shader
 to the underlying libraries and hardware.</para>
 
+<?page-break?>
+
 <para>A simple working example showing X3D with &glsl; shader code:</para>
 
 <screen>#X3D V3.2 utf8
@@ -564,6 +566,8 @@ Shape {
   geometry Sphere { radius 2 }
 }
 </screen>
+
+<?page-break?>
 
 <para>The shader code provided this way <emphasis>replaces</emphasis>
 the standard calculations done by the GPU. This means that all
@@ -1226,13 +1230,10 @@ are documented in <xref linkend="appendix.plugs" />.</para>
           const in gl_LightProducts light_products,
           const in gl_MaterialParameters material)
         {
-          light_scale *= pow(dot(
-            normalize(light_source.spotDirection),
-            -light_dir), 10.0) * 2.0;
+          light_scale *= pow(dot(normalize(
+            light_source.spotDirection), -light_dir), 10.0) * 2.0;
         }</emphasis>"
-      }
-  }
-}
+    } } } <!-- page break is near, so close blocks quickly, no newlines -->
 </screen>
 
 </section>
@@ -1678,7 +1679,7 @@ plugs to also be automatically handled this way.
 <title>Effects that cooperate with geometry shaders</title>
 
 <para>User effects that want to cooperate with geometry shaders
-have to override plugs <literal>PLUG_geometry_vertex_xxx</literal>.
+have to override plugs <literal>PLUG_&shy;geometry_&shy;vertex_&shy;xxx</literal>.
 The exact specification of these plugs is
 in <xref linkend="section.geometry_plugs" />.
 Overriding these plugs allows to pass-through or blend custom vertex attributes
@@ -1702,26 +1703,24 @@ As always, just placing two or more effects together
 on the X3D <literal>effects</literal> field makes them automatically
 cooperate.</para>
 
-<para>There is one more small technical obstacle here.
+<para>There is one obstacle here.
 In case of user-defined vertex attributes, using the geometry shader
-means that the attribute name must change as it is passed from
+means that the attribute name must change on it's way from
 the vertex shader to the fragment shader. That is because you have
-to declare input and output variables inside geometry shader,
-and they simply must have different names.
+to use different input and output names for this attribute inside the geometry shader.
 On the other hand, when there is no geometry shader,
 attribute name must be exactly the same in both the vertex shader and
 fragment shader. This means that creating a vertex, fragment
 and geometry shader combo in which the geometry shader
 is optional is not possible in pure shading language like &glsl;.
-We give authors a conditional define <literal>HAS_GEOMETRY_SHADER</literal>
-available in the fragment shader, to overcome this.
-This way authors can write this in fragment shaders:
+To overcome this, we automatically define a symbol <literal>HAS_GEOMETRY_SHADER</literal>
+for all fragment shaders' parts.
+This way we can write in the fragment shader code like:
 </para>
 
 <screen>#ifdef HAS_GEOMETRY_SHADER
   #define my_attribute my_attribute_fragment
 #endif
-
 in float my_attribute;
 </screen>
 
