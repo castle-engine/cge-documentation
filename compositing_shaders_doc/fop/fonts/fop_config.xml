@@ -76,10 +76,14 @@
 
            So to be 100% sure that PDF looks and prints the same, we have
            to specify and embed all fonts.
-           We take Times, Courier, Arial from MS Core Fonts
-           (ttf-mscorefonts-installer package in Debian), in TTF.
-           We take Symbol from LibreOffice OpenSymbol font (ttf-opensymbol
-           package in Debian), also in TTF. -->
+           - We take Times, Arial from MS Core Fonts
+             (ttf-mscorefonts-installer package in Debian), in TTF.
+           - We take Mono from Liberation (ttf-liberation).
+             Courier in MS Core Fonts looks worse (look e.g. on quote signs),
+             as well as FreeFont (ttf-freefont).
+           - We take Symbol from LibreOffice OpenSymbol font (ttf-opensymbol
+             package in Debian), also in TTF.
+      -->
 
       <font metrics-url="fop/fonts/myserif.xml" kerning="yes"
         embed-url="/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman.ttf">
@@ -99,19 +103,19 @@
       </font>
 
       <font metrics-url="fop/fonts/mymonospace.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Courier_New.ttf">
+        embed-url="/usr/share/fonts/truetype/ttf-liberation/LiberationMono-Regular.ttf">
         <font-triplet name="MyMonospace" style="normal" weight="normal"/>
       </font>
       <font metrics-url="fop/fonts/mymonospace-bold.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Courier_New_Bold.ttf">
+        embed-url="/usr/share/fonts/truetype/ttf-liberation/LiberationMono-Bold.ttf">
         <font-triplet name="MyMonospace" style="normal" weight="bold"/>
       </font>
       <font metrics-url="fop/fonts/mymonospace-italic.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Courier_New_Italic.ttf">
+        embed-url="/usr/share/fonts/truetype/ttf-liberation/LiberationMono-Italic.ttf">
         <font-triplet name="MyMonospace" style="italic" weight="normal"/>
       </font>
       <font metrics-url="fop/fonts/mymonospace-bold-italic.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Courier_New_Bold_Italic.ttf">
+        embed-url="/usr/share/fonts/truetype/ttf-liberation/LiberationMono-BoldItalic.ttf">
         <font-triplet name="MyMonospace" style="italic" weight="bold"/>
       </font>
 

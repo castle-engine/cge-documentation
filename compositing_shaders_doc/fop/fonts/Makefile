@@ -32,13 +32,13 @@ myserif-italic.xml: /usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Ital
 myserif-bold-italic.xml:/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Bold_Italic.ttf
 	fop-ttfreader $< $@
 
-mymonospace.xml: /usr/share/fonts/truetype/msttcorefonts/Courier_New.ttf
+mymonospace.xml: /usr/share/fonts/truetype/ttf-liberation/LiberationMono-Regular.ttf
 	fop-ttfreader $< $@
-mymonospace-bold.xml: /usr/share/fonts/truetype/msttcorefonts/Courier_New_Bold.ttf
+mymonospace-bold.xml: /usr/share/fonts/truetype/ttf-liberation/LiberationMono-Bold.ttf
 	fop-ttfreader $< $@
-mymonospace-italic.xml: /usr/share/fonts/truetype/msttcorefonts/Courier_New_Italic.ttf
+mymonospace-italic.xml: /usr/share/fonts/truetype/ttf-liberation/LiberationMono-Italic.ttf
 	fop-ttfreader $< $@
-mymonospace-bold-italic.xml: /usr/share/fonts/truetype/msttcorefonts/Courier_New_Bold_Italic.ttf
+mymonospace-bold-italic.xml: /usr/share/fonts/truetype/ttf-liberation/LiberationMono-BoldItalic.ttf
 	fop-ttfreader $< $@
 
 mysans.xml: /usr/share/fonts/truetype/msttcorefonts/Arial.ttf
