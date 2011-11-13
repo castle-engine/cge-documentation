@@ -59,6 +59,84 @@
         <font-triplet name="DejaVuSans" style="normal" weight="bold"/>
       </font>
 
+      <!-- fop manual on http://xmlgraphics.apache.org/fop/trunk/fonts.html
+           says "By default, all fonts are embedded if an output
+           format supports font embedding.". But that's not true.
+           "pdffonts" on generated PDF shows that standard Base-14 fonts
+           are not embedded. That's probably because FOP doesn't read
+           these font files at all. FOP has embedded (in Java class files)
+           only metrics for the standard Base-14 Fonts. It's up to the viewer
+           (like evince) to find and use actual font files for them.
+
+           In theory, embedding the Base-14 fonts is not needed, as every system
+           and printer must have them. But in practice, there may be small
+           differences (http://xmlgraphics.apache.org/fop/trunk/fonts.html
+           admits itself that some programs do substitutions with slightly
+           different fonts).
+
+           So to be 100% sure that PDF looks and prints the same, we have
+           to specify and embed all fonts.
+           We take Times, Courier, Arial from MS Core Fonts
+           (ttf-mscorefonts-installer package in Debian), in TTF.
+           We take Symbol from LibreOffice OpenSymbol font (ttf-opensymbol
+           package in Debian), also in TTF. -->
+
+      <font metrics-url="fop/fonts/myserif.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman.ttf">
+        <font-triplet name="MySerif" style="normal" weight="normal"/>
+      </font>
+      <font metrics-url="fop/fonts/myserif-bold.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Bold.ttf">
+        <font-triplet name="MySerif" style="normal" weight="bold"/>
+      </font>
+      <font metrics-url="fop/fonts/myserif-italic.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Italic.ttf">
+        <font-triplet name="MySerif" style="italic" weight="normal"/>
+      </font>
+      <font metrics-url="fop/fonts/myserif-bold-italic.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Bold_Italic.ttf">
+        <font-triplet name="MySerif" style="italic" weight="bold"/>
+      </font>
+
+      <font metrics-url="fop/fonts/mymonospace.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Courier_New.ttf">
+        <font-triplet name="MyMonospace" style="normal" weight="normal"/>
+      </font>
+      <font metrics-url="fop/fonts/mymonospace-bold.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Courier_New_Bold.ttf">
+        <font-triplet name="MyMonospace" style="normal" weight="bold"/>
+      </font>
+      <font metrics-url="fop/fonts/mymonospace-italic.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Courier_New_Italic.ttf">
+        <font-triplet name="MyMonospace" style="italic" weight="normal"/>
+      </font>
+      <font metrics-url="fop/fonts/mymonospace-bold-italic.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Courier_New_Bold_Italic.ttf">
+        <font-triplet name="MyMonospace" style="italic" weight="bold"/>
+      </font>
+
+      <font metrics-url="fop/fonts/mysans.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Arial.ttf">
+        <font-triplet name="MySans" style="normal" weight="normal"/>
+      </font>
+      <font metrics-url="fop/fonts/mysans-bold.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Arial_Bold.ttf">
+        <font-triplet name="MySans" style="normal" weight="bold"/>
+      </font>
+      <font metrics-url="fop/fonts/mysans-italic.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Arial_Italic.ttf">
+        <font-triplet name="MySans" style="italic" weight="normal"/>
+      </font>
+      <font metrics-url="fop/fonts/mysans-bold-italic.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/msttcorefonts/Arial_Bold_Italic.ttf">
+        <font-triplet name="MySans" style="italic" weight="bold"/>
+      </font>
+
+      <font metrics-url="fop/fonts/mysymbol.xml" kerning="yes"
+        embed-url="/usr/share/fonts/truetype/openoffice/opens___.ttf">
+        <font-triplet name="MySymbol" style="normal" weight="normal"/>
+      </font>
+
     </fonts>
 
     </renderer>

@@ -60,7 +60,7 @@
      and Symbol font family doesn't have an italic version
      (causes some warnings from FOP). -->
 <xsl:template match="phrase[@role='symbol']">
-  <fo:inline font-family="Symbol" font-style="normal">
+  <fo:inline font-family="MySymbol" font-style="normal">
     <xsl:apply-templates/>
   </fo:inline>
 </xsl:template>
@@ -110,5 +110,12 @@
 <xsl:template match="processing-instruction('page-break')">
   <fo:block break-after="page"/>
 </xsl:template>
+
+<xsl:param name="body.font.family">MySerif</xsl:param>
+<xsl:param name="dingbat.font.family">MySerif</xsl:param>
+<xsl:param name="monospace.font.family">MyMonospace</xsl:param>
+<xsl:param name="sans.font.family">MySans</xsl:param>
+<xsl:param name="title.font.family">MySans</xsl:param>
+<xsl:param name="symbol.font.family">MySymbol</xsl:param>
 
 </xsl:stylesheet>
