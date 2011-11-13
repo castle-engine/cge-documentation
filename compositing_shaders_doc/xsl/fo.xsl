@@ -111,6 +111,8 @@
   <fo:block break-after="page"/>
 </xsl:template>
 
+<!-- Use our custom fonts, to have all fonts embedded in PDF.
+     The font family names correspond to names in ../fop/fonts/fop_config.xml. -->
 <xsl:param name="body.font.family">MySerif</xsl:param>
 <xsl:param name="dingbat.font.family">MySerif</xsl:param>
 <xsl:param name="monospace.font.family">MyMonospace</xsl:param>
