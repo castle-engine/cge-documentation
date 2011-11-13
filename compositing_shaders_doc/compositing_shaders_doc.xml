@@ -1218,10 +1218,8 @@ Remember that all plugs available in our implementation
 are documented in <xref linkend="appendix.plugs" />.</para>
 
 <screen>SpotLight {
-  effects Effect {
-    language "GLSL"
-    parts EffectPart {
-      type "FRAGMENT"
+  effects Effect { language "GLSL"
+    parts EffectPart { type "FRAGMENT"
       url "data:text/plain,
         <emphasis role="bold">void PLUG_light_scale(inout float light_scale,
           const in vec3 normal_eye,
@@ -1378,11 +1376,10 @@ to achieve interesting visual effects.</para>
           for (int i = 0; i &lt; count; i ++)
           {
             distances[i] = distance(vec3(tex_coord), feature_points[i]);
-            /*
-            ...
-            Update closest0 to indicate index of the closest feature point,
-            that is distances[closest0] is smallest among all distances.
-            Update closest1 to index of the 2nd-closest feature point.
+            /* ...
+             Update closest0 to indicate the closest feature point,
+             that is distances[closest0] is smallest among all distances.
+             Update closest1 to index of the 2nd-closest feature point.
             */
           }
 
@@ -1394,6 +1391,8 @@ to achieve interesting visual effects.</para>
   defaultTexCoord "BOUNDS3D"
 }
 </screen>
+
+<?page-break?>
 
 <para>Note that this is a very simple approach to implementing
 <emphasis>cellular texturing</emphasis>. Much more optimal implementation
@@ -1648,8 +1647,7 @@ replaces every triangle with an averaged single point.</para>
 
       <emphasis role="bold">void geometryVertexZero();
       void geometryVertexAdd(const int index, const float scale);</emphasis>
-
-      void main()
+<!--- could be extra line here, but we have page break --><?page-break?>      void main()
       {
         gl_Position = (
           gl_in[0].gl_Position +
