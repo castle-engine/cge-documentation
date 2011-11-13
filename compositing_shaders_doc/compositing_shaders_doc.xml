@@ -1508,8 +1508,8 @@ Geometry shader can use the information about given primitive
 A single geometry shader may generate any number of primitives,
 so it is possible to <quote>explode</quote> a single input primitive
 into a number of others (or delete some original primitives based on some criteria).
-The type of the output primitive may be different than input &mdash;
-for example, triangles may be changed into points or the other way around.</para>
+The type of the primitive may be changed by the geometry shader &mdash;
+for example, triangles may be converted into points or the other way around.</para>
 
 <figure id="figure.geometry_shader_effects">
   <title>Converting mesh into a dense line and point sets by geometry shaders</title>
@@ -1551,7 +1551,7 @@ and maximum number of vertex output).
 <para>When writing a geometry shader, we want to control the logic
 of the primitive generation, and the output primitive type.
 This means that the shader author wants to provide the main part
-of the geometry shader, that defines the <literal>main()</literal>
+of the geometry shader, that contains the <literal>main()</literal>
 entry point and necessary <literal>layout</literal> declarations.</para>
 
 <!--
@@ -1575,7 +1575,7 @@ code with three functions:</para>
     &mdash; set output vertex to be equal to the input vertex of the given index.</para></listitem>
 
   <listitem><para><literal>void geometryVertexZero()</literal>
-    &mdash; set output vertex to have all attributes zero.
+    &mdash; set all output vertex attributes to zero.
     This is really useful only before doing a series
     of <literal>geometryVertexAdd</literal> calls.</para></listitem>
 
@@ -1593,7 +1593,7 @@ geometryVertexAdd(i, 1.0);
 </screen>
 
 <para>For example, this is a trivial pass-through geometry shader,
-that does simply nothing. Thanks to using <literal>geometryVertexSet</literal>,
+that doesn't do anything. Thanks to using <literal>geometryVertexSet</literal>,
 every other effect still works (without <literal>geometryVertexSet</literal>,
 various effects would break, because values would not be passed from vertex
 shaders to fragment shaders).</para>
@@ -1624,11 +1624,10 @@ shaders to fragment shaders).</para>
 }
 </screen>
 
-<para>For elaborate uses, <literal>geometryVertexAdd</literal> may be used
+<para>For more elaborate cases, <literal>geometryVertexAdd</literal> may be used
 to blend many input vertexes into one final output vertex.
-As another simple example, below is a geometry shader that
-replaces all triangles with a single vertex that is an average
-of three input vertex attributes.</para>
+An example below shows a geometry shader that
+replaces every triangle with an averaged single point.</para>
 
 <screen>effects Effect {
   language "GLSL"
@@ -1661,7 +1660,7 @@ of three input vertex attributes.</para>
 </screen>
 
 <para>The <literal>geometryVertexXxx</literal> functions <quote>magically</quote>
-take into account all the values that need to be handled for
+take into account all the attributes that need to be handled for
 renderer internal effects. User effects (<literal>Effect</literal> nodes)
 may have to override corresponding <literal>geometry_vertex_xxx</literal>
 plugs to also be automatically handled this way.
@@ -1678,31 +1677,31 @@ The exact specification of these plugs is
 in <xref linkend="section.geometry_plugs" />.
 Overriding these plugs allows to pass-through or blend custom vertex attributes
 needed by the effects. By correctly overriding them, the user effects
-can work regardless if the geometry shader is used.</para>
+can work regardless if the geometry shader is linked or not.</para>
 
 <para>To override these plugs, user effects must include an
 <literal>EffectPart</literal> with <literal>type</literal>
-set to <literal>"GEOMETRY"</literal>, only to override the
-<literal>PLUG_geometry_vertex_xxx</literal> plugs.
-This <literal>EffectPart</literal> will be optional: it will be used
+set to <literal>"GEOMETRY"</literal>.
+This <literal>EffectPart</literal> code is optional. It will be used
 if an other effect will provide a <literal>main()</literal> entry
 for geometry shaders, and discarded otherwise.</para>
 
-<para>Our goal is that effects can be written independently from each other.
-See the example <literal>geometry_shader_optional.x3dv</literal>
-in our demo models <literal>compositing_shaders</literal> subdirectory.
+<para>Our goal throughout this paper is to make effects independent
+from each other, and composable with each other.
+See the example <literal>compositing_shaders/geometry_shader_optional.x3dv</literal>
+in our demo models.
 It shows that all kinds of effects, including geometry shader effects,
 may be created and applied independently from other effects.
 As always, just placing two or more effects together
 on the X3D <literal>effects</literal> field makes them automatically
 cooperate.</para>
 
-<para>There is one more small technical problem obstacle here.
+<para>There is one more small technical obstacle here.
 In case of user-defined vertex attributes, using the geometry shader
 means that the attribute name must change as it is passed from
 the vertex shader to the fragment shader. That is because you have
 to declare input and output variables inside geometry shader,
-and they must have different names.
+and they simply must have different names.
 On the other hand, when there is no geometry shader,
 attribute name must be exactly the same in both the vertex shader and
 fragment shader. This means that creating a vertex, fragment
@@ -1710,7 +1709,7 @@ and geometry shader combo in which the geometry shader
 is optional is not possible in pure shading language like &glsl;.
 We give authors a conditional define <literal>HAS_GEOMETRY_SHADER</literal>
 available in the fragment shader, to overcome this.
-This way authors can do things like this in fragment shaders:
+This way authors can write this in fragment shaders:
 </para>
 
 <screen>#ifdef HAS_GEOMETRY_SHADER
@@ -1740,20 +1739,20 @@ with geometry shader part,
 or an <literal>Effect</literal> with geometry shader and
 a <literal>main()</literal> entry.
 At the end, if <literal>HasGeometryMain</literal> is <literal>true</literal>,
-then we link geometry shader (together with our utility functions
+we link the geometry shader (together with our utility functions
 <literal>geometryVertexXxx</literal>). Otherwise, whole geometry shader code
 is discarded.</para>
 
-<para>To detect if <literal>Effect</literal> part contains
+<para>To detect if an <literal>Effect</literal> part contains
 a <literal>main()</literal> entry,
 we thought about introducing a boolean field like <literal>geometryMain</literal>
 for the <literal>EffectPart</literal> node.
-But actually scanning the shader code for the text <literal>main()</literal>
+But actually scanning the shader code for the exact text <literal>main()</literal>
 (when <literal>EffectPart.type</literal> is <literal>"GEOMETRY"</literal>)
 is simpler and more natural for most cases.
 For the <literal>ShaderPart</literal> with <literal>type="GEOMETRY"</literal>,
-we assume it always contains a <literal>main()</literal>,
-since <literal>ComposedShader</literal> is always assumed to contain
+we assume it always contains a <literal>main()</literal> entry,
+since <literal>ComposedShader</literal> must always contain
 a full working shader code.</para>
 
 </section>
