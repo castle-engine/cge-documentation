@@ -1511,6 +1511,14 @@ into a number of others (or delete some original primitives based on some criter
 The type of the output primitive may be different than input &mdash;
 for example, triangles may be changed into points or the other way around.</para>
 
+<figure id="figure.geometry_shader_effects">
+  <title>Converting mesh into a dense line and point sets by geometry shaders</title>
+  <mediaobject>
+  <imageobject role="html"> <imagedata format="PNG" fileref="images/geometry_shader_effects.png" /> </imageobject>
+  <imageobject role="fo">   <imagedata format="PNG" fileref="images/geometry_shader_effects.png" width="&figure_width;" contentwidth="&figure_width;" /> </imageobject>
+  </mediaobject>
+</figure>
+
 <para>More details and examples of using the geometry shaders together
 with X3D and our engine are on <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_shaders.php#section_geometry" />.
 The examples there show a basic approach of using standard
@@ -1666,25 +1674,43 @@ plugs to also be automatically handled this way.
 
 <para>User effects that want to cooperate with geometry shaders
 have to override plugs <literal>PLUG_geometry_vertex_xxx</literal>.
+The exact specification of these plugs is
+in <xref linkend="section.geometry_plugs" />.
 Overriding these plugs allows to pass-through or blend custom vertex attributes
 needed by the effects. By correctly overriding them, the user effects
-can be prepared to work both with and without geometry shader.</para>
+can work regardless if the geometry shader is used.</para>
 
-<para>The exact specification of geometry shader plugs is
-in <xref linkend="section.geometry_plugs" />.</para>
+<para>To override these plugs, user effects must include an
+<literal>EffectPart</literal> with <literal>type</literal>
+set to <literal>"GEOMETRY"</literal>, only to override the
+<literal>PLUG_geometry_vertex_xxx</literal> plugs.
+This <literal>EffectPart</literal> will be optional: it will be used
+if an other effect will provide a <literal>main()</literal> entry
+for geometry shaders, and discarded otherwise.</para>
 
-<para>TODO: raw
+<para>Our goal is that effects can be written independently from each other.
+See the example <literal>geometry_shader_optional.x3dv</literal>
+in our demo models <literal>compositing_shaders</literal> subdirectory.
+It shows that all kinds of effects, including geometry shader effects,
+may be created and applied independently from other effects.
+As always, just placing two or more effects together
+on the X3D <literal>effects</literal> field makes them automatically
+cooperate.</para>
 
-Actually, for user effects, they will have to override
-special plugs, but more about this later.
-
-Geometry shader authors want to control the algorithm of the geometry shader. Our system can offer two things:
-- The geometry shader can define custom plugs, and allow other user effects to use these plugs. This is natural, and doesn't really require anything new from our system.
-- We have to provide a comfortable method to integrate effects (both internal renderer effects, and other user effects) with geometry shaders. This means that effect authors must have a way of declaring how their variables should be passed through or mixed in the geometry shader.
-
-  Naturally, we do it using plugs. We add plugs that can be overwritten to define how to pass-through or blend parameters of your effect in the shader. This means that some EffectPart code with type = GEOMETRY is optional: it should be used only if there is other shader code that actually enables geometry shaders. Otherwise, it can be simply ignored.
-
-  There is a small technical problem here: at least in GLSL, in case of user-defined vertex attributes, using the geometry shader means that the attribute name must change from vertex shader to fragment shader. That is because you have to declare input and output variables inside geometry shader, and they must have different names. On the other hand, when there is no geometry shader, attribute name must be exactly the same from vertex shader to fragment shader. This means that creating a vertex, fragment and geometry shader combo in which the geometry shader is optional is not possible. We give authors a conditional define HAS_GEOMETRY_SHADER available in the fragment shader, to overcome this. This way authors can do things like
+<para>There is one more small technical problem obstacle here.
+In case of user-defined vertex attributes, using the geometry shader
+means that the attribute name must change as it is passed from
+the vertex shader to the fragment shader. That is because you have
+to declare input and output variables inside geometry shader,
+and they must have different names.
+On the other hand, when there is no geometry shader,
+attribute name must be exactly the same in both the vertex shader and
+fragment shader. This means that creating a vertex, fragment
+and geometry shader combo in which the geometry shader
+is optional is not possible in pure shading language like &glsl;.
+We give authors a conditional define <literal>HAS_GEOMETRY_SHADER</literal>
+available in the fragment shader, to overcome this.
+This way authors can do things like this in fragment shaders:
 </para>
 
 <screen>#ifdef HAS_GEOMETRY_SHADER
@@ -1694,13 +1720,16 @@ Geometry shader authors want to control the algorithm of the geometry shader. Ou
 in float variable_name;
 </screen>
 
-<para>
-inside fragment shaders, and make them working both with and without geometry shaders.
-
-  The geometry shader creator can call special geometry_set, geometry_zero, geometry_blend functions to pass-through or blend the inputs to outputs. These will take care of both renderer internal shaders and user effects (as long as user effects correctly implement PLUG_geometry_vertex_xxx).
-
-TODO: end of raw, hopefully
+<para>This allows to write a fragment shader that will work
+both with geometry shaders (when the geometry shader will output
+<literal>variable_name_fragment</literal>) and without (when the
+vertex shader will output <literal>variable_name</literal>).
 </para>
+
+</section>
+
+<section id="section.geometry_shaders_implementation">
+<title>Implementation</title>
 
 <para>The implementation of geometry shaders extensions is outlined
 in the <xref linkend="chapter.implementation" />.
@@ -1726,14 +1755,6 @@ For the <literal>ShaderPart</literal> with <literal>type="GEOMETRY"</literal>,
 we assume it always contains a <literal>main()</literal>,
 since <literal>ComposedShader</literal> is always assumed to contain
 a full working shader code.</para>
-
-<figure id="figure.geometry_shader_effects">
-  <title>Converting mesh into a dense line and point sets by geometry shaders</title>
-  <mediaobject>
-  <imageobject role="html"> <imagedata format="PNG" fileref="images/geometry_shader_effects.png" /> </imageobject>
-  <imageobject role="fo">   <imagedata format="PNG" fileref="images/geometry_shader_effects.png" width="&figure_width;" contentwidth="&figure_width;" /> </imageobject>
-  </mediaobject>
-</figure>
 
 </section>
 
