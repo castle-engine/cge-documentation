@@ -100,6 +100,7 @@ become more independent.</para>
 <para>We have designed our effects to fit naturally in 3D scene graph formats,
 in particular we present a number of extensions to the X3D standard.
 Our extensions nicely integrate shader effects with X3D
+<!-- Reviewers say: "concepts like" required here -->
 concepts like shapes, groups, light sources and textures.
 </para>
 
@@ -129,8 +130,9 @@ way to use them with X3D.
 <para>The shaders designed using the standard nodes
 <emphasis>replace</emphasis> the normal rendering functionality, not <emphasis>enhance</emphasis> it.
 This reflects the underlying API, like OpenGL or Direct3D.
-The 3D libraries, in turn, follow the hardware idea that shader code
-should be a complete and optimized program
+The 3D libraries, in turn, follow the hardware idea that
+<!-- Reviewers say: no "a" here -->
+shader code should be a complete and optimized program
 designed for rendering a particular shape.
 </para>
 
@@ -239,6 +241,7 @@ The model is based on <ulink url="http://opengameart.org/content/shrine-shinto-j
 </para>
 
 <para>We present a system for creating effects by essentially compositing
+<!-- Reviewers say: no "compositing together", just "compositing" -->
 pieces of a shader code. All the effects defined this way effortlessly
 cooperate and can be combined with each other and with application internal
 shaders. This makes shader programs:</para>
@@ -292,7 +295,7 @@ The X3D specification lists the available node types and their fields.
 It is also possible to define new full-featured node types using <emphasis>prototypes</emphasis>.</para>
 <!-- More about protos?
 Prototypes are available
-for defining new node types, and external prototypes are available
+to define new node types, and external prototypes are available
 to load prototypes from other files.
 This provides you opportunities to define whole libraries of new objects,
 cooperating with each other, much alike libraries and modules
@@ -336,7 +339,7 @@ Again, you can open this file with any X3D browser
 </X3D>]]>
 </screen>
 
-<!-- More about encodings, and binary encoding?
+<!-- More about encodings and binary encoding?
 <para>X3D allows to encode the nodes graph in various formats.
 The most classic is a text file format, that requires a specialized parser,
 and is called nowadays "classic (VRML) encoding". The commonly used now
@@ -378,7 +381,7 @@ the sphere up.</para>
 <para>The behavior of X3D scene can also be enhanced by scripting
 languages.</para>
 Scripts: integration with script languages (like JavaScript) easy.
-Script remains a~``black box'' for~X3D. At the~same time
+Script remains a~<quote>black box</quote> for~X3D. At the~same time
 in X3D we define exactly what parts of the~scene are accessed.
 -->
 
@@ -388,7 +391,7 @@ in X3D we define exactly what parts of the~scene are accessed.
 Initial VRML version, <emphasis>VRML 1.0</emphasis>, was based
 on a subset of an even older format,
 <emphasis>Inventor</emphasis>. Later VRML version, <emphasis>VRML 2.0</emphasis>
-(called also <emphasis>VRML 97</emphasis> due to it's release
+(called also <emphasis>VRML 97</emphasis> due to its release
 date), changed the syntax a lot and added many new features for
 interactive 3D worlds.
 X3D version numbers start from 3.0, to emphasize that X3D is
@@ -418,14 +421,14 @@ about is the same thing as <quote>X3D browsers</quote> in practice.
 <para>Graphic processing unit (GPU) is given a set of 3D points
 (vertexes) connected into triangles. For each vertex, some work
 should be performed, at least to transform it from an object space
-into the clip space (this is when we move and rotate our objects,
-and where we can apply perspective projection). <emphasis>Vertex shaders</emphasis>
+into the clip space. This is where we move and rotate our objects,
+and apply perspective projection. <emphasis>Vertex shaders</emphasis>
 allow to replace this per-vertex work with a custom program written in a special
 <emphasis>shading language</emphasis>.
 When the vertexes are processed, the GPU performs <emphasis>rasterization</emphasis>,
 determining which screen pixels are actually covered by the triangles.
-Then each pixel is drawn, which involves calculating the actual color to be drawn
-(for example, mixing color from the lighting calculation with the texture color).
+Then each pixel is drawn, which involves calculating the actual pixel color.
+For example by mixing color from the lighting calculations with the texture color.
 <emphasis>Fragment (pixel) shaders</emphasis> allow to replace this
 per-pixel work with a custom program.<!-- <footnote>
 <para>The distinction between <emphasis>fragment</emphasis> and <emphasis>pixel</emphasis>
@@ -466,7 +469,7 @@ void main(void)
   <emphasis>/* pass unchanged texture coordinate to the fragment shader */</emphasis>
   gl_TexCoord[0] = gl_MultiTexCoord0;
   <emphasis>/* calculate vertex position in clip space */</emphasis>
-  gl_Position = ftransform();
+  gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
 }
 </screen>
 
@@ -526,8 +529,8 @@ Shape {
 }
 </screen>
 
-<para>And a little longer example, showing X3D with the previous shader
-code (multiplying texture by 2).</para>
+<para>A little longer example, showing X3D with the previous shader
+code (multiplying texture by 2):</para>
 
 <screen>#X3D V3.2 utf8
 PROFILE Interchange
@@ -543,7 +546,7 @@ Shape {
             <emphasis role="bold">void main(void)
             {
               gl_TexCoord[0] = gl_MultiTexCoord0;
-              gl_Position = ftransform();
+              gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
             }</emphasis>"
         }
         ShaderPart {
@@ -566,7 +569,7 @@ Shape {
 the standard calculations done by the GPU. This means that all
 the lighting and texturing effects, if needed, have to be reimplemented
 from scratch in our shader. There is no way to combine
-our shader with standard rendering features, and it is impossible
+our shader with standard rendering features and it is impossible
 to automatically combine two shader sources. This drawback reflects
 the design of the hardware. And the whole work presented in this paper
 strives to overcome this problem.</para>
@@ -777,6 +780,7 @@ Drupal approach is quite similar to our
 core idea of combining effects. Our effects are similar to
 Drupal's modules and our <quote>plugs</quote> are analogous to Drupal hooks.</para>
 
+<!--
 <para>Our effects can define functions with special names to enhance
 the standard shader behavior, just like Drupal modules can define functions
 to act on an event from another module.
@@ -787,6 +791,7 @@ so calling the plugs must be implemented by text replacements)
 and some special opportunities (we can define effects at
 the appropriate nodes of X3D, like textures and lights sources,
 as we do not want to throw all the effects in one bag).</para>
+-->
 
 <!--
   OpenSceneGraph:
@@ -1043,8 +1048,8 @@ the separate compilation units in case of &glsl;.</para>
 
 <para>
 Detecting special <literal>PLUG_</literal> function names inside the shader code
-is trivial, and it turned out to be the best approach to design our effects.
-This means that each effect code is clean, and can be compiled separately
+is trivial and it turned out to be the best approach to design our effects.
+This means that each effect code is clean and can be compiled separately
 from others. It allows us to naturally use
 the <emphasis>separate compilation units</emphasis> in case of &glsl; implementation.</para>
 -->
@@ -1088,7 +1093,7 @@ needed by user.
 </figure>
 
 <para>Note that all introduced nodes benefit from X3D mechanism to reuse the nodes
-by reference (the <literal>DEF</literal> / <literal>USE</literal> keywords). Reusing the
+by reference (the <literal>DEF</literal> and <literal>USE</literal> keywords). Reusing the
 <literal>Effect</literal> nodes
 is most natural and allows to combine existing effects in any desired way.
 Reusing the <literal>EffectPart</literal> nodes is also useful, when some effects
@@ -1391,7 +1396,7 @@ to achieve interesting visual effects.</para>
 
 <para>Note that this is a very simple approach to implementing
 <emphasis>cellular texturing</emphasis>. Much more optimal implementation
-is possible, and there are many variations that achieve different visual appeal.
+is possible. There are also many variations that achieve different visual appeal.
 See our engine demo models (<ulink url="http://castle-engine.sourceforge.net/demo_models.php" />)
 for a complete and working implementation.</para>
 
@@ -1469,7 +1474,7 @@ to the first <literal>texture_color</literal> plug.</para>
 </section>
 
 <section id="section.filtering">
-<title>Texture resolution doesn't matter</title>
+<title>Texture resolution does not matter</title>
 
 <para>The shader effects for textures are calculated at each screen fragment,
 not at each texel. So the effects are not concerned with the texture size
@@ -1507,7 +1512,7 @@ Geometry shader can use the information about given primitive
 (vertex positions and attributes) and can generate other primitives.
 A single geometry shader may generate any number of primitives,
 so it is possible to <quote>explode</quote> a single input primitive
-into a number of others (or delete some original primitives based on some criteria).
+into a number of others. Or we can entirely discard some primitives.
 The type of the primitive may be changed by the geometry shader &mdash;
 for example, triangles may be converted into points or the other way around.</para>
 
@@ -1549,7 +1554,7 @@ and maximum number of vertex output).
 -->
 
 <para>When writing a geometry shader, we want to control the logic
-of the primitive generation, and the output primitive type.
+of the primitive generation and the output primitive type.
 This means that the shader author wants to provide the main part
 of the geometry shader, that contains the <literal>main()</literal>
 entry point and necessary <literal>layout</literal> declarations.</para>
@@ -1565,7 +1570,7 @@ and layout declarations (for GLSL >= 1.50).
 It must be possible to write a flexible geometry shader code,
 that works with any internal effects and user effects
 in <literal>Effect</literal> nodes. In other words, when writing
-the geometry shaders, we don't want to hardcode what values have
+the geometry shaders, we do not want to hardcode what values have
 to be passed from vertex processor to the rasterizer.
 To make this possible, with every geometry shader we will link additional
 code with three functions:</para>
@@ -1585,8 +1590,8 @@ code with three functions:</para>
 
 <para>The idea is that <literal>geometryVertexSet</literal>
 can be used to simply pass-through values from vertex processing to the rasterizer.
-<literal>geometryVertexSet(i)</literal> is equivalent (but possibly more efficient)
-to</para>
+Calling <literal>geometryVertexSet(i)</literal>
+is equivalent (but possibly more efficient) to</para>
 
 <screen>geometryVertexZero();
 geometryVertexAdd(i, 1.0);
@@ -1596,7 +1601,8 @@ geometryVertexAdd(i, 1.0);
 that doesn't do anything. Thanks to using <literal>geometryVertexSet</literal>,
 every other effect still works (without <literal>geometryVertexSet</literal>,
 various effects would break, because values would not be passed from vertex
-shaders to fragment shaders).</para>
+shaders to fragment shaders). This is what we mean by <quote>robust</quote>
+geometry shaders.</para>
 
 <screen>effects Effect {
   language "GLSL"
@@ -1713,20 +1719,21 @@ This way authors can write this in fragment shaders:
 </para>
 
 <screen>#ifdef HAS_GEOMETRY_SHADER
-  #define variable_name variable_name_fragment
+  #define my_attribute my_attribute_fragment
 #endif
 
-in float variable_name;
+in float my_attribute;
 </screen>
 
-<para>This allows to write a fragment shader that will work
-both with geometry shaders (when the geometry shader will output
-<literal>variable_name_fragment</literal>) and without (when the
-vertex shader will output <literal>variable_name</literal>).
+<para>Such fragment shader can receive it's input either
+from the geometry shader (under the name <literal>my_attribute_fragment</literal>)
+or straight from the vertex shader (under the name
+<literal>my_attribute</literal>).
 </para>
 
 </section>
 
+<!--
 <section id="section.geometry_shaders_implementation">
 <title>Implementation</title>
 
@@ -1756,6 +1763,7 @@ since <literal>ComposedShader</literal> must always contain
 a full working shader code.</para>
 
 </section>
+-->
 
 </chapter>
 
@@ -2004,8 +2012,9 @@ only with calculating the normal vectors in the object space.
 Yet another <literal>Effect</literal> node is responsible for
 transforming these normal vectors into the eye space.
 This way we have extracted all the common logic into a separate effect,
-making it clear where the alternative versions differ and what they have
-in common.
+making it clear where the alternative versions differ and what
+<!-- Reviewers say: no "do" here -->
+they have in common.
 This was possible because one effect can define
 new plug names, that can be used by the other effects.</para>
 
@@ -2310,10 +2319,12 @@ processing it and adding to the given <literal>CompleteCode</literal>..</para>
 <section id="section.together">
 <title>Final algorithm</title>
 
-<para>Finally, using the above functions,
-we actually construct the final shader code for given shape.
-All the effects (including effects special to lights and textures)
-are correctly applied by the algorithm below.</para>
+<para>Using the above functions,
+we construct the final shader code for given shape.
+All the effects (including effects specific to lights and textures)
+are correctly applied by the algorithm below.
+Specific requirements of the <emphasis>geometry shaders</emphasis> are also
+taken into account.</para>
 
 <screen role="pseudocode">FinalShader &assign; new TShaderSource
 set FinalShader to basic rendering code
@@ -2701,7 +2712,7 @@ content authors. We have implemented our approach for the &glsl; shading languag
 
 <para>
 A lot of people helped and encouraged the development of our VRML/X3D engine,
-with it's rendering features and extensions. A big <quote>thank you</quote>
+with its rendering features and extensions. A big <quote>thank you</quote>
 goes to all of you!
 </para>
 
