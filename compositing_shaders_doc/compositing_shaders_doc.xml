@@ -28,6 +28,7 @@
 <!ENTITY or "<emphasis role='bold'>or</emphasis>">
 <!ENTITY not "<emphasis role='bold'>not</emphasis>">
 <!ENTITY while "<emphasis role='bold'>while</emphasis>">
+<!ENTITY else "<emphasis role='bold'>else</emphasis>">
 
 <!-- common names -->
 <!ENTITY glsl "<emphasis>GLSL</emphasis>">
@@ -1516,6 +1517,9 @@ The examples there show a basic approach of using standard
 <literal>ComposedShader</literal> node to define a geometry shader for the shape.
 Here, we investigate how our effects improve the geometry shaders.</para>
 
+<section id="section.robust_geometry_shaders">
+<title>Robust geometry shaders</title>
+
 <!--When we implement a new algorithm using geometry shaders,
 we have slightly different needs than
 Geometry shaders work very nicely with our effects system.
@@ -1655,6 +1659,11 @@ may have to override corresponding <literal>geometry_vertex_xxx</literal>
 plugs to also be automatically handled this way.
 </para>
 
+</section>
+
+<section id="section.effects_enabling_geometry_shaders">
+<title>Effects that cooperate with geometry shaders</title>
+
 <para>TODO: raw
 Actually, for user effects, they will have to override
 special plugs, but more about this later.
@@ -1668,9 +1677,11 @@ Geometry shader authors want to control the algorithm of the geometry shader. Ou
   There is a small technical problem here: at least in GLSL, in case of user-defined vertex attributes, using the geometry shader means that the attribute name must change from vertex shader to fragment shader. That is because you have to declare input and output variables inside geometry shader, and they must have different names. On the other hand, when there is no geometry shader, attribute name must be exactly the same from vertex shader to fragment shader. This means that creating a vertex, fragment and geometry shader combo in which the geometry shader is optional is not possible. We give authors a conditional define HAS_GEOMETRY_SHADER available in the fragment shader, to overcome this. This way authors can do things like
 </para>
 
-<screen>#ifndef HAS_GEOMETRY_SHADER
-  #define fragment_attribute_name attribute_name
+<screen>#ifdef HAS_GEOMETRY_SHADER
+  #define variable_name variable_name_fragment
 #endif
+
+in float variable_name;
 </screen>
 
 <para>
@@ -1710,15 +1721,15 @@ a full working shader code.</para>
 ------------------------------------------------------------------------------
 For this purpose, we introduce:
 
-void PLUG_geometry_set(const int i)
+void PLUG_geometry_set(const in int index)
 
 Override this plug to set current geometry shader output to be equal to geometry shader input number i. If your effect defines a custom varying value (output from vertex shader, input to fragment shader) then you should override this plug, to make geometry shaders working seamlessly with your effect.
 
-void PLUG_geometry_zero(const int i)
+void PLUG_geometry_zero(const in int index)
 
 Override this plug to set current geometry shader output to be zero.
 
-void PLUG_geometry_add(const int i, const float scale)
+void PLUG_geometry_add(const in int index, const in float scale)
 
 Override this plug to add to current geometry shader output value from input index i, scaled by given float value.
 
@@ -1733,6 +1744,8 @@ Together, PLUG_geometry_zero and PLUG_geometry_add allow to blend a number of ve
   <imageobject role="fo">   <imagedata format="PNG" fileref="images/geometry_shader_effects.png" width="&figure_width;" contentwidth="&figure_width;" /> </imageobject>
   </mediaobject>
 </figure>
+
+</section>
 
 </chapter>
 
@@ -2477,13 +2490,17 @@ to the <literal>FinalShader</literal>. Overriding <literal>light_scale</literal>
 at this point means that we can scale the contribution of every light
 by the same function.</para>
 
-<screen role="pseudocode">&if; &not; HasGeometryMain &then;
+<screen role="pseudocode">&if; HasGeometryMain &then;
+  &foreach; FragmentPart &in; FinalShader[fragment] &do;
+    FragmentPart &assign; '#define HAS_GEOMETRY_SHADER' + FragmentPart &else;
   FinalShader[geometry] &assign; empty
 </screen>
 
-<para>Discard all geometry shader code if there is no <literal>main()</literal>
-entry point for this stage. This means that we simply do not need
-to transform primitives by the geometry shader.</para>
+<para>Decide if we really want to link geometry shaders,
+based on whether we have <literal>main()</literal> for geometry shaders.
+If yes, then <literal>HAS_GEOMETRY_SHADER</literal> symbol has to be defined,
+as it may be useful for fragment shader authors.
+Otherwise, discard all geometry shader code.</para>
 
 <para>At the end, <literal>FinalShader</literal> is just a collection
 of strings forming a shading language source code.
