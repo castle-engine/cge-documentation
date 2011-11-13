@@ -101,3 +101,12 @@
      (Not used after all... defaults are actually better?) -->
 <xsl:param name="body.margin.top">0.7in</xsl:param>
 <xsl:param name="body.margin.bottom">0.7in</xsl:param>
+
+<!-- ======================================================================= -->
+
+<!-- Center all figures.
+     Following ideas from http://www.sagehill.net/docbookxsl/ImageAlignment.html
+     and http://lists.oasis-open.org/archives/docbook-apps/201002/msg00005.html -->
+<xsl:attribute-set name="figure.properties">
+  <xsl:attribute name="text-align">center</xsl:attribute>
+</xsl:attribute-set>
