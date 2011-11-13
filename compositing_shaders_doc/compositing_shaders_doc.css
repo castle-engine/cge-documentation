@@ -53,3 +53,12 @@ p.fo_vertical_space { display: none; }
 div.calloutlist p {
   margin-bottom: 0em; margin-top: 1em;
 }
+
+/* Center titlepage (inside parent, and center text inside) */
+div.book-titlepage {
+  margin-left: auto;
+  margin-right: auto;
+  width: 80%;
+  text-align: center;
+  border: thin solid black;
+}

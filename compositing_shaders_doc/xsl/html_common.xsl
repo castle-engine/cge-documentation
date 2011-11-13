@@ -27,4 +27,7 @@
   </b>
 </xsl:template>
 
+<!-- Our titlepage customization -->
+<xsl:include href="html-titlepage/mytitlepage.xsl"/>
+
 </xsl:stylesheet>
