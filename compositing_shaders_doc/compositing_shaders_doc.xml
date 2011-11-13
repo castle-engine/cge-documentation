@@ -1664,7 +1664,17 @@ plugs to also be automatically handled this way.
 <section id="section.effects_enabling_geometry_shaders">
 <title>Effects that cooperate with geometry shaders</title>
 
+<para>User effects that want to cooperate with geometry shaders
+have to override plugs <literal>PLUG_geometry_vertex_xxx</literal>.
+Overriding these plugs allows to pass-through or blend custom vertex attributes
+needed by the effects. By correctly overriding them, the user effects
+can be prepared to work both with and without geometry shader.</para>
+
+<para>The exact specification of geometry shader plugs is
+in <xref linkend="section.geometry_plugs" />.</para>
+
 <para>TODO: raw
+
 Actually, for user effects, they will have to override
 special plugs, but more about this later.
 
@@ -1687,7 +1697,7 @@ in float variable_name;
 <para>
 inside fragment shaders, and make them working both with and without geometry shaders.
 
-  The geometry shader creator can call special geometry_set, geometry_zero, geometry_blend functions to pass-through or blend the inputs to outputs. These will take care of both renderer internal shaders and user effects (as long as user effects correctly implement PLUG_geometry_xxx).
+  The geometry shader creator can call special geometry_set, geometry_zero, geometry_blend functions to pass-through or blend the inputs to outputs. These will take care of both renderer internal shaders and user effects (as long as user effects correctly implement PLUG_geometry_vertex_xxx).
 
 TODO: end of raw, hopefully
 </para>
@@ -1716,26 +1726,6 @@ For the <literal>ShaderPart</literal> with <literal>type="GEOMETRY"</literal>,
 we assume it always contains a <literal>main()</literal>,
 since <literal>ComposedShader</literal> is always assumed to contain
 a full working shader code.</para>
-
-<para>TODO: raw
-------------------------------------------------------------------------------
-For this purpose, we introduce:
-
-void PLUG_geometry_set(const in int index)
-
-Override this plug to set current geometry shader output to be equal to geometry shader input number i. If your effect defines a custom varying value (output from vertex shader, input to fragment shader) then you should override this plug, to make geometry shaders working seamlessly with your effect.
-
-void PLUG_geometry_zero(const in int index)
-
-Override this plug to set current geometry shader output to be zero.
-
-void PLUG_geometry_add(const in int index, const in float scale)
-
-Override this plug to add to current geometry shader output value from input index i, scaled by given float value.
-
-Together, PLUG_geometry_zero and PLUG_geometry_add allow to blend a number of vertex inputs with arbitrary weights. PLUG_geometry_set allows to simply pass-through a given value from vertex to fragment shader, which is a common need. The idea is that PLUG_geometry_set(i) is an optimized shortcut for doing PLUG_geometry_zero(i) followed by PLUG_geometry_add(i, 1.0).
-------------------------------------------------------------------------------
-</para>
 
 <figure id="figure.geometry_shader_effects">
   <title>Converting mesh into a dense line and point sets by geometry shaders</title>
@@ -2879,6 +2869,39 @@ along with material emissive and global scene ambient colors,
 result is clamped to 1.0, and the alpha value is set correctly.
 You can change now the fragment color, if you want to do something <emphasis>before</emphasis>
 texturing is applied.</para>
+
+</section>
+
+<section id="section.geometry_plugs">
+<title>Geometry shader plugs</title>
+
+<para>Each geometry shader plug <literal>PLUG_geometry_vertex_xxx</literal>
+enhances what happens when the corresponding <literal>geometryVertexXxx</literal>
+function is called.
+See <xref linkend="chapter.geometry_shaders" /> for details.</para>
+
+<screen role="plug_declaration">void <emphasis role="bold">PLUG_geometry_vertex_set</emphasis>(
+  const in int index)
+</screen>
+
+<para>Set current geometry shader output to be equal
+to geometry shader input with given <literal>index</literal>.
+If your effect defines a custom varying value (output from vertex shader,
+input to fragment shader) then you should override this plug,
+to make geometry shaders working seamlessly with your effect.</para>
+
+<screen role="plug_declaration">void <emphasis role="bold">PLUG_geometry_vertex_zero</emphasis>()
+</screen>
+
+<para>Set current geometry shader output to be zero.</para>
+
+<screen role="plug_declaration">void <emphasis role="bold">PLUG_geometry_vertex_add</emphasis>(
+  const in int index,
+  const in float scale)
+</screen>
+
+<para>Add to the current geometry shader output value from input <literal>index</literal>,
+scaled by given <literal>scale</literal>.</para>
 
 </section>
 </appendix>
