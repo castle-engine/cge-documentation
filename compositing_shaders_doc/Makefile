@@ -40,8 +40,13 @@ SCP_OPTIONS=
 # Prepare and upload our output under
 # [http://castle-engine.sourceforge.net/compositing_shaders_doc/].
 .PHONY: upload
-upload: clean default
+upload: clean
+	sed -e 's|<!-- <xsl:import href="html_piwik.xsl"/> -->|<xsl:import href="html_piwik.xsl"/> <!-- enabled -->|' --in-place xsl/html_chunks.xsl
+	$(MAKE) default
+	sed -e 's|<xsl:import href="html_piwik.xsl"/> <!-- enabled -->|<!-- <xsl:import href="html_piwik.xsl"/> -->|' --in-place xsl/html_chunks.xsl
 	cd output/xsl/ && tar czvf ../../output.tar.gz *
 	scp $(SCP_OPTIONS) output.tar.gz $(SF_CONNECT)
 	./sf_upload_finalize.sh $(SF_USERNAME) $(SF_PATH)
 	rm -f output.tar.gz
+# Do not keep HTML version with Piwik enabled on local disk.
+	rm -Rf output/xsl/html/
