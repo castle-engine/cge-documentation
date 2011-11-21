@@ -103,19 +103,19 @@
       </font>
 
       <font metrics-url="fop/fonts/mymonospace.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/ttf-liberation/LiberationMono-Regular.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationMono-Regular.ttf">
         <font-triplet name="MyMonospace" style="normal" weight="normal"/>
       </font>
       <font metrics-url="fop/fonts/mymonospace-bold.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/ttf-liberation/LiberationMono-Bold.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationMono-Bold.ttf">
         <font-triplet name="MyMonospace" style="normal" weight="bold"/>
       </font>
       <font metrics-url="fop/fonts/mymonospace-italic.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/ttf-liberation/LiberationMono-Italic.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationMono-Italic.ttf">
         <font-triplet name="MyMonospace" style="italic" weight="normal"/>
       </font>
       <font metrics-url="fop/fonts/mymonospace-bold-italic.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/ttf-liberation/LiberationMono-BoldItalic.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationMono-BoldItalic.ttf">
         <font-triplet name="MyMonospace" style="italic" weight="bold"/>
       </font>
 
