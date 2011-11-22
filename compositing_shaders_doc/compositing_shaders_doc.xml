@@ -2835,6 +2835,18 @@ in which case it will affect the contribution of all the lights on given shape.
 <para>The <literal>light_dir</literal> vector is a normalized
 direction to the light, in eye space.</para>
 
+<screen role="plug_declaration">void <emphasis role="bold">PLUG_material_light_diffuse</emphasis>(
+  inout vec4 diffuse,
+  const in vec4 vertex_eye,
+  const in vec3 normal_eye,
+  const in gl_LightSourceParameters light_source,
+  const in gl_MaterialParameters material)
+</screen>
+
+<para>Diffuse color at each fragment may be changed here.
+This is usually a multiplication of material and light diffuse colors,
+but you can change it here into anything you like.</para>
+
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_add_light_contribution_front</emphasis>(
   inout vec4 color,
   const in vec4 vertex_eye,
@@ -2845,6 +2857,18 @@ direction to the light, in eye space.</para>
 <para>Add pixel color for a lit material. This is typically used to add the light sources.
 There is also the <literal>add_light_contribution_back</literal>,
 for light contribution on the back side of the faces.</para>
+
+<screen role="plug_declaration">void <emphasis role="bold">PLUG_lighting_apply</emphasis>(
+  inout vec4 fragment_color,
+  const vec4 vertex_eye,
+  const vec3 normal_eye_fragment)
+</screen>
+
+<para>At this point, the lighting is calculated. Light contributions are summed,
+along with material emissive and global scene ambient colors,
+result is clamped to 1.0, and the alpha value is set correctly.
+You can change the fragment color now, if you want to do something <emphasis>before</emphasis>
+texturing is applied.</para>
 
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_texture_color</emphasis>(
   inout vec4 texture_color,
@@ -2885,30 +2909,6 @@ to the final (textured) fragment color.</para>
 <para>Do the final processing of the fragment. This is called after applying
 both textures and fog, and cannot modify the fragment color anymore.
 This is useful for operations like alpha-testing the fragment.</para>
-
-<screen role="plug_declaration">void <emphasis role="bold">PLUG_material_light_diffuse</emphasis>(
-  inout vec4 diffuse,
-  const in vec4 vertex_eye,
-  const in vec3 normal_eye,
-  const in gl_LightSourceParameters light_source,
-  const in gl_MaterialParameters material)
-</screen>
-
-<para>Diffuse color at each fragment may be changed here.
-This is usually a multiplication of material and light diffuse colors,
-but you can change it here into anything you like.</para>
-
-<screen role="plug_declaration">void <emphasis role="bold">PLUG_lighting_apply</emphasis>(
-  inout vec4 fragment_color,
-  const vec4 vertex_eye,
-  const vec3 normal_eye_fragment)
-</screen>
-
-<para>At this point, the lighting is calculated. Light contributions are summed,
-along with material emissive and global scene ambient colors,
-result is clamped to 1.0, and the alpha value is set correctly.
-You can change the fragment color now, if you want to do something <emphasis>before</emphasis>
-texturing is applied.</para>
 
 </section>
 
