@@ -1704,7 +1704,7 @@ cooperate.</para>
 
 <para>There is one obstacle here.
 In case of user-defined vertex attributes, using the geometry shader
-means that the attribute name must change on it's way from
+means that the attribute name must change on its way from
 the vertex shader to the fragment shader. That is because you have
 to use different input and output names for this attribute inside the geometry shader.
 On the other hand, when there is no geometry shader,
@@ -1723,7 +1723,7 @@ This way we can write in the fragment shader code like:
 in float my_attribute;
 </screen>
 
-<para>Such fragment shader can receive it's input either
+<para>Such fragment shader can receive its input either
 from the geometry shader (under the name <literal>my_attribute_fragment</literal>)
 or straight from the vertex shader (under the name
 <literal>my_attribute</literal>).
