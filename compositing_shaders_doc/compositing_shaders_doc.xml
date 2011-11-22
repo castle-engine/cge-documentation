@@ -114,9 +114,9 @@ with many advanced graphic features. <xref linkend="chapter.x3d" />
 describes X3D in more detail.
 </para>
 
-<para>The X3D <emphasis>Programmable shaders component</emphasis> <xref linkend="bib.x3d_shaders" />
+<para><emphasis>Programmable shaders component</emphasis> <xref linkend="bib.x3d_shaders" />
 (part of the X3D standard) defines how <emphasis>shaders</emphasis> can be assigned
-to particular shapes. <!-- and how they interact with other X3D features. -->
+to visible shapes. <!-- and how they interact with other X3D features. -->
 <emphasis>Shaders</emphasis> are programs usually executed on the graphic processor unit
 (GPU). They control the per-vertex and per-pixel processing,
 for example summing the lights contribution
@@ -139,7 +139,7 @@ designed for rendering a particular shape.
 <para>We argue that a different approach is needed in many situations.
 Authors usually would like to keep the normal rendering features working
 and only add their own effects. The 3D renderer
-implementation usually already has an extensive internal shaders system
+already has an extensive internal shaders system
 and the authors want to depend on these internal shaders
 to do the common job.
 </para>
@@ -166,7 +166,7 @@ or (when shadow map is not available) always return 1.
 The <emphasis>normal</emphasis> function may take the vector straight from
 the geometry description, or calculate it using a texture value (classic bump mapping).
 See <xref linkend="figure.bump_mapping_shadows" />.
-The <emphasis>light_color</emphasis> function may be replaced to use different
+The <emphasis>light_color</emphasis> function may use different
 lighting models (Phong, Ward, Cook-Torrance and so on).
 Sometimes it makes sense to change these functions
 for all the light sources and sometimes only a specific light source
@@ -200,7 +200,7 @@ shaders. This makes shader programs:</para>
     are correctly applied.</para></listitem>
 </orderedlist>
 
-<para>It is important that we still keep
+<para>It is important to note that we keep
 the full power of a chosen GPU shading language.
 We deliberately do not try to invent here a new language, or wrap existing
 language in some cumbersome limitations.
@@ -282,14 +282,14 @@ For example, you can create an X3D file using any popular 3D modeller
 (like our <emphasis>view3dscene</emphasis>, see <xref linkend="bib.castleengine" />).</para>
 
 <para>Many common 3D features, like triangle meshes with materials and textures,
-and easy to express. Yet the whole X3D standard is quite large,
+are easy to express. Yet the whole X3D standard is quite large,
 including advanced 3D concepts like NURBS,
 cube mapping, multi-texturing, particle effects, skinned humanoid animation,
-spatial sound, physics.</para>
+spatial sound, and physics.</para>
 
 <para>The scene is represented as a graph of <emphasis>nodes</emphasis>.
 In the simple cases, the scene is just a tree of nodes.
-In a general case, it can be a directed graph of nodes, with cycles possible.
+In a general case, it can be a directed graph of nodes, with possible cycles.
 <!-- Mention DEF/USE keywords. -->
 The X3D specification lists the available node types and their fields.
 It is also possible to define new full-featured node types using <emphasis>prototypes</emphasis>.</para>
@@ -304,7 +304,7 @@ for functions and classes in normal programming languages.
 
 <para>An example of a simple X3D file in
 the <quote>classic</quote> encoding follows.
-You can save it as a file with extension <literal>.x3dv</literal>
+You can save it as a file named <literal>test.x3dv</literal>
 and open with any X3D browser.</para>
 
 <screen>#X3D V3.2 utf8
@@ -318,7 +318,7 @@ Shape {
 Note that we omitted  <!--the optional (but adviced)-->
 DTD and XML schema declarations for brevity.
 Again, you can open this file with any X3D browser
-(be sure to save it with <literal>.x3d</literal> extension).</para>
+(be sure to save it with an <literal>.x3d</literal> extension).</para>
 
 <!--
 <!DOCTYPE X3D PUBLIC
@@ -349,7 +349,7 @@ methods to binary encode XML.</para>
 
 <para>To enable basic animation and interactive behavior, X3D introduces
 the concept of <emphasis>events</emphasis> and <emphasis>routes</emphasis>.
-Many nodes have an ability to <emphasis>send events</emphasis>, notifying
+Many nodes have the ability to <emphasis>send events</emphasis>, notifying
 about something. There are even special nodes called <emphasis>sensors</emphasis>
 with the sole purpose of sending events when something happens.
 For example <emphasis>mouse sensors</emphasis>, that report user clicking and dragging
@@ -428,7 +428,7 @@ allow to replace this per-vertex work with a custom program written in a special
 When the vertexes are processed, the GPU performs <emphasis>rasterization</emphasis>,
 determining which screen pixels are actually covered by the triangles.
 Then each pixel is drawn, which involves calculating the actual pixel color.
-For example by mixing color from the lighting calculations with the texture color.
+For example we can mix color from the lighting calculations with the texture color.
 <emphasis>Fragment (pixel) shaders</emphasis> allow to replace this
 per-pixel work with a custom program.<!-- <footnote>
 <para>The distinction between <emphasis>fragment</emphasis> and <emphasis>pixel</emphasis>
@@ -474,13 +474,13 @@ void main(void)
 </screen>
 
 <screen><emphasis>/* fragment shader */
-/* the texture contents are loaded outside of the shader program,
+/* myTexture contents are loaded outside of the shader program,
    by appropriate OpenGL calls. */</emphasis>
 uniform sampler2D myTexture;
 void main(void)
 {
   <emphasis>/* take the texture color at given coordinates, multiply by 2,
-     use it to set fragment (pixel) color */</emphasis>
+     use it as the fragment (pixel) color */</emphasis>
   gl_FragColor = texture2D(myTexture, gl_TexCoord[0].st) * 2.0;
 }
 </screen>
@@ -632,7 +632,7 @@ this component is still an important base for our work. It defines
 how to comfortably keep shader code inside X3D nodes. It also shows
 how to pass uniform values (including textures) to the shaders.</para>
 
-<para>An old solution to combine effects, used even before the shading languages,
+<para>An old method to combine effects, used even before the shading languages,
 is a multi-pass rendering. Each rendering pass adds or multiplies
 to the buffer contents, adding a layer with desired effect.
 However, this is expensive &mdash; in each pass we usually have to repeat
@@ -640,8 +640,9 @@ some work, at least transforming and clipping the geometry.
 It is also not flexible &mdash; we can only modify
 the complete result of the previous pass.
 In our work, we want to allow a single rendering pass to be as
-powerful as it can.
-Arranging shader functions in a pipeline has similar disadvantages
+powerful as it can.</para>
+
+<para>Arranging shader functions in a pipeline has similar disadvantages
 as multi-pass rendering, except there's no speed penalty in this case.</para>
 
 <para>Common approach for writing a flexible shader code is to create
@@ -715,7 +716,7 @@ Unless a new language becomes a de-facto standard,
 obsoleting other languages in the same domain, which is hard.
 -->
 For developers of 3D rendering applications, there's an additional
-effort with integrating the new language with a renderer,
+effort of integrating the new language with a renderer,
 which often is not a trivial task.
 This creates a practical problem for new languages &mdash; because
 they are not popular, it's even harder for them to become popular.
@@ -822,7 +823,7 @@ as we do not want to throw all the effects in one bag).</para>
 <chapter id="chapter.plugs">
 <title>Extending the shaders with plugs</title>
 
-<para>The core idea of our approach is that the base shader code defines
+<para>The core idea of our approach is that the base shader defines
 points where calls to user-defined functions may be inserted. We call
 these places <emphasis>plugs</emphasis>, as they act like sockets where logic
 may be added. Each plug has a name and a given set of parameters.
@@ -1064,7 +1065,7 @@ the <emphasis>separate compilation units</emphasis> in case of &glsl; implementa
 <title>Effects for particular shapes</title>
 
 <para>There are various places where an <literal>Effect</literal> node may be used.
-To apply an effect for a given shape appearance, it can be placed
+To apply an effect on a given shape, it can be placed
 on the new <literal>Appearance.effects</literal> list:</para>
 
 <screen><phrase role="underline">Appearance</phrase>
@@ -1292,7 +1293,7 @@ It is repeated here only for completeness.</para>
 <para>An effect overriding the <literal>texture_color</literal> plug
 should be included, otherwise texture colors are undefined.
 Our implementation
-sets the default texture color to pink (RGB(1,&nbsp;0,&nbsp;1)), so it stands out,
+sets the default texture color to pink (<emphasis>RGB(1,&nbsp;0,&nbsp;1)</emphasis>), so it stands out,
 reminding author to override it.</para>
 
 <para>The texture coordinates, or the algorithm to generate them,
@@ -1400,7 +1401,7 @@ is possible. There are also many variations that achieve different visual appeal
 See our engine demo models (<ulink url="http://castle-engine.sourceforge.net/demo_models.php" />)
 for a complete and working implementation.</para>
 
-<para>Figure <xref linkend="figure.cellular_texturing" /> shows this texture
+<para><xref linkend="figure.cellular_texturing" /> shows this texture
 used in various settings.
 It can be combined with other textures without any effort
 &mdash; in this case, we show it combined with a cube map texture
@@ -1524,9 +1525,9 @@ for example, triangles may be converted into points or the other way around.</pa
   </mediaobject>
 </figure>
 
-<para>More details and examples of using the geometry shaders together
+<para>More details about using the geometry shaders
 with X3D and our engine are on <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_shaders.php#section_geometry" />.
-The examples there show a basic approach of using standard
+The examples there show how to use the standard
 <literal>ComposedShader</literal> node to define a geometry shader for the shape.
 Here, we investigate how our effects improve the geometry shaders.</para>
 
@@ -1553,7 +1554,7 @@ declarations (input and output types of the geometry shader,
 and maximum number of vertex output).
 -->
 
-<para>When writing a geometry shader, we want to control the logic
+<para>When we write a geometry shader, we want to control the logic
 of the primitive generation and the output primitive type.
 This means that the shader author wants to provide the main part
 of the geometry shader, that contains the <literal>main()</literal>
@@ -1696,7 +1697,7 @@ from each other, and composable with each other.
 See the example <literal>compositing_shaders/geometry_shader_optional.x3dv</literal>
 in our demo models.
 It shows that all kinds of effects, including geometry shader effects,
-may be created and applied independently from other effects.
+may be created and applied independently from each other.
 As always, just placing two or more effects together
 on the X3D <literal>effects</literal> field makes them automatically
 cooperate.</para>
@@ -1787,29 +1788,37 @@ will be uniquely renamed to not collide with each other.</para>
 at shape appearance, and finally the effects inside the grouping nodes.
 Although, preferably, for most effects this order will not matter.</para>
 
-<para>A plug is often defined to allow modifying some parameter
-repeatedly (like adding or modulating the fragment color),
-so one or more of the parameters are often allowed to be handled
-as &_inout; values.</para>
-
-<para>The same plug name may be defined many times in the source shader.
-This means that a single <literal>PLUG_xxx</literal> function will be called
-many times. For example, this is useful when the algorithm is naturally
-expressed as a loop, but it had to be unrolled for shader source
-(for example, to slightly tweak some loop iterations).
-The plug names that are available per-light source and per-texture
+<para>For the effects on lights and textures, we first try to find the plug
+specific to the given light or texture node.
+<!--The plug names that are available per-light source and per-texture
 are an example of this.
+-->
 <!--
 If you use the <literal>PLUG_texture_color</literal>
 inside <literal>Appearance.effects</literal>, you change the color of all
 the textures (even shader textures).
 Removed: Not really available, as params to texture_color differ.
 -->
-Using the <literal>PLUG_light_scale</literal>
-inside <literal>Appearance.effects</literal>, the intensity
-of all the light sources on the given shape can be changed. Contrast this with using
-the same <literal>PLUG_light_scale</literal> inside a <literal>X3DLightNode.effects</literal>,
-where only the given light node contribution is changed.</para>
+This means that using the <literal>PLUG_light_scale</literal>
+inside the <literal>X3DLightNode.effects</literal>
+changes only the given light node contribution.
+Contrast this with using the same <literal>PLUG_light_scale</literal> inside
+<literal>Appearance.effects</literal>, in which case
+the intensity of all the light sources on the given shape can be changed.</para>
+
+<para>A plug is often defined to allow modifying some parameter
+repeatedly (like adding or modulating the fragment color),
+so one or more of the parameters are often allowed to be handled
+as &_inout; values.</para>
+
+<para>The same plug name may be defined many times in the source shader.
+That is, the magic comment <literal>/&#xFEFF;* PLUG: name ... *&#xFEFF;/</literal> may be
+repeated a couple of times, with the same <literal>name</literal>.
+This means that the final shader may call every matching <literal>PLUG_name</literal> function
+many times. This is useful when the algorithm is naturally
+expressed as a loop, but it had to be unrolled for shader source
+(for example, to slightly tweak some loop iterations).
+</para>
 
 <para>Currently all the plugs must be procedures, that is their result type
 must be declared as <literal>void</literal>. We have been considering
@@ -1944,8 +1953,8 @@ plug function names and comments.
 <title>Examples</title>
 
 <para>A static screenshot will never express the freedom
-of movement in an animated 3D scene. So we would like to encourage
-the reader to try the examples mentioned in this chapter yourself.
+of movement in an animated 3D scene. So we encourage
+you to try the examples mentioned in this chapter yourself.
 Download <literal>view3dscene</literal>, our X3D browser,
 from <ulink url="http://castle-engine.sourceforge.net/view3dscene.php" />.
 Then download our demo models from
@@ -1958,7 +1967,7 @@ should be interesting.</para>
 <para>Effects may define and use their own uniform variables, including textures,
 just like the standard shader nodes. So we can combine any number of textures
 inside an effect. As an example we wrote a simple effect that mixes a couple of
-textures based on a terrain height (see <xref linkend="figure.terrain" />).
+textures based on a terrain height. See <xref linkend="figure.terrain" />.
 We could also pass any other uniform value to the effect, for example
 passing the current time from an X3D <literal>TimeSensor</literal> allows to make
 animated effects.</para>
@@ -1971,8 +1980,8 @@ animated effects.</para>
   </mediaobject>
 </figure>
 
-<para>We can wrap 2D or 3D noise inside a <literal>ShaderTexture</literal>
-(see <xref linkend="figure.noise" />).
+<para>We can wrap 2D or 3D noise inside a <literal>ShaderTexture</literal>.
+See <xref linkend="figure.noise" />.
 A texture node like <literal>NoiseTexture</literal> from InstantReality
 <xref linkend="bib.instantreality.noisetex" />
 may be implemented on GPU by a simple prototype using the <literal>ShaderTexture</literal>.
@@ -1986,7 +1995,7 @@ may be implemented on GPU by a simple prototype using the <literal>ShaderTexture
   </mediaobject>
 </figure>
 
-<para><emphasis>Water</emphasis> is very nice to implement with the help of our effects,
+<para><emphasis>Water</emphasis> can be elegantly implemented using our effects,
 as a proper water simulation
 is naturally a combination of a couple effects.
 To simulate waves we want to vary vertex
@@ -2068,9 +2077,9 @@ in real-time.</para>
 
 <para>
 We also have plugs to change the geometry in object space.
-Again, since the effect is integrated with all the browser shaders,
-you only need to code a simple function to change the vertex positions
-as you want. The effect instantly works with all the lighting and texturing
+Since the effect is automatically integrated with all the browser shaders,
+you only need to code a simple function to change the vertex positions.
+The effect instantly works with all the lighting and texturing
 conditions.
 Since the transformation is done on GPU, there's practically
 no speed penalty for animating thousands of flowers in our test scene.
@@ -2104,7 +2113,7 @@ Which is actually exactly what our effects already do for you &mdash;
 the implementation of our effects constructs and links
 the appropriate shader code, gathering the information from all the nodes
 that affect the given shape. The information is nicely integrated
-with X3D nodes, effects are specified at suitable nodes, and their
+with X3D, effects are specified at suitable nodes, and their
 uniform values and attributes are integrated with X3D fields.</para>
 
 </chapter>
@@ -2162,9 +2171,9 @@ of effect parts &mdash; but that's just a lack of &cg; and &hlsl;.
 that generates a complete shader source for rendering a given shape.
 It takes into account standard rendering features (X3D light sources,
 textures and such), custom shaders (by X3D nodes like
-<literal>ComposedShader</literal>) and our shaders' effects
-(by <literal>Effect</literal> nodes). All effects are properly added
-together to the final shader code.</para>
+<literal>ComposedShader</literal>) and our shader effects
+(by <literal>Effect</literal> nodes). All effects are properly combined
+to form the final shader code.</para>
 
 <para>We keep the final shader code as three arrays of strings.
 Each array keeps code for a specific shader type: vertex, geometry and fragment.
@@ -2199,8 +2208,8 @@ are also renamed to unique names, since a single plug may be overridden
 by many effects. The modified <literal>PlugValue</literal>
 is inserted to the <literal>CompleteCode</literal> as well.
 Effectively, the caller can usually <quote>forget</quote>
-about the <literal>PlugValue</literal> value afterwards &mdash;
-it has been processed, and correctly added to the <literal>CompleteCode</literal>.
+about the <literal>PlugValue</literal> afterwards &mdash;
+it has been processed, and correctly merged with the <literal>CompleteCode</literal>.
 </para>
 
 <screen role="pseudocode">&type;
@@ -2425,8 +2434,8 @@ in a separate <literal>LightShader</literal> variable.</para>
 
   <callout arearefs="co.light_effects" id="callout.light_effects">
     <para>Next we apply <literal>Effect</literal> nodes specific to this light source.
-    After this, <literal>LightShader</literal> contains both the initial code
-    and user effects code. Doing it this way means that the standard
+    After this, <literal>LightShader</literal> contains the initial code
+    merged with user effects. Doing it this way means that the standard
     light source plugs (like <literal>light_scale</literal>)
     as well as custom plugs (defined in one <literal>Effect</literal> node
     and used by following <literal>Effect</literal> nodes)
@@ -2487,10 +2496,10 @@ named <literal>PLUG_texture_apply</literal> that can be later connected
 to the final shader. It should also declare plug named <literal>texture_color</literal>,
 that can be used by user effects for this texture.</para>
 
-<para>We deliberately omit here some details,
-that in practice may cause the lighting and texture effects
-application to differ a little more. One such detail will be explained
-in the <xref linkend="section.shadows_from_multiple_lights" />.</para>
+<para>There are actually more differences between
+the application of the light and texture effects.
+<xref linkend="section.shadows_from_multiple_lights" /> describes
+one feature that makes their logic slightly more complicated.</para>
 
 <screen role="pseudocode">EnableEffects(appearance node.Effects, FinalShader)
 
@@ -2505,7 +2514,7 @@ and effects for all groups containing this shape, are applied.</para>
 plugs, like <literal>light_scale</literal>. That's simply because
 we have already added all the lighting and texturing shading code
 to the <literal>FinalShader</literal>. Overriding <literal>light_scale</literal>
-at this point means that we can scale the contribution of every light
+at this point means that we scale the contribution of every light
 by the same function.</para>
 
 <screen role="pseudocode">&if; HasGeometryMain &then;
@@ -2523,7 +2532,7 @@ Otherwise, discard all geometry shader code.</para>
 <para>At the end, <literal>FinalShader</literal> is just a collection
 of strings forming a shading language source code.
 For &glsl;, each string is naturally a <quote>separate compilation unit</quote>,
-and can be compiled separately.
+and can be compiled in isolation.
 For other shading languages, the parts may be simply concatenated together
 as necessary.</para>
 
@@ -2582,10 +2591,10 @@ of the <emphasis>Percentage Closer Filtering</emphasis>
 <para>The calculation of light effects has to be complicated a little
 to make it work.
 In our simple pseudo-code, we added the effects to the <literal>LightShader</literal>
-(by <literal>EnableEffects(Light.Effects, LightShader)</literal>)
-and then we immediately folded <literal>LightShader</literal> into the
+<!--(by <literal>EnableEffects(Light.Effects, LightShader)</literal>) -->
+and then we immediately merged <literal>LightShader</literal> with the
 <literal>FinalShader</literal>. Now, we need to remember the
-separate <literal>LightShader</literal> for a longer time,
+<literal>LightShader</literal> value for a longer time,
 in case it should be augmented with a shadow map.
 Alternatively, we could search
 for corresponding shadow maps at the moment
@@ -2610,7 +2619,10 @@ is not found, we create a new one. This is quite simple to do,
 and it provides a perfect sharing of shaders.</para>
 
 <para>The hash value could be calculated based solely on the final string
-of the shader. However, this is too slow in our experience &mdash;
+of the shader.
+<!-- (and the uniform values it receives, as we don't update them
+     every time...)  -->
+However, this is too slow in our experience &mdash;
 as it means that all the string operations have to be performed before
 we even know the hash. It's much faster to calculate
 the hash value looking at all the parameters that will affect the generated
@@ -2627,7 +2639,7 @@ parameters.
 </para>
 
 <para>An additional advantage of the <quote>pool of shaders</quote>
-appears when a subset of the needed shaders is known in the advance.
+appears when a subset of the needed shaders is known in advance.
 For example, imagine an evening outdoor scene, with a storm in the distance.
 The lighting cracks the sky occasionally, making everything temporarily bright.
 In technical words, the scene has highly dynamic lighting,
@@ -2895,7 +2907,7 @@ but you can change it here into anything you like.</para>
 <para>At this point, the lighting is calculated. Light contributions are summed,
 along with material emissive and global scene ambient colors,
 result is clamped to 1.0, and the alpha value is set correctly.
-You can change now the fragment color, if you want to do something <emphasis>before</emphasis>
+You can change the fragment color now, if you want to do something <emphasis>before</emphasis>
 texturing is applied.</para>
 
 </section>
