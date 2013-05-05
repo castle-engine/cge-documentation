@@ -985,7 +985,7 @@ SFString [] <emphasis role="bold">type</emphasis> "VERTEX"
   # allowed values are
   # VERTEX | GEOMETRY | FRAGMENT.
 
-MFString [] <emphasis role="bold">url</emphasis> []
+MFString [in,out] <emphasis role="bold">url</emphasis> []
   # The source code, like ShaderPart.url.
   # May come from an external file (url),
   # or inline (following "data:text/plain,").
