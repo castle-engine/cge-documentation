@@ -26,7 +26,7 @@ html_post = mkdir -p $(1)admonitions/ && \
 .PHONY: default
 default: validate-xmllint html pdf
 
-include ../../vrml_engine_doc/Makefile-docbook
+include ../vrml_engine_internals/Makefile-docbook
 
 # upload ---------------------------------------------------------------------
 
