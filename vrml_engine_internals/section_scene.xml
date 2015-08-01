@@ -1,0 +1,353 @@
+<?xml version='1.0'?>
+<!DOCTYPE sect1 PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+
+<sect1 id="section.scene">
+<title>VRML scene</title>
+
+<!-- Source units: CastleSceneCore, Shape -->
+
+<para>If you want to operate on the VRML graph, for
+some purposes it's enough to load your scene to a
+<literal>TVRMLNode</literal> instance.
+This way you know the root node of the scene. Each node points
+(within it's <literal>Children</literal> property and <literal>SFNode</literal>
+and <literal>MFNode</literal> fields) to it's children nodes,
+so if you know the root node of the scene, you know the whole
+scene. <literal>TVRMLNode</literal> class gives you
+many methods to operate on the nodes graph, and sometimes this is all you need.
+</para>
+
+<para>However, some operations cannot be implemented in
+<literal>TVRMLNode</literal> class. The basic reason is that the node
+doesn't <quote>know</quote> the state of VRML graph where it
+is used. Node's state is affected by other nodes that may be it's
+parents or siblings. Moreover, a node may be used many times in the
+same scene (by <link linkend="section.def_use">DEF / USE mechanism</link>),
+so it may occur many times in a scene with different states.
+That's why many <literal>TVRMLNode</literal> methods
+(like <literal>Triangulate</literal> and <literal>BoundingBox</literal>
+methods described in <xref linkend="section.geometry_node" />) require
+a parameter <literal>State</literal>: they are not able to figure it
+out automatically.</para>
+
+<para>These are the reasons why an additional class, called
+<literal>TCastleSceneCore</literal>, was created. It is essentially
+just a wrapper around a VRML root node (kept inside it's
+<literal>RootNode</literal> property) adding a lot of useful
+and comfortable methods to operate and investigate the scene as a whole.
+</para>
+
+<sect2 id="section.vrml_shape">
+<title>VRML shape</title>
+
+<para>First, let's introduce a building block for our scene class:
+a <emphasis>shape</emphasis>. Instance of <literal>TShape</literal>
+class. Shape is basically two pieces of information: a geometry node
+(<literal>TVRMLGeometryNode</literal>) and it's state
+(<literal>TX3DGraphTraverseState</literal>).
+For VRML &gt;= 2.0, this usually corresponds to
+a single instance of actual VRML <literal>Shape</literal> node,
+that's the reason for it's name.</para>
+
+<para><emphasis>Shape</emphasis> contains absolutely all the information
+needed to render and generally deal with this piece of VRML graph.
+It's completely independent from other shapes.</para>
+
+<para>For VRML 2.0, some shape features were
+already available. That's because of smart definitions of
+<literal>children</literal> fields of grouping nodes, as explained earlier in
+<xref linkend="section.why_vrml_2_is_better" />: we don't
+need so much state information in VRML 2.0 and we can pick
+children of grouping nodes in any order. Still, our shape provides
+the more complete solution: it includes also accumulated transformation matrix and
+<quote>global</quote> properties (fog and active lights).</para>
+
+</sect2>
+
+<sect2 id="section.simple_shapes_tree">
+<title>Simple tree of shapes</title>
+
+<para>This is the main property of <literal>TCastleSceneCore</literal>.
+The idea is simple: to overcome
+the problems with VRML state, we can just use <literal>Traverse</literal>
+method from the root node (see <xref linkend="section.vrml_node_traverse" />)
+and store every geometry node (descendant of <literal>TVRMLGeometryNode</literal>,
+see <xref linkend="section.geometry_node" />) along with it's state.
+As a result we get a simple list of shapes.
+This list is, to some extent, an alternative <quote>flattened</quote>
+representation of the VRML graph.</para>
+
+<para>Actually, we can't really have a completely flat list of shapes.
+Instead, we create
+a simple, usually quite flat tree of shapes, in <literal>TCastleSceneCore.Shapes</literal>.
+Reason: some things, like <literal>Switch</literal> node, require some
+processing each time we want to browse the tree (this way, we keep track
+of shapes in inactive <literal>Switch</literal> children, which allows
+us very fast switching of <literal>Switch.whichChoice</literal>,
+that is: replacing/adding/removing large parts of VRML graph).</para>
+
+<para>So we take VRML nodes graph, and transform it into another
+graph (shapes tree)... But the resulting tree is really much simpler,
+it's just as simple representation of VRML visible things as you can get.</para>
+
+<para>This way we solve various problems mentioned in
+<xref linkend="section.vrml_state" />: we get full accumulated
+VRML state readily available for each shape.
+Also, given a tree of shapes, we can pick our shapes in any order,
+and we can pick
+any of them. This is crucial for various
+<link linkend="chapter.opengl_rendering">OpenGL rendering</link>
+features and optimizations.</para>
+
+<para>Additional advantage of looking at our shapes tree
+is that resources completely not used (for example <literal>Texture2</literal>
+node not used by any node in VRML 1.0) are not present there.
+They don't occur in a state of any shape.
+So unused textures will not be even loaded from their files.</para>
+
+<para>Finally, remember that in <xref linkend="section.vrml_state" />
+we mentioned a practical problem of simple VRML 1.0 implementation
+in OpenGL: OpenGL stack sizes are limited. Our scene solves this,
+because there is no unlimited push/pop hierarchy anymore.
+Features of nodes like VRML 1.0 <literal>Separator</literal>
+and <literal>TransformSeparator</literal> are already handled
+at this stage. And they are handled without using any OpenGL stacks,
+since this unit can't even depend on OpenGL. Features of VRML 2.0
+<literal>Transform</literal> nodes that apply transformation
+to all it's children are already handled here too.</para>
+
+</sect2>
+
+<sect2 id="section.scene_events">
+<title>Events</title>
+
+<para><literal>TCastleSceneCore</literal> is responsible for implementing
+most of the events mechanism of VRML / X3D.
+Just set <literal>ProcessEvents</literal>
+property to true.</para>
+
+<para>Some underlying parts of events mechanism are in fact implemented
+at the lower level, that is inside <literal>TVRMLNode</literal> class
+and friends. For example, event routes are instantiated when reading VRML file
+and they become attached to VRML graph. So passing events through routes
+is already working at this point. Also, exposed events
+are implemented directly inside <literal>TX3DField</literal>. So setting
+an exposed field by <literal>eventIn</literal> causes appropriate behavior
+(changing field's
+value and generating proper <literal>eventOut</literal>).</para>
+
+<para>However, without <literal>TCastleSceneCore.ProcessEvents</literal>,
+all these routes and exposed events are useless, since nothing initially
+<quote>fires</quote> the event. Routes and exposed events are mechanisms
+to process events, but they cannot generate events <quote>on their own</quote>,
+that is they generate events only when other events push them to it.
+The way to make an <quote>initial event</quote> in VRML / X3D is to use
+<emphasis>sensor nodes</emphasis>. Various <emphasis>sensor nodes</emphasis>
+emit events at specified situations, for example</para>
+
+<itemizedlist>
+  <listitem><para><literal>TimeSensor</literal>
+    fires events continuously when time changes,</para></listitem>
+  <listitem><para><literal>KeySensor</literal>
+    fires events when user presses a key within VRML browser,</para></listitem>
+  <listitem><para><literal>TouchSensor</literal> and
+    others from <quote>pointing device sensor component</quote> in X3D
+    fire events when user clicks / drags with mouse,</para></listitem>
+  <listitem><para><literal>ProximitySensor</literal> and
+    <literal>TransformSensor</literal> fire events
+    on collision (of viewer or normal objects within VRML world)
+    with user-defined boxes in space, thus allowing collision detection
+    to VRML authors.</para></listitem>
+</itemizedlist>
+
+<para>By setting <literal>TCastleSceneCore.ProcessEvents</literal> to true
+(and updating <literal>TCastleSceneCore.WorldTime</literal>,
+<literal>TCastleSceneCore.KeyDown</literal> and others) you make sensors
+work. Thus initial events are generated when appropriate, and
+routes and exposed events take care of spreading them, changing VRML graph
+as necessary.</para>
+
+</sect2>
+
+<sect2 id="section.various_comfortable_routines">
+<title>Various comfortable routines</title>
+
+<para>Numerous other features are available in our scene class:</para>
+
+<itemizedlist>
+  <listitem><para>Methods to calculate bounding box,
+    vertexes count and triangles count of the whole scene.
+    They work simply by summing appropriate results of all
+    shapes.</para></listitem>
+
+  <listitem><para>Methods to calculate triangles
+    list (triangulate all shapes in the scene) and to build
+    octrees for the scene. There are also comfortable properties
+    to store the build octree associated with given scene &mdash;
+    although our engine doesn't limit how you manage the constructed
+    octrees, you can create as many octrees for given scene as you
+    want and store them where you want.</para>
+
+    <para>More about octrees in <xref linkend="chapter.octree" />.</para></listitem>
+
+  <listitem><para>Methods to find <literal>Viewpoint</literal>
+    or camera nodes, transform them, and calculate simple
+    (position, direction, up) triple describing camera setting.</para></listitem>
+
+  <listitem><para>Methods to find <literal>Fog</literal> node and calculate
+    it's transformation.</para></listitem>
+</itemizedlist>
+
+</sect2>
+
+<sect2 id="section.scene_caching">
+<title>Caching</title>
+
+<para>Some scene properties are quite time-consuming
+to calculate. Calculating the tree of shapes
+requires traversing whole scene graph. Calculating scene bounding
+box is even more difficult, since for each shape we must calculate
+it's bounding box
+(in fact calculation of scene bounding box as implemented
+simply uses the shapes tree). Obviously we cannot repeat
+these calculations each time we need these values. So the results
+are cached inside <literal>TCastleSceneCore</literal> instance.</para>
+
+<para>Most of the properties are cached:
+shapes, bounding boxes, vertexes and triangles counts,
+fog properties. Even triangles' lists may be cached if you want.</para>
+
+<para>Also various properties for single shapes are cached
+inside <literal>TShape</literal> instance: bounding box,
+bounding sphere and triangle and vertexes counts. After all,
+some of these operations are quite time-consuming by themselves.
+For example to calculate bounding box of <literal>IndexedFaceSet</literal>
+we have to iterate over all it's coordinates.</para>
+
+<para>Direct changes to actual VRML nodes are not
+automatically detected. In other words cache is not automatically
+cleared on changes. Instead you have to manually call
+<literal>TCastleSceneCore.ChangedField</literal>
+(or eventually <literal>TCastleSceneCore.ChangedAll</literal>)
+after changing some parts of the scene. Scene analyzes how this change
+affects the rendered scene, and invalidates as few as possible parts
+of the cache.</para>
+
+<para>For example changes to VRML 1.0 nodes like <literal>Texture2</literal> or
+<literal>Material</literal> will affect
+only the shapes that have these nodes in their
+state. So the whole shapes tree doesn't need to be
+regenerated, also the information about other shapes
+(like their bounding boxes) is still valid.</para>
+
+<para>For simple scene changes, you can also use <literal>TX3DField.Send</literal>
+methods. This will change the value of the field,
+and automatically notify all interested scenes.
+You can also just send events instead of directly modifying fields,
+see the next section.</para>
+
+<para>In <xref linkend="section.scene_gl" /> we will introduce the
+<literal>TCastleScene</literal> class
+that descends from <literal>TCastleSceneCore</literal>.
+It adds various OpenGL methods and caches various OpenGL resources
+related to rendering particular scene parts.
+This means that our <literal>ChangedField</literal> method
+will have even greater impact.</para>
+
+<!-- <emphasis>automatic calling of <literal>ChangedXxx</literal> methods
+on every changes</emphasis> would cause
+slowdowns when heavily processing VRML graph. It's better in this
+case to leave calling of <literal>ChangedXxx</literal> explicitly
+to the programmer.
+To achieve the same speed on automatic calls, we would have
+to remember them and defer them to a later time, until you explicitly
+call something like <literal>FlushChanges</literal> (but this would
+be then troublesome anyway), or until it's needed.
+But <quote>deferring work until it's needed</quote> is pretty
+much what we already do in current <literal>ChangedFields</literal>
+implementation. <literal>ChangedFields</literal> doesn't rebuild anything,
+it only marks which properties,
+shapes and such need some recalculation. And even such
+<quote>marking which shapes need some recalculation</quote>
+takes some time, and it would hurt when you heavily process VRML graph.
+So the solution depends on implementing at least <literal>ChangedField</literal>
+faster, such that calling it thousand times or more would not hurt.
+(Think about modifying field type <literal>MFVec3f</literal> by code like
+<literal>for I := 0 to Field.Count - 1 do Items[I] := ....</literal>).
+This is possible (just mark fields <quote>dirty</quote>
+by some flag)... hm, but it's a lot of work and is just not done yet :)</para>
+-->
+
+</sect2>
+
+<sect2 id="section.scene_events_changed">
+<title>Events and ChangedField notifications</title>
+
+<para>At the low level, passing events works by
+<literal>TX3DEvent.Send</literal> method and
+<literal>TX3DEvent.OnReceive</literal> callbacks.
+Both input and output events can be send and received:
+for input events, it's the outside world (routes, scripts)
+that sends the event, and handling of the event is specific
+to containing node. For output events, it's the other way around:
+sending the event is specific to containing node, and the event
+is received by connected routes.
+</para>
+
+<para>When exposed fields are changed through events,
+<literal>TCastleSceneCore</literal> takes care to automatically
+internally call appropriate <literal>ChangedField</literal> methods.
+This means that events mechanism automatically updates everything
+as necessary, and you don't have to worry about it &mdash; the VRML
+world inside <literal>TCastleSceneCore</literal> will just magically
+change by itself, assuming <literal>TCastleSceneCore.ProcessEvents</literal>
+is on. This also means that <literal>ChangedField</literal> methods
+implement the <quote>cherry-picking optimizations</quote>
+when VRML graph is changed: they know about what changed, and they
+know how it affects the rest of the VRML graph, and so they decide
+what needs to be recalculated. For example, when
+<literal>Coordinate</literal> node changed through event,
+we know that only geometry using this coordinate node has changed,
+so only it's resources need to be recomputed.
+There are <emphasis>a lot</emphasis>
+of possibilities to optimize here by using knowledge about
+what specific node does, what it possibly affects etc. VRML 2.0 things
+are easier and probably more optimized in this regard
+&mdash; reasons were given in
+<xref linkend="section.vrml_state"/>
+and <xref linkend="section.why_vrml_2_is_better" />.</para>
+
+<para>So we have three methods of changing the field value.
+Do it directly, like</para>
+
+<screen>Field.Value := 666;
+Scene.ChangedField(Field);
+</screen>
+
+<para>or do it by sending event, like</para>
+
+<screen>Field.EventIn.Send(666);
+</screen>
+
+<para>or use the simplest <literal>TX3DField.Send</literal> method,
+that sends an event (or directly changes value, if events processing is turned off),
+like</para>
+
+<screen>Field.Send(666);
+</screen>
+
+<para>This will trigger all event callbacks, so the field value will change,
+and everyone interested will be notified about this: output event of exposed
+field will be generated and sent along the routes,
+and <literal>TCastleSceneCore</literal> will be notified about the change.</para>
+
+</sect2>
+
+</sect1>
+
+<!--
+  Local Variables:
+  ispell-local-dictionary: "american"
+  End:
+-->

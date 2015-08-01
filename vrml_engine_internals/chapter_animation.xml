@@ -1,0 +1,333 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+
+<chapter id="chapter.animation">
+<title>Animation</title>
+
+<!-- Source units: CastleSceneCore for events, PrecalculatedAnimation -->
+
+<para>There are two approaches to playing a 3D animation in our engine:</para>
+
+<section id="section.animation_interactive">
+<title>Interactive VRML: <literal>TCastleScene</literal>
+with <literal>ProcessEvents = true</literal></title>
+
+<para>This approach means that you load one VRML / X3D file, and the
+<literal>TCastleScene</literal> (actually, ancestor
+<literal>TCastleSceneCore</literal>)
+will make the events work, sending/receiving events through routes,
+activating sensors, running scripts etc. Among many things,
+this means that world time will be passed to VRML <literal>TimeSensor</literal> nodes,
+allowing you to animate by VRML interpolator nodes.
+You can also pass user input to <literal>TCastleSceneCore</literal>
+methods like <literal>TCastleSceneCore.KeyDown</literal>,
+and then the user will be able to fully interact with the VRML scene.</para>
+
+<para>This is what should be used for presenting interactive VRML
+world to the user, as envisioned by VRML specifications.</para>
+
+<section>
+<title>3D formats support</title>
+
+<itemizedlist>
+  <listitem><para>This plays interactive and animated
+    <emphasis>VRML / X3D</emphasis> files.</para></listitem>
+
+  <listitem><para>You can also load any <emphasis>other 3D model files</emphasis>
+    to <literal>TCastleScene</literal>.
+    But turning <literal>ProcessEvents = true</literal>
+    will do nothing for non-VRML files.
+    Result will be just a still scene. Other 3D model formats
+    cannot declare things like sensors or routes, so activating
+    VRML events processing for them is useless.</para></listitem>
+
+  <listitem><para>The <emphasis><ulink url="http://castle-engine.sourceforge.net/kanim_format.php">Kanim</ulink>
+    format</emphasis> is an exception &mdash;
+    it cannot be used in such way. Kanim format can only be loaded
+    to a <emphasis>sequence</emphasis> of still VRML models, or to
+    <literal>TCastlePrecalculatedAnimation</literal> described below.
+    That was the very design idea behind Kanim format, actually.
+    You cannot load it and play with a single <literal>TCastleScene</literal>
+    instance.</para></listitem>
+</itemizedlist>
+
+</section>
+</section>
+
+<section id="section.animation_precalculated">
+<title>Non-interactive precalculated animation: <literal>TCastlePrecalculatedAnimation</literal></title>
+
+<para>This approach means that at loading time we "fix" the whole the animation.
+Animation becomes something like a 3D movie &mdash; you can freely
+play/stop/rewind it (more generally, you control the value of
+Time of the animation, how it changes), but that's it.
+VRML events, scripts etc.
+don't work when playing the animation (although they may be used to
+generate the animation). The animation is completely non-interactive.</para>
+
+<para>Besides the fact that the animation is non-interactive, another
+downside is that loading time (and probably resource use, like memory)
+is larger, especially for longer animations. That's because we
+store the whole animation in memory. Currently, this means that
+we simply store a still shot of the animation <literal>TCastlePrecalculatedAnimation.ScenesPerTime</literal>
+per second, e.g. 30 * <literal>TCastleScene</literal> per second. Although we store
+in memory intelligently (these 30 * <literal>TCastleScene</literal> will actually
+share all the non-moving parts in memory), that's still quite a lot
+of memory for longer/more complicated animations.</para>
+
+<para><emphasis>Huge advantage of this method: once loaded,
+animation can be played ultra-fast</emphasis>.
+Actually, it's as fast a displaying a still model (currently, this is exactly
+what is done under the hood: at each time, we simply display one chosen frame of
+animation; in the future this may change, but still will be lighting
+fast). That's the reward for long loading time and "fixing" the animation.</para>
+
+<para>Use this method when you have a fixed set of animations to load
+at your program's startup. For example, creature animations in typical
+3D FPS game are just that: a couple of fixed animations (one for walking,
+one for shooting etc.). Larger loading time and memory use are
+acceptable (and not that large, if you have nice low-poly models),
+and the ultra-fast playing speed during the game is the must-have feature.</para>
+
+<section id="section.animation_3d_formats">
+<title>3D formats support</title>
+
+<itemizedlist>
+  <listitem><para><emphasis><ulink url="http://castle-engine.sourceforge.net/kanim_format.php">Kanim
+    (Castle Game Engine animations)</ulink></emphasis> format was
+    specifically created to describe precalculated animations.
+    <literal>TCastlePrecalculatedAnimation.LoadFromFile</literal> loads this.</para></listitem>
+
+  <listitem><para>We also load <emphasis>MD3 (Quake3 engine)</emphasis>
+    animations to this form, as they are especially suitable for it.</para></listitem>
+
+  <listitem><para>You can also <quote>record</quote>
+    interactive animation (by events) from a <emphasis>single
+    VRML / X3D file</emphasis> into our precalculated animation.
+    <literal>TCastlePrecalculatedAnimation.LoadFromEvents</literal> method was
+    designed specifically for this.
+    <ulink url="http://castle-engine.sourceforge.net/view3dscene.php">view3dscene</ulink>
+    has menu item <emphasis>Animation -&gt; Precalculate Animation from
+    VRML Events...</emphasis> to see this at work.</para></listitem>
+
+  <listitem><para>You can also load <emphasis>any still model</emphasis> using
+    <literal>TCastlePrecalculatedAnimation.LoadStatic</literal> method.
+    As the name suggests, this just creates a dummy animation,
+    that acts as working <literal>TCastlePrecalculatedAnimation</literal>
+    but in fact is still.</para>
+
+    <para>Of course, if you want to do some programming,
+    you can also use general <literal>TCastlePrecalculatedAnimation.Load</literal>
+    to create an animation from any sequence of still models.</para></listitem>
+</itemizedlist>
+</section>
+
+<section id="section.structural_equality">
+<title>Structural equality</title>
+
+<para><literal>TCastlePrecalculatedAnimation</literal> class is used to build
+and render precalculated animations. When loading
+you provide one or more VRML models.
+For each provided model you specify an associated position in time.
+The resulting animation will change the first VRML model to the last one,
+such that at any time point we will either use one of the predefined models
+(if point in time is close to the model's associated time) or a new
+model created by interpolating between two successive models in time.</para>
+
+<para>Under the hood, we have quite intelligent algorithm that checks
+each pair of two successive models for <emphasis>structural equality</emphasis>.
+<quote>Structural equality</quote> simply means that the two VRML models
+are equal, with the exception of various floating-point fields,
+on which they may differ. The idea is that we can define <emphasis>linear
+interpolation</emphasis> between two models that are structurally equal.
+So when you specify two structurally equal models for an animation,
+we can generate many intermediate scenes (this is
+the <literal>ScenesPerTime</literal>
+parameter to loading method) that smoothly show one model changing into
+the other. This can interpolate any floating-point field value, like
+<literal>SFColor</literal>,
+<literal>SFFloat</literal>, <literal>SFMatrix</literal>,
+<literal>SFRotation</literal>, <literal>SFVec2f</literal> and
+<literal>SFVec3f</literal> an all equivalent multi-valued fields
+(they can differ in values, but still must have the same number of items).</para>
+
+<para>For example, the first model may be a small sphere with blue color,
+and the second model may be a larger sphere with white color.
+The resulting animation depicts a growing sphere with color fading
+from blue to white. More examples:</para>
+
+<itemizedlist>
+  <listitem><para>Moving, rotating, scaling objects may be expressed
+    by changing transformation values.</para></listitem>
+
+  <listitem><para>Any kind of morphing (mesh deformation) may
+    be expressed by changing values of <literal>IndexedFaceSet</literal>
+    coordinates.</para></listitem>
+
+  <listitem><para>Materials, colors, lights may change.
+    Even such properties like a material transparency,
+    or a light position or direction.</para></listitem>
+
+  <listitem><para>Texture coordinates may change to achieve
+    effects like a moving water surface.</para></listitem>
+</itemizedlist>
+
+<para>Another advantage of structural equality is that we will perform
+rigorous merging of two structurally equal models. This means that
+when two nodes are detected to be <emphasis>exactly equal</emphasis>, one of them will be removed
+(and pointers rearranged to both point to the same node in memory).
+If the nodes are not exactly equal, we still check their children and possibly
+merge them. This is a huge saving in terms of memory, as practically
+all the non-animated parts of the model will only be kept once in memory.
+It's implemented quite intelligently, so it's actually a relatively fast
+process done during the model loading.</para>
+
+<para>All the models of the animation do not actually have to be structurally
+equal. You can even change one model into something completely different.
+But in these cases we cannot generate smooth transition from one model to the other,
+and the animation will just show a sudden change into new version
+at it's time.</para>
+
+<para>If you're concerned that possibly some parts of your animation
+are not structurally equal, you can always load them into
+<ulink url="http://castle-engine.sourceforge.net/view3dscene.php">view3dscene</ulink>
+run with <literal>--debug-log</literal> command-line option.
+Then, at loading time, you will get messages on console if two
+successive models were not detected as structurally equal
+(and so a sharp change from one to the other will be shown in animation).
+The message will also describe exactly where the difference is found.</para>
+
+<!-- This sentence is so obvious that I don't know where to put it...
+     <para>Every animation may be played backwards and/or in a loop.</para> -->
+</section>
+
+<section id="section.generating_intermediate_scenes">
+<title>Generating intermediate scenes</title>
+
+<para>First of all, the scenes are <emphasis>not interpolated when
+rendering</emphasis>. Instead, at loading time, we create
+a number of new interpolated models and save them
+(along with the models that were specified explicitly).
+The parameter <literal>ScenesPerTime</literal>
+says with what granularity the intermediate scenes
+are constructed for a time unit.</para>
+
+<para>If you specify too large
+<literal>ScenesPerTime</literal> your animations will take a lot
+of time to prepare and will require a lot of memory.
+On the other hand too small <literal>ScenesPerTime</literal> value will
+result in an unpleasant jagged animation. Ideally, <literal>ScenesPerTime</literal>
+should be &gt;= than the number of frames you will render in your time unit,
+but this is usually way too large value.</para>
+
+<para>Special value of <literal>0</literal> for <literal>ScenesPerTime</literal>
+means that you want only the explicitly passed nodes in the scene,
+nothing more. No more intermediate scenes will ever be created.
+This creates a trivial animation that suddenly jumps from
+one still model to the next at specified times. It may be useful if you
+already have generated a lot of models, densely distributed
+over time, and you don't need <literal>TCastlePrecalculatedAnimation</literal> to insert any more
+scenes. <emphasis>Structural equality</emphasis> (or it's lack)
+doesn't change the look of such animation, as no additional interpolation is done
+when loading, but still structurally equal models may be merged
+to conserve memory use.</para>
+
+<para>Internally, the <literal>TCastlePrecalculatedAnimation</literal> wraps
+each model (that was specified explicitly or created by interpolation)
+in a new <literal>TCastleScene</literal> instance
+(but with VRML event processing left turned off).
+This means that we have all the features
+of our static OpenGL rendering available when doing animations too.
+The suggested display list optimization for animations is usually
+<literal>roShapeDisplayList</literal>, since this allows
+various animation frames to share as much display lists as they can.
+Sharing display lists is very important for animations, otherwise
+you can easily run out of graphic card memory (and preparing animations
+will take a long time).</para>
+</section>
+
+<section id="section.kanim">
+<title>Storing precalculated animations in Kanim files</title>
+
+<para>We have a special file format to express precalculated animations:
+<ulink url="http://castle-engine.sourceforge.net/kanim_format.php">Kanim,
+Castle Game Engine animations</ulink>. It references a number of
+static 3D model files and their corresponding times, describing
+the animation.</para>
+
+<para>If you want to experiment with Kanim format,
+<ulink url="http://castle-engine.sourceforge.net/view3dscene.php">view3dscene</ulink>
+can load and play animations in Kanim format.
+You can find example Kanim animations in
+<ulink url="http://castle-engine.sourceforge.net/demo_models.php">VRML/X3D demo models</ulink>
+(see directory <literal>kanim/</literal>),
+the sources of our engine also contain simple examples in
+directory <filename>castle_game_engine/examples/</filename>
+(like <literal>resource_animations</literal> that plays animations
+specified in <literal>resource.xml</literal> files for game creatures/items).
+Also <ulink url="http://castle-engine.sourceforge.net/castle.php"><quote>The
+Castle</quote></ulink> uses such animations for all creatures and weapons.</para>
+
+<para>In general, using a single VRML / X3D file and animating with
+VRML interpolators is a much better approach than Kanim files.
+Not to mention that this
+is what VRML specifications envisioned. Since you can record
+VRML interpolators by <literal>TCastlePrecalculatedAnimation.LoadFromEvents</literal>,
+so both animation approaches (interactive by <literal>TCastleScene.ProcessEvents = true</literal>
+or precalculated by <literal>TCastlePrecalculatedAnimation</literal>) are possible
+when animation is designed with VRML interpolators.</para>
+
+<para>Also, Kanim files may waste a lot of disk space if
+your animation tries to change two pieces of your model
+with drastically different speeds. Consider this:</para>
+
+<orderedlist>
+  <listitem><para>It's OK to create an animation
+    with a box that blinks (changes color) 100 times per time unit.
+    Just 2 model files are needed for this, with Kanim file specifying
+    to loop them over a short period of time.</para></listitem>
+
+  <listitem><para>It's also OK to create an animation
+    with a sphere that blinks only once for a given time unit.</para></listitem>
+
+  <listitem><para>But if you want to create an animation that contains
+    both the box (blinking 100 times/time unit) and the sphere
+    (blinking once for a time unit), you will have to prepare
+    100 still 3D files to express this!</para></listitem>
+</orderedlist>
+
+<para>VRML interpolators don't have this problem, since every interpolator
+has it's own set of keys. So both can be placed within the same file,
+without the need to explicitly write 100 values anywhere.</para>
+
+<para>Despite this, there remains <emphasis>one practical advantage
+of using Kanim file format</emphasis>:
+you can design your animations using any authoring software
+that can export static VRML files. If your modeler
+can design animations, but doesn't save them to VRML interpolator
+nodes, all you have to do is to export your models a couple of times
+from a couple of different points in time.</para>
+
+<para>For example, my favorite open-source modeler
+<ulink url="http://www.blender3d.org/">Blender</ulink> cannot
+export animations to VRML interpolators. Our approach
+allowed me to workaround this, designing animations in Blender and using
+them in my engine.</para>
+
+<para>On the positive side, there is at least one open-source program
+that can design animations with VRML interpolators:
+<ulink url="http://vrml.cip.ica.uni-stuttgart.de/dune/">White Dune</ulink>.
+Since version 0.29beta987, <emphasis>White Dune</emphasis> can even
+export animations with interpolators to a sequence of VRML files
+with Kanim file format, suitable for our engine.</para>
+</section>
+</section>
+
+</chapter>
+
+<!--
+  Local Variables:
+  ispell-local-dictionary: "american"
+  End:
+-->

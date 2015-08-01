@@ -1,0 +1,23 @@
+- HTML output: _mini.png images should be displayed in a link to non-mini.
+
+----------------------------------------
+Probably resigned ideas:
+- Write about the fact that Inventor had much more nodes,
+  with generally duplicated functionality (many ways
+  to express Transform, to express RGB colors etc.)
+
+- At the fog_culling notes, mention famous very old
+  Ultima Underworld 1/2 games that used this: literally only a couple
+  of rects were visible from the view point. Resigned: no sure proof ?
+  Besides that everything differently anyway, tile based world etc.,
+  so the analogy is amusing but probably useless.
+
+No time to add, or not important/connected to VRML enough:
+
+- vrml overview:
+  - Describe in "VRML notable features" also:
+    Text,FontStyle.
+    Lights.
+
+- VRMLSceneWaypoints
+- Cameras

@@ -1,0 +1,931 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+
+<chapter id="chapter.scene_graph">
+<title>Reading, writing, processing VRML scene graph</title>
+
+<!-- Source units: X3DNodes -->
+
+<para>This and the following chapters will describe how our VRML engine works.
+We will describe used data structures and algorithms. Together this should
+give you a good idea of what our engine is capable of, where are it's
+strengths and weaknesses, and how it's all achieved.</para>
+
+<para>In this document we should <emphasis>not</emphasis> go
+into details about some ObjectPascal-specific language constructs
+or solutions &mdash; this would be too low-level stuff, uninteresting
+from a general point of view. If you're an ObjectPascal programmer
+and you want to actually use my engine then you may find it helpful
+to study
+<ulink url="http://castle-engine.sourceforge.net/sources.php">
+source code</ulink> (especially example programs in <filename>examples</filename>
+subdirectories) and
+<ulink url="http://castle-engine.sourceforge.net/reference.php">
+units reference</ulink> while reading this document.
+If you only want to read this document, everything that you need
+is some basic idea about object-oriented programming.</para>
+
+<sect1 id="section.tvrmlnode_basics">
+<title>TVRMLNode class basics</title>
+
+<para>The base class of our engine is the <literal>TVRMLNode</literal>
+class, not surprisingly representing a VRML node. This is an abstract
+class, for all specific VRML node types we have some descendant
+of <literal>TVRMLNode</literal> defined. Naming convention for non-abstract
+node classes is like <literal>TNodeCoordinate</literal> class for VRML
+<literal>Coordinate</literal> node type.</para>
+
+<para>Every VRML node has it's fields available in it's
+<literal>Fields</literal> property. You can also access
+individual fields by properties named like <literal>FdXxx</literal>,
+for example <literal>FdPoint</literal> is a property of
+<literal>TNodeCoordinate</literal> class that represents
+<literal>point</literal> field of <literal>Coordinate</literal> node.</para>
+
+<para>VRML 1.0 children nodes are accessed by <literal>Children</literal>
+and <literal>ChildrenCount</literal> properties.
+For VRML 2.0 this is not needed, since you access all children nodes
+by accessing appropriate <literal>SFNode</literal> and <literal>MFNode</literal>
+fields. A convenience properties named
+<literal>SmartChildren</literal> and <literal>SmartChildrenCount</literal>
+are defined: for <quote>normal</quote> VRML 2.0 grouping nodes
+(this mostly means nodes with <literal>MFNode</literal> field named
+<literal>children</literal>) the <literal>SmartChildrenXxx</literal>
+properties operate on appropriate <literal>MFNode</literal>, for other
+nodes they operate on VRML 1.0 <literal>ChildrenXxx</literal> properties.
+</para>
+
+<para>Because of <link linkend="section.def_use">DEF / USE mechanism</link>
+each node may be a children (<quote>children</quote> both in the
+VRML 1.0 and 2.0 senses) of more than one node. This means that
+we cannot use some trivial destructing strategy. When we destruct
+some node's instance, we cannot simply destruct all it's children,
+because they are possibly used in other nodes. The simple solution
+to this is to keep track in each node about it's parents.
+Each node has properties <literal>ParentNodes</literal>
+and <literal>ParentNodesCount</literal> that track information about
+all the nodes that use it in VRML 1.0 style (i.e. on
+<literal>TVRMLNode.Children</literal> list). And properties
+<literal>ParentFields</literal>
+and <literal>ParentFieldsCount</literal> that track information about
+all the <literal>SFNode</literal> and <literal>MFNode</literal>
+fields referencing this node. The children node is automatically destroyed
+when it has no parents &mdash; which means that
+both <literal>ParentNodesCount</literal> and
+<literal>ParentFieldsCount</literal> are zero.
+Effectively, we implemented <firstterm>reference-counting</firstterm>.
+And as a bonus, <literal>ParentXxx</literal> properties are sometimes
+helpful when we want to do some <quote>bottom-to-top</quote>
+processing of VRML graph (although this should be generally avoided,
+<quote>top-to-bottom</quote> processing is much more in the spirit
+of the VRML graph).</para>
+
+<para>Classes for VRML nodes specific to particular VRML version
+get a suffix <literal>_1</literal> or <literal>_2</literal> representing
+their intended VRML version. For example, we have
+<literal>TNodeIndexedFaceSet_1</literal> (for VRML 1.0) and
+<literal>TNodeIndexedFaceSet_2</literal> (for VRML 2.0) classes.
+Such nodes always have their <literal>ForVRMLVersion</literal> method
+overridden to indicate in what VRML version they are allowed to be used.
+For example, when parser starts reading <literal>IndexedFaceSet</literal>
+node, it creates either <literal>TNodeIndexedFaceSet_1</literal> or
+<literal>TNodeIndexedFaceSet_2</literal>, depending on VRML version
+indicated in the file header line. Note that this separation between VRML versions
+is done only when reading VRML nodes from file. When processing
+VRML nodes graph by code you can freely mix VRML nodes from various
+VRML versions and everything will work, including writing nodes
+back to VRML file (although if you mix VRML versions too carelessly
+you may get VRML file that can only be read back by my engine, and not
+by other engines that may be limited to only VRML 1.0 or only VRML 2.0).
+More on this later in <xref linkend="section.vrml_1_2_sum" />.</para>
+
+<para>The result of parsing any VRML file is always a single <literal>
+TVRMLNode</literal> instance representing the root node of the given file.
+If the file had more than one root node <footnote><para>Multiple
+root nodes are allowed in VRML 2.0 specification.
+Our engine also allows them for VRML 1.0 because it's an extension
+often expected by VRML 1.0 creators (humans and programs).</para></footnote>
+then our engine wraps them in an additional <literal>Group</literal>
+node. More precisely, additional instance of <literal>TVRMLRootNode</literal>
+is created. It descends
+from <literal>TNodeGroup_2</literal> (but is suitable for all VRML/X3D versions).
+This way it can always be treated as 100% normal <literal>Group</literal>
+nodes. At the same time, VRML writing code can take special precautions
+to not record these <quote>fake</quote> group nodes back to VRML file.</para>
+</sect1>
+
+<sect1 id="section.vrml_1_2_sum">
+<title>The sum of VRML 1.0 and 2.0</title>
+
+<para>Our engine handles both VRML 1.0 and VRML 2.0.
+As we have seen in <xref linkend="chapter.vrml" />, there are
+important differences between these VRML versions.
+The way how I decided to handle both VRML versions is the more
+difficult, but also more complete approach. Effectively, you have the
+<emphasis>sum of VRML 1.0 and 2.0 features available</emphasis>.</para>
+
+<para>I decided to avoid trying to create some internal
+conversions from VRML 1.0 to VRML 2.0, or VRML 2.0 to 1.0,
+or to some newly invented internal format.
+I wanted to have a full, flexible, 100% conforming to
+VRML 1.0 and VRML 2.0 specifications engine. And the fact is that any
+conversion along the way will likely cause problems &mdash;
+ideologically speaking, that's because there is always something lost,
+or at least difficult to recover, when a
+complicated conversion is done.</para>
+
+<para>Practically here are some reasons why
+a simple conversion between VRML 1.0 and VRML 2.0 is not possible,
+in any direction:</para>
+
+<orderedlist>
+  <listitem><para>VRML 2.0 specification authors intentionally
+    wanted to simplify some things that people
+    (both VRML world authors and VRML browser implementors)
+    thought were unnecessarily complicated in VRML 1.0.
+    This causes problems for a potential converter from VRML 1.0 to 2.0,
+    since it will have trouble to express some VRML 1.0 constructs.
+    For example:</para>
+
+    <itemizedlist>
+      <listitem><para>In VRML 1.0 you can specify multiple materials for a single
+        geometry node. In VRML 2.0 each geometry node uses at most one
+        material. So a potential converter from VRML 1.0 to 2.0
+        may need to split geometry nodes.</para></listitem>
+
+      <listitem><para>In VRML 1.0 you can accumulate
+        texture transformations (<literal>Texture2Transform</literal>
+        nodes). In VRML 2.0 you can't (you can only place one
+        <literal>TextureTransform</literal> node in the
+        <literal>Appearance.textureTransform</literal> field).
+        So a potential converter must accumulate texture transformations
+        on it's own. And this is not trivial in a general case,
+        because you can't directly specify texture transformation matrix
+        in VRML 2.0. Instead you have to express texture transformation
+        in terms of one translation, one rotation and one scaling.
+        </para></listitem>
+
+      <listitem><para>In VRML 1.0 you can specify any 4x4 matrix transformation
+        using <literal>MatrixTransformation</literal> node.
+        This is not possible at all in VRML 2.0. In
+        VRML 2.0 geometry transformation must be specified in terms of
+        translations, rotations and scaling. </para></listitem>
+
+      <listitem><para>In VRML 1.0 you can limit
+        which geometry nodes are affected by <literal>PointLight</literal> or
+        <literal>SpotLight</literal> by placing light nodes at particular points
+        in the node hierarchy. That's because in VRML 1.0 light nodes work just
+        like other <quote>state changing</quote> nodes: they affect
+        all subsequent nodes, until blocked by the end of the
+        <literal>Separator</literal> node.</para>
+
+        <para>In VRML 2.0 this doesn't work.
+        You cannot control what parts of the scene are
+        affected by light nodes by placing light nodes at some
+        particular place in the node hierarchy. Instead,
+        you have to use <literal>radius</literal> field of light nodes.
+        This means that some VRML 1.0 tricks are simply not possible.
+        </para></listitem>
+
+      <listitem><para><literal>OrthographicCamera</literal>
+        is not possible to express using VRML 2.0 standard nodes.
+        </para></listitem>
+    </itemizedlist>
+
+    <para>Summary: in certain cases translating VRML 1.0 to 2.0
+    can be very hard or even impossible. If we want to handle VRML 1.0
+    perfectly, we can't just write a converter from VRML 1.0 to 2.0 and
+    then define every operation only in terms of VRML 2.0.
+    </para></listitem>
+
+  <listitem><para>On the other hand, VRML 2.0 also includes various things
+    not present in VRML 1.0. This includes many new nodes,
+    that often cannot be expressed at all in VRML 1.0:
+    all sensors, scripts, interpolators, special things like
+    <literal>Collision</literal> and <literal>Billboard</literal>.</para>
+
+    <para>Moreover, VRML 2.0 uses <literal>SFNode</literal>
+    (with possible <literal>NULL</literal> value) and
+    <literal>MFNode</literal>, and generally
+    reduces the state that needs to be remembered when
+    processing VRML graph. This means that many
+    existing features have to be expressed differently.</para>
+
+    <para>For example consider specifying normals for
+    <literal>IndexedFaceSet</literal>. In VRML 2.0
+    everything that decides about how generated normals
+    are supplied are the <literal>normal</literal>
+    and <literal>normalIndex</literal> fields of given
+    <literal>IndexedFaceSet</literal> node.
+    We take advantage of the <literal>SFNode</literal>
+    field type, and say that whole <literal>Normal</literal>
+    node may be just placed within <literal>normal</literal> field of
+    <literal>IndexedFaceSet</literal>.
+    So we just keep whole knowledge inside <literal>IndexedFaceSet</literal>
+    node.</para>
+
+    <para>On the other hand, in VRML 1.0 we have to use the value of
+    last <literal>NormalBinding</literal> node. This says whether we
+    should use the last <literal>Normal</literal> node, and how.
+    </para>
+
+    <para>Potential VRML 2.0 to 1.0 converter would have to make a lot
+    of effort to <quote>deconstruct</quote> VRML 2.0 shape properties
+    back to VRML 1.0 state nodes. This makes conversion difficult
+    to revert (e.g. when we want to write VRML 2.0 content back to file).
+    </para></listitem>
+</orderedlist>
+
+<para>That's why I decided to support in my engine the sum of all VRML features.
+For example, VRML 1.0 nodes can have direct children nodes, so I support it
+(by <literal>Children</literal> property of <literal>TVRMLNode</literal>).
+VRML 2.0 nodes can have children nodes through <literal>SFNode</literal>
+and <literal>MFNode</literal> fields, so I support it too.
+I'm not trying hard to <quote>combine</quote>
+these two ideas (direct children nodes and children inside
+<literal>MFNode</literal>) into one
+&mdash; I just implement and handle them both
+<footnote><para><literal>SmartChildrenXxx</literal> properties
+mentioned in the previous section somewhat combine
+VRML 1.0 and 2.0 ideas of children nodes, but they are generally not used
+except in some small pieces of code where they just make the code
+shorter.</para></footnote>.</para>
+
+<para>In some cases this approach forces me to do more work.
+For example, for many routines that calculate bounding boxes
+of geometry nodes, I had to prepare three routines:</para>
+
+<orderedlist>
+  <listitem><para>Common implementation, as a static procedure inside the
+    <literal>X3DNodes</literal> unit. This handles actual calculation
+    and as parameters expects already calculated properties of given
+    shape. As a simple example, when calculating bounding box
+    of a cube, we expect to get three parameters describing cube's sizes in
+    X, Y and Z dimension.</para></listitem>
+
+  <listitem><para>VRML 1.0 implementation in VRML 1.0-specific
+    node version that calls the common implementation,
+    after preparing parameters for common implementation.
+    As a simple example, <literal>TNodeCube_1</literal> (VRML 1.0 cube)
+    just uses it's <literal>FdWidth</literal>, <literal>FdHeight</literal>
+    and <literal>FdDepth</literal> as appropriate sizes.</para></listitem>
+
+  <listitem><para>And VRML 2.0 implementation in VRML 2.0-specific
+    node version, that also calls the common implementation after
+    preparing it's parameters.
+    As a simple example, <literal>TNodeBox</literal> (VRML 2.0 cube)
+    accesses three items of it's <literal>FdSize</literal> field to get
+    the appropriate sizes.</para></listitem>
+</orderedlist>
+
+<para>In our simple example above we talked about a cube,
+and the whole issue with calculating three size values differently
+for VRML 1.0 and 2.0 was actually trivial.
+But the point is that for some nodes,
+like <literal>IndexedFaceSet</literal>, this is much harder.</para>
+
+<para>For VRML authors this <quote>sum</quote> approach means
+that when reading VRML 1.0, many VRML 2.0 constructs
+(that not conflict with anything in VRML 1.0)
+are allowed, and the other way around too. That's why you can actually
+mix VRML 1.0 and 2.0 code in my engine. Consider this strange file:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/sum_1_2.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>Four spheres in mixed VRML 1.0 and 2.0 code</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/sum_1_2_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/sum_1_2_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/sum_1_2_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>This file uses VRML 2.0 sphere that is transformed using
+both  VRML 1.0 approach (<literal>Translation</literal> node that affects
+all subsequent nodes) and VRML 2.0 approach (<literal>Transform</literal>
+node that affects all it's children). And everything works:
+VRML 1.0 nodes are handled according to VRML 1.0 specification,
+VRML 2.0 according to VRML 2.0 specification. Transformations,
+no matter which VRML version was used to specify them, affect all shapes.
+The file's header line
+says that it's supposed to be VRML 2.0, and this means that when
+we have a node name that is possible in both VRML specifications
+(but must be handled differently in each version), for example
+<literal>Transform</literal> node, file header decides which version
+of this node (<literal>TNodeTransform_1</literal> or
+<literal>TNodeTransform_2</literal>) is created when parsing this file.
+</para>
+
+<para>This also means that you have many VRML 2.0 features available
+in VRML 1.0. VRML 2.0 nodes like <literal>Background</literal>,
+<literal>Fog</literal> and many others, that express features not available
+at all in standard VRML 1.0, may be freely placed inside VRML 1.0 models
+when using our engine.</para>
+
+<para>Also including (using <literal>WWWInline</literal> or
+<literal>Inline</literal> nodes) VRML 1.0 files within VRML 2.0
+files (and the other way around) is possible. Each VRML file will
+be parsed taking into account it's own header line, and then included
+content is actually placed as a children node of including
+<literal>WWWInline</literal> or <literal>Inline</literal> node.
+So you get VRML graph hierarchy with nodes mixed from both VRML versions.</para>
+
+</sect1>
+
+<!-- <sect1>
+<title>Features of TVRMLNode class</title>
+
+<para>What follows is a list of the most notable <literal>TVRMLNode</literal>
+features.</para>
+-->
+
+<sect1 id="section.reading_vrml">
+<title>Reading VRML files</title>
+
+<para>You can create a node using <literal>CreateParse</literal>
+constructor to parse the node. Or you can initialize node
+contents by parsing it using <literal>Parse</literal> method.
+However, these both approaches require you to
+first prepare appropriate <literal>TX3DLexer</literal>
+instance and a list of read node names.</para>
+
+<para>There are comfortable routines like <literal>ParseVRMLFile</literal>
+that take care of this for you. They create appropriate lexer,
+and may create also suitable <literal>TStream</literal> instance to read
+given file content.</para>
+
+<para>Some details about parsing:</para>
+
+<itemizedlist>
+  <listitem><para>Our VRML/X3D lexer is a unified lexer for both
+    VRML 1.0, 2.0 and (classic) X3D. Most of the syntax
+    is identical, minor differences can be handled correctly
+    by a lexer because it always knows VRML/X3D header line of
+    the given file. So it knows what syntax to expect.
+    </para></listitem>
+
+  <listitem><para>VRML/X3D version of the original file
+    is saved in <literal>TVRMLRootNode.ForceVersion</literal>.
+    This will be used later when saving.
+    Parser always returns <literal>TVRMLRootNode</literal>
+    instance, this keeps some per-file settings like version
+    and X3D profile, components and meta values.</para>
+
+    <para>When saving, you can save any <literal>TVRMLNode</literal> instance
+    to file. If it is not <literal>TVRMLRootNode</literal>,
+    or if <literal>TVRMLRootNode.HasForceVersion</literal> is false,
+    we simply assume it uses the latest X3D version.</para>
+
+    <para>In engine versions &lt;= 2.5.0 we experimented
+    with auto-detecting the suitable VRML/X3D version for nodes inside,
+    but this mechanism was dropped. It was complicated, and was failing
+    anyway for complicated cases (nodes from mixed versions,
+    things with routes, imports, exports etc.). If you want to save a specific
+    VRML/X3D version, it's best to simply wrap it inside <literal>TVRMLRootNode</literal>
+    and force desired version explicitly.
+    Modern programs should target only X3D anyway,
+    as VRML 1.0 is ancient, and VRML 2.0 is old too (from 1997).</para></listitem>
+
+  <listitem><para>While parsing, <literal>ForVRMLVersion</literal>
+    method mentioned earlier may be used to decide which node classes
+    to create based on VRML/X3D version indicated in the file's header line.</para>
+  </listitem>
+
+  <listitem><para>To properly handle
+    <link linkend="section.def_use">DEF / USE mechanism</link>
+    we keep a list of known node names while parsing.
+    <emphasis>After</emphasis> a node with <literal>DEF</literal> clause
+    is parsed we add the node name and it's reference to
+    <literal>NodeNameBinding</literal>
+    list that is passed through all parse routines.
+    When a <literal>USE</literal> clause is encountered,
+    we just search this list for appropriate node name.</para>
+
+    <para>Simple VRML rules of <literal>DEF</literal> / <literal>USE</literal>
+    behavior make this approach correct. Remember that VRML name
+    scope is not modeled after normal programming languages,
+    where name scope of an identifier is usually limited
+    to the structure (function, class, etc.) where this identifier
+    is declared. In VRML, name scope always spans to the end
+    of whole VRML file (or to the next <literal>DEF</literal>
+    occurrence with the same name, that overrides previous
+    name). Also, the name scope is always limited to the current file
+    &mdash; for example, you cannot use names defined in other VRML
+    files (that you included by <literal>Inline</literal> nodes,
+    or that include you).
+    <!-- TODO: this was supposed to be a footnote, but in FOP >= 0.9x
+      it fails, see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=451258 -->
+    (Prototypes and external prototypes in VRML 2.0 are designed
+    to allow reusing VRML code between different VRML files.)
+    </para>
+
+    <para>The simple trick with adding our name to <literal>NodeNameBinding</literal>
+    <emphasis>after</emphasis> the node is fully parsed prevents
+    creating loops in our graph, in case supplied VRML file is invalid.
+    </para></listitem>
+</itemizedlist>
+</sect1>
+
+<sect1 id="section.writing_vrml">
+<title>Writing VRML files</title>
+
+<para><literal>SaveToStream</literal> method of <literal>TVRMLNode</literal>
+class allows you to save node contents (including children nodes) to any stream.
+Just like for reading, there are also more comfortable routines for writing
+called <literal>SaveToVRMLFile</literal>.</para>
+
+<sect2 id="section.def_use_when_writing">
+<title>DEF / USE mechanism when writing</title>
+
+<para>When writing we also keep track of all node names defined
+to make use of DEF / USE mechanism. If we want to write a named node,
+we first check <literal>NodeNameBinding</literal> list whether the same name
+with the same node was already written to file. If yes, then we
+can place a <literal>USE</literal> statement, otherwise we have
+to actually write the node's contents and add given node to
+<literal>NodeNameBinding</literal> list.</para>
+
+<para>The advantages of above <literal>NodeNameBinding</literal>
+approach is that it always works correctly.
+Even for node graphs created by code
+(as opposed to node graphs read earlier from VRML file).
+If node graph was obtained by reading VRML file, then the
+DEF / USE statements will be correctly written back to the file, so there will
+not be any unnecessary size bloat. But note that in some cases
+if you created your node graph by code then some node contents
+may be output more than once in the file:</para>
+
+<orderedlist>
+  <listitem><para>First of all, that's because we can use DEF / USE
+    mechanism only for nodes that are named. For unnamed nodes,
+    we will have to write them in expanded form every time.
+    Even if they were nicely shared in node graph.</para></listitem>
+
+  <listitem><para>Second of all, VRML name scope is weak
+    and if you use the same node name twice, then you may
+    force our writing algorithm to write node in expanded
+    form more than once (because you <quote>overridden</quote>
+    node name between the first <literal>DEF</literal> clause
+    and the potential place for corresponding <literal>USE</literal> clause).
+    </para></listitem>
+</orderedlist>
+
+<para>So if you process VRML nodes graph by code and you want
+to maximize the chances that DEF / USE mechanism will be used
+while writing as much as it can, then you should always name
+your nodes, and name them uniquely.</para>
+
+<para>It's not hard to design a general approach that will always
+automatically make your names unique.  VRML 97 annotated
+specification suggests adding to the node name an <literal>_</literal> (underscore)
+character followed by some integer for this purpose. For example,
+in our engine you can enumerate all nodes (use <literal>EnumerateNode</literal>
+method), and for each node that is used more than once (you can
+check it easily: such node will have <literal>ParentNodesCount + ParentFieldsCount > 1</literal>)
+you can append <literal>'_' + PtrUInt(Pointer(Node))</literal> to the
+node name. The only problem with this approach (and the reason why
+it's not done automatically) is that you will have to strip
+these suffixes later, if you will read this file back
+(assuming that you want to get the same node names).
+This can be easily done (just remove everything following the last underscore
+in the names of multiply instantiated nodes).
+But then if you load the created VRML file into some other
+VRML browser, you may see these internal suffixes anyway.
+That's why my decision was that by default such behavior is not done.
+So the generated VRML file will always have exactly the same node
+names as you specified.</para>
+
+</sect2>
+
+<sect2 id="section.vrml_preserving">
+<title>VRML graph preserving</title>
+
+<para>As was mentioned a couple of times earlier, we do everything
+to get the VRML scene graph in memory in exactly the same form
+as was recorded in VRML file, and when writing the resulting VRML file
+also directly corresponds (including DEF / USE mechanism and node names)
+to VRML graph in memory.</para>
+
+<para>Actually, there are two exceptions:</para>
+
+<orderedlist>
+  <listitem><para><literal>Inline</literal> nodes load their
+    referenced content as their children</para></listitem>
+  <listitem><para>When reading VRML file with multiple root
+    nodes, we wrap them in additional <literal>Group</literal>
+    node</para></listitem>
+</orderedlist>
+
+<para>... but we work around these two exceptions when writing VRML files.
+This means that reading the scene graph from file and then
+writing it back produces the file with the exact same
+VRML content. But whitespaces (including comments) are removed,
+when writing we reformat everything to look nice.
+So you can simply read and then write back VRML file
+to get a simple VRML pretty-printer.</para>
+
+</sect2>
+</sect1>
+
+<sect1 id="section.constructing_vrml_by_code">
+<title>Constructing and processing VRML graph by code</title>
+
+<para>This feature was mentioned a couple of times before.
+In code, you can simply instantiate any nodes you want, you can
+add them as a children of other nodes, you can set their
+fields as you like, and so on. Also several methods for
+enumerating and searching the nodes graph are provided
+(like <literal>EnumerateNodes</literal> and <literal>FindNode</literal>).
+See <ulink url="http://castle-engine.sourceforge.net/reference.php">units
+reference</ulink> for details.</para>
+
+<para>I made a decent converter from 3DS, Wavefront OBJ and other file formats
+to X3D this way. Once I was able to read these files, it was trivial
+to construct according VRML/X3D graphs for them.
+You can then save constructed VRML/X3D graph to a file (so user
+can actually use this converter) and you can further
+process and render them just like any other VRML nodes graph
+(so my engine seamlessly handles 3DS and Wavefront files too,
+even though it's almost solely oriented on VRML).</para>
+
+<para>This also allows authors to include 3DS, Wavefront OBJ
+and other files inside VRML/X3D files by <literal>Inline</literal> nodes,
+making it possible to create scenes in mixed 3D formats.</para>
+</sect1>
+
+<sect1 id="section.vrml_node_traverse">
+<title>Traversing VRML graph</title>
+
+<para><firstterm>Traversing VRML graph</firstterm> means visiting
+all active VRML graph nodes in a depth-first search order.
+By <quote>active</quote> nodes we mean that only the visible
+(or affecting the visible) parts of the graph are browsed &mdash;
+for example, only one child of a <literal>Switch</literal>
+and <literal>LOD</literal> nodes is visited.</para>
+
+<para>You can traverse nodes using <literal>Traverse</literal>
+or <literal>TraverseFromDefaultState</literal> methods.
+For each visited node, a callback function will be called.</para>
+
+<para>The most important feature of traversing is that whole VRML
+state that we talked about in <xref linkend="section.vrml_state" />
+is collected along the way. For each visited node traverse
+callback gets all the information about accumulated transformation,
+active light nodes and (meaningful only for VRML 1.0 nodes)
+currently bound property nodes (material, texture etc.).</para>
+
+</sect1>
+
+<sect1 id="section.geometry_node">
+<title>Geometry nodes features</title>
+
+<para>An important descendant of <literal>TVRMLNode</literal> is
+the <literal>TVRMLGeometryNode</literal> class. This is an abstract
+class. All visible VRML nodes (in VRML 1.0 and 2.0) are descendants of this class.</para>
+
+<para><literal>TVRMLGeometryNode</literal> class defines a couple of
+important methods,
+overridden in each descendant. All of these methods take
+a <literal>State</literal> parameter that describes
+VRML state at given point of the graph
+(this is typically obtained by a traverse callback),
+since we need this to have full knowledge about node's geometry.</para>
+
+<sect2 id="section.bounding_boxes">
+<title>Bounding boxes</title>
+
+<para><literal>LocalBoundingBox</literal> and
+<literal>BoundingBox</literal> methods calculate axis-aligned
+bounding box of given node.</para>
+
+<para><firstterm>Axis-aligned bounding box</firstterm> is one of the
+simplest bounding volume types. It's a cuboid with axes aligned
+to base coordinate system X, Y and Z axes. It can be easily
+expressed as a pair of 3D points. In our engine we require
+that the points' coordinates are correctly ordered, i.e.
+X position of the first point must always be less or equal than
+the X position of the second point, and analogously for Y and Z
+values. We also have the special value for designating empty
+bounding box. And while we're talking about empty bounding boxes,
+remember to not confuse empty box with a box with zero
+volume: a box with zero volume still has some position.
+For example, a <literal>PointSet</literal> VRML node with only
+one point has a non-empty bounding box with a zero volume.
+A <literal>PointSet</literal> without any points has empty
+bounding box.</para>
+
+<para>I chose axis-aligned bounding boxes just because they are very
+simple to calculate and operate on. They have some disadvantages &mdash;
+as with all bounding volumes, there is some compromise between
+how accurately they describe bounding volumes
+and how comfortable it is to operate on them.
+But in practice they just work fast and are enough accurate.</para>
+
+<para><literal>LocalBoundingBox</literal> method returns a bounding
+box of given object without transforming it (i.e. assuming that
+<literal>State</literal> contains an identity transformation).
+<literal>BoundingBox</literal> method
+takes current transformation into account. Each descendant
+has to override at least one of these methods.
+If you override only <literal>LocalBoundingBox</literal> then
+<literal>BoundingBox</literal> will be calculated by transforming
+<literal>LocalBoundingBox</literal> (which can give poor bounding
+volume, much larger than necessary).
+If you override only <literal>BoundingBox</literal> then
+<literal>LocalBoundingBox</literal> will be calculated by
+calling <literal>BoundingBox</literal> with transformation matrix
+set to identity matrix (this can make <literal>LocalBoundingBox</literal>
+implementation much slower than a potential special
+<literal>LocalBoundingBox</literal> implementation that knows that
+there is no transformation, so no matrix multiplications have to be done).</para>
+
+</sect2>
+
+<sect2 id="section.triangulating">
+<title>Triangulating</title>
+
+<para><literal>VerticesCount</literal> and
+<literal>TrianglesCount</literal> calculate triangles
+and vertices count of given geometry.</para>
+
+<para><literal>LocalTriangulate</literal> and
+<literal>Triangulate</literal> methods are available in the <literal>TShape</literal>
+class. They calculate all the triangles of given geometry.
+See the example program <literal>examples/vrml/triangulate_demo.lpr</literal>
+in engine sources for a complete code that uses it.
+Simple lines and points
+are ignored by this method, so you can't use it to render
+VRML nodes like <literal>PointSet</literal> and <literal>IndexedLineSet</literal>.
+Use <literal>TShape.GeometryArrays</literal> if you want the full
+information about every shape (including indexes, colors,
+and all the other information required for efficient rendering).</para>
+
+<para>These methods take <literal>OverTriangulate</literal> parameter
+which requires some explanation.</para>
+
+<para>When using Gouraud shading
+(and that is the case when rendering models in OpenGL)
+it's desirable to triangulate every large surface &mdash;
+<emphasis>even if it doesn't
+improve the geometry approximation by triangles</emphasis>.
+This is the inherent problem of Gouraud shading, that says that
+lighting calculations are done only at the vertices and
+within the triangles color is interpolated between vertices.
+This is much faster than calculating light for every pixel,
+but it also produces inaccurate rendering results when there
+is <quote>something interesting going on with the lighting</quote>
+within the triangle. For example when a thin spot light
+shines at the middle of the triangle,
+or when the bright specular highlight should appear in
+the middle of the triangle. Gouraud shading may miss such
+effects, because the triangle will be completely dark
+if all three of it's vertices are determined to be dark.</para>
+
+<para>The solution to this is just to avoid problematic situations
+by using smaller triangles generating more vertices.</para>
+
+<para>For example: when we triangulate quadrics
+like cylinder and cone, we always approximate circles at their
+bases as a set of lines, so their side faces are split to many
+triangles. I call this triangulation <quote>dividing into slices</quote>,
+after OpenGL documentation, because this triangulation looks
+like dividing a pizza into slices (when looking from the top of the
+quadric). But this produces large (tall) triangles
+that start at the base circle and end at the top (top peak
+of the cone, or top circle of the cylinder). This is undesirable
+for Gouraud shading, so we do additional triangulation:
+we divide cone and cylinder into stacks (like stacks of the tower).
+Dividing into stacks doesn't improve the quality of our approximation
+(when we triangulate cone or cylinder, we always only approximate
+it's real geometry), but it helps the shapes to look good when rendering
+with Gouraud shading.</para>
+
+<para>I call this additional triangulation an <firstterm>over-triangulation</firstterm>.
+While it's useful for Gouraud shading, for many other purposes it's
+unnecessary and slows down processing (since it creates unnecessarily many triangles).
+These purposes include collision detection and rendering the scene with
+other methods, like Phong shading or ray-tracing algorithms.</para>
+
+<para>That's why my triangulation methods allow you to turn
+this feature on and off as desired by <literal>OverTriangulate</literal>
+parameter.</para>
+
+<para>Let's take a look at the following example:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/over_triangulating.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<para>The example shows the cone, the cylinder and the cube
+with various triangulation.
+Leftmost column has no over-triangulation, next columns
+have more and more over-triangulation.
+The VRML code uses the <literal>KambiTriangulation</literal> node
+to control the triangulation. This node is my VRML extension
+(hence the prefix <literal>Kambi</literal>), see the page
+<ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#ext_kambi_triangulation"/>
+for details.</para>
+
+<para>Spot lights shine on every object.
+First screenshot shows the wireframe view, so you
+can see how the triangulation looks like.</para>
+
+<!-- Workaround for FOP: keeping figure title+content together problem. -->
+<?page-break?>
+
+<para role="para_with_larger_screen_mini">
+<figure>
+  <title>Different triangulations example (wireframe view)</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/over_triangulating_wire_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/over_triangulating_wire_screen.png"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/over_triangulating_wire_screen.eps"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>Now let's see the same example rendered using
+OpenGL (Gouraud shading).
+As you can see, on the leftmost column spot highlight is not
+visible at all. The more to the right and the spot looks better
+and better.</para>
+
+<para role="para_with_larger_screen_mini">
+<figure>
+  <title>Different triangulations example (Gouraud shading)</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/over_triangulating_opengl_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/over_triangulating_opengl_screen.png"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/over_triangulating_opengl_screen.eps"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>And finally let's see ray-tracer rendering of the same
+example. As you can see, over-triangulation (on boxes faces, and stacks on
+cones and cylinders) doesn't matter here at all.</para>
+
+<para role="para_with_larger_screen_mini">
+<figure>
+  <title>Different triangulations example (ray-tracer rendering)</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/over_triangulating_raytr_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/over_triangulating_raytr_screen.png"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/over_triangulating_raytr_screen.eps"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>If you want to control how detailed the triangulation should be:</para>
+
+<itemizedlist>
+  <listitem><para>Programmers can use <literal>Detail_QuadricSlices</literal>,
+    <literal>Detail_QuadricStacks</literal> and <literal>Detail_RectDivisions</literal>
+    global variables.</para></listitem>
+
+  <listitem><para>VRML authors can use the
+    <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#ext_kambi_triangulation">
+    KambiTriangulation</ulink> VRML node to control this.</para></listitem>
+
+  <listitem><para>Finally, my programs
+    <ulink url="http://castle-engine.sourceforge.net/view3dscene.php">view3dscene</ulink> and
+    <ulink url="http://castle-engine.sourceforge.net/rayhunter.php">rayhunter</ulink> allow
+    you to control this by command-line options</para>
+
+<screen>--detail-quadric-slices &lt;integer&gt;
+--detail-quadric-stacks &lt;integer&gt;
+--detail-rect-divisions &lt;integer&gt;
+</screen>
+    </listitem>
+</itemizedlist>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="section.wwwbasepath">
+<title>WWWBasePath property</title>
+
+<para>This is a string property that specifies base URL of each node.
+Actually, for now our engine doesn't support downloading data using
+any network protocol,
+so this is always treated just like an absolute path
+on local file-system. It is always set to the directory of VRML file from which given
+node was read. It's used by nodes that reference any external file,
+like <literal>Inline</literal> or <literal>ImageTexture</literal>.
+Thanks to this field, all such nodes can always resolve their
+<literal>url</literal> fields with respect to the directory of their
+file.</para>
+
+<para>For example, assume that inside some directory you have a main VRML file
+<filename>main.wrl</filename> and two subdirectories: <filename>textures</filename>
+and <filename>inline</filename>. Inside <filename>textures</filename> you
+have a file <filename>my_texture.png</filename> and inside
+<filename>inline</filename> you have VRML file
+<filename>textured_box.wrl</filename>. Finally, let's say that
+you want to include textured box in <filename>main.wrl</filename> file,
+so you write
+
+<screen>Inline { url "inline/textured_box.wrl" }</screen>
+
+Now inside <filename>textured_box.wrl</filename> you should reference
+the texture like
+
+<screen>ImageTexture { url "../textures/texture.png" }</screen>
+
+and everything will work when you open <filename>main.wrl</filename> VRML file.
+Moreover, <filename>textured_box.wrl</filename> is able to <quote>stand
+on it's own</quote> too, which means that you can open only
+<filename>textured_box.wrl</filename> and texture will still be properly
+read.</para>
+
+<para>This is similar to <ulink url="http://www.w3.org/TR/xmlbase/">xml:base</ulink>
+attribute in XML, that was needed to make including XML files by XInclude
+and referencing external files from various elements (like DocBook's
+<literal>imagedata</literal>) to cooperate seamlessly.</para>
+
+</sect1>
+
+<sect1 id="section.custom_vrml_nodes">
+<title>Defining your own VRML nodes</title>
+
+<para>At the end it's worth noting that you're not limited to the
+nodes defined by VRML specifications and implemented in <literal>X3DNodes</literal>
+unit. You can freely define your own <literal>TVRMLNode</literal> descendants.
+All it takes to make them visible is to register them in
+<literal>NodesManager</literal> object. For example, call
+
+<screen>NodesManager.RegisterNodeClasses([TNodeMy]);</screen>
+
+from your unit's initialization section. You may also want to add
+it to the <literal>AllowedChildrenNodes</literal> list.</para>
+
+<para>This way you can define specific VRML nodes for a specific
+programs, without the need to modify anything within the base units.
+I used this technique in the
+<ulink url="http://castle-engine.sourceforge.net/malfunction.php">
+malfunction game</ulink> to define special-purpose VRML nodes like
+<literal>MalfunctionLevelInfo</literal> and
+<literal>MalfunctionNotMovingEnemy</literal>.
+</para>
+
+</sect1>
+
+<xi:include href="section_scene.xml"
+  xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+</chapter>
+
+<!--
+  Local Variables:
+  ispell-local-dictionary: "american"
+  End:
+-->

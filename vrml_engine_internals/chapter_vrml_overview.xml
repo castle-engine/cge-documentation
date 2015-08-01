@@ -1,0 +1,2359 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+
+<chapter id="chapter.vrml">
+<title>Overview of VRML</title>
+
+<para>This chapter is an overview of VRML concepts.
+It describes the language from the point of view of VRML author.
+<!-- (be it a human or a program). --> It teaches how a simple VRML
+files look like and what are basic building blocks of every
+VRML file. It's intended to be a simple tutorial into VRML,
+not a complete documentation how to write VRML files.
+If you want to learn how to write non-trivial
+VRML files you should consult <link linkend="section.links_vrml_spec">
+VRML specifications</link>.</para>
+
+<para>This chapter also describes main differences between VRML 1.0, 2.0
+(also known as <emphasis>VRML 97</emphasis>) and 3.0 (more widely known as
+<emphasis>X3D</emphasis>). Our engine currently handles all these VRML versions.
+However, at the time of initial writing of this document, our engine supported
+only VRML 1.0 and basic 2.0, so more advanced and interesting VRML 2.0 and X3D
+concepts are only outlined at the end of this chapter &mdash; maybe this
+will be enhanced some day.</para>
+
+<sect1 id="section.first_example">
+<title>First example</title>
+
+<para>VRML files are normal text files, so they can be viewed and edited
+in any text editor. Here's a very simple VRML 1.0 file that defines
+a sphere:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/simplest_sphere_1.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<para>The first line is a header. It's purpose is to identify
+VRML version and encoding used. Oversimplifying things a little,
+every VRML 1.0 file will start with the exact same line:
+<literal>#VRML V1.0 ascii</literal>.</para>
+
+<para>After the header comes the actual content.
+Like many programming languages, VRML language is a free-form
+language, so the amount of whitespace in the file doesn't really matter.
+In the example file above we see a declaration of a <firstterm>node</firstterm>
+called <literal>Sphere</literal>. <quote>Nodes</quote> are the building
+blocks of VRML: every VRML file specifies a directed graph of nodes.
+After specifying the node name (<literal>Sphere</literal>),
+we always put an opening brace (character <literal>{</literal>),
+then we put a list of <firstterm>fields</firstterm> and
+<firstterm>children nodes</firstterm> of our node,
+and we end the node by a closing brace (character <literal>}</literal>).
+In our simple example above, the <literal>Sphere</literal>
+node has no fields specified and no children nodes.</para>
+
+<para>The geometry defined by this VRML file is a sphere
+centered at the origin of coordinate system (i.e. point (0, 0, 0)) with
+a radius 1.0.</para>
+
+<!-- I tried to use <qandaset> for this, but honestly I can't
+     make it to look the way I want. -->
+
+<orderedlist>
+  <listitem><para>Why the sphere is centered at the origin?</para>
+
+    <para>Spheres produces by a <literal>Sphere</literal> node
+    are always centered at the origin &mdash; that's defined by
+    VRML specifications.
+    Don't worry, we <emphasis>can</emphasis> define spheres centered at any point,
+    but to do this we have to use other nodes that will move
+    our <literal>Sphere</literal> node &mdash; more on this later.</para></listitem>
+
+  <listitem><para>Why the sphere radius is 1.0?</para>
+
+    <para>This is the default radius of spheres produced
+    by <literal>Sphere</literal> node. We could change it by
+    using the <literal>radius</literal> field of a <literal>Sphere</literal>
+    node &mdash; more on this later.</para></listitem>
+</orderedlist>
+
+<para>Since the material was not specified, the sphere will use
+the default material properties. These make a light gray diffuse color
+(expressed as (0.8, 0.8, 0.8) in RGB) and a slight ambient color
+((0.2, 0.2, 0.2) RGB).</para>
+
+<figure>
+  <title>VRML 1.0 sphere example</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/simplest_sphere_1_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/simplest_sphere_1_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/simplest_sphere_1_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>An equivalent VRML 2.0 file looks like this:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/simplest_sphere_2.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<para>As you can see, the header line is now different.
+It indicates VRML version as 2.0 and encoding as utf8
+<footnote><para>VRML 2.0 files are always encoded using plain text in utf8.
+There was a plan to design other encodings, but it was never realized
+for VRML 2.0. VRML 2.0 files distributed on WWW are often compressed
+with gzip, we can say that it's a <quote>poor-man's binary encoding</quote>.</para>
+
+<para>X3D (VRML 2.0 successor) filled the gap by specifying
+three encodings available: <quote>classic VRML encoding</quote>
+(this is exactly what VRML 2.0 uses), an XML encoding and a binary encoding.
+Our engine currently handles XML and classic X3D encoding.
+</para></footnote>.</para>
+
+<para>In VRML 2.0 we can't directly use a <literal>Sphere</literal>
+node. Instead, we have to define a <literal>Shape</literal> node
+and set it's <literal>geometry</literal> field to our desired
+<literal>Sphere</literal> node. More on fields and children nodes
+later.</para>
+
+<para>Actually, our VRML 2.0 example is not equivalent to VRML 1.0
+version: in VRML 2.0 version sphere is unlit (it will be rendered
+using a single white color). It's an example of a general decision in VRML 2.0
+specification: <emphasis>the default behavior is the one
+that is easiest to render</emphasis>. If we want to make the sphere
+lit, we have to add a <firstterm>material</firstterm> to it &mdash;
+more on this later.
+</para>
+
+<figure>
+  <title>VRML 2.0 sphere example</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/simplest_sphere_2_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/simplest_sphere_2_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/simplest_sphere_2_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+</sect1>
+
+<sect1 id="section.fields">
+<title>Fields</title>
+
+<para>Every VRML node has a set of <firstterm>fields</firstterm>.
+A field has a name, a type, and a default value. For example,
+<literal>Sphere</literal> node has a field named <literal>radius</literal>,
+of type <literal>SFFloat</literal>, that has a default value of 1.0.
+</para>
+
+<sect2 id="section.field_types">
+<title>Field types</title>
+
+<para>There are many field types defined by VRML specification.
+Each field type specifies a syntax for field values in VRML file,
+and sometimes it specifies some interpretation of the field value.
+Example field types are:</para>
+
+<variablelist>
+  <varlistentry>
+    <term><literal>SFFloat</literal>, <literal>SFDouble</literal>, <literal>SFTime</literal></term>
+    <listitem><para>A float value. Syntax is identical to the syntax
+      used in various programming languages, for example
+      <literal>3.1415926</literal> or <literal>12.5e-3</literal>.
+      </para>
+
+      <para>X3D added <literal>SFDouble</literal> type,
+      which should be stored and processed with at least double precision.</para>
+
+      <para>And there's the <literal>SFTime</literal> field type.
+      It's syntax and internals are equivalent to <literal>SFDouble</literal>,
+      but it has an added semantic: it specifies a time period or a point in time.
+      In the latter case, this is the number of seconds passed since
+      the <firstterm>Unix epoch</firstterm> (<emphasis>00:00:00 UTC on 1 January 1970</emphasis>).
+      Although for single-player games, where time is not necessarily tied
+      to the real-world time, sometimes other interpretations are useful,
+      see my <ulink url="http://castle-engine.sourceforge.net/x3d_time_origin_considered_uncomfortable.php"><quote>VRML / X3D
+      time origin considered uncomfortable</quote> article</ulink>.
+      </para>
+      </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><literal>SFLong</literal> (in VRML 1.0)</term>
+    <term><literal>SFInt32</literal> (in VRML 2.0)</term>
+    <listitem><para>A 32-bit integer value. As you can see, the name
+      was changed in VRML 2.0 to indicate clearly the range of allowed
+      values.</para></listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><literal>SFBool</literal></term>
+    <listitem><para>A boolean value. Syntax: one word, either
+      <literal>FALSE</literal> or <literal>TRUE</literal>.
+      Note that VRML is case-sensitive. In VRML 1.0 you could
+      also write the number 0 (for <literal>FALSE</literal>)
+      or 1 (for <literal>TRUE</literal>), but this additional syntax
+      was removed from VRML 2.0 (since it's quite pointless).</para></listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><literal>SFVec2f</literal></term>
+    <term><literal>SFVec3f</literal></term>
+    <term><literal>SFVec4f</literal></term>
+    <listitem><para>Vector of 2, 3 or 4 floating point values. Syntax is to
+      write them as a sequence of <literal>SFFloat</literal> values, separated by
+      whitespace. The specification doesn't say how these vectors
+      are interpreted: they can be positions, they can be directions etc.
+      The interpretation must be given for each case when some node
+      includes a field of this type.
+      </para>
+
+      <para>The 4-component <literal>SFVec4f</literal> was added in X3D.
+      X3D also added double-precision versions of these vectors:
+      <literal>SFVec2d</literal>, <literal>SFVec3d</literal>, <literal>SFVec4d</literal>.</para></listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><literal>SFColor</literal></term>
+    <term><literal>SFColorRGBA</literal> (X3D)</term>
+    <listitem><para>Syntax of <literal>SFColor</literal> is exactly like <literal>SFVec3f</literal>,
+      but this field has a special interpretation: it's an RGB
+      (red, green, blue) color specification. Each component must
+      be between 0.0 and 1.0. For example, this is a yellow color:
+      <literal>1 1 0</literal>.</para>
+
+      <para>X3D adds also 4-component type <literal>SFColorRGBA</literal>,
+      that adds alpha (opacity) value to the RGB color.</para></listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><literal>SFRotation</literal></term>
+    <listitem><para>Four floating point values specifying rotation
+      around an axis. First three values specify an axis,
+      fourth value specifies the angle of rotation (in radians).
+    </para></listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><literal>SFMatrix3f</literal> (X3D)</term>
+    <term><literal>SFMatrix3d</literal> (X3D)</term>
+    <term><literal>SFMatrix4f</literal> (X3D)</term>
+    <term><literal>SFMatrix4d</literal> (X3D)</term>
+    <term><literal>SFMatrix</literal> (VRML 1.0)</term>
+    <listitem><para>3x3 and 4x4 matrix types, in single or double precision.
+      Especially useful when transferring matrix data to GPU shaders.</para>
+
+      <para>VRML 1.0 had also a type named just <literal>SFMatrix</literal>,
+      this was equivalent to X3D's <literal>SFMatrix4f</literal>.</para>
+      </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><literal>SFImage</literal></term>
+    <listitem><para>This field type is used to specify image content
+      for <literal>PixelTexture</literal> node in VRML 2.0
+      (<literal>Texture2</literal> node in VRML 1.0).
+      This way you can specify texture content directly in VRML file,
+      without the need to reference any external file.
+      You can create grayscale, grayscale with alpha, RGB or RGB with alpha
+      images this way. This is sometimes comfortable, when you
+      must include everything in one VRML file, but beware that
+      it makes VRML files very large (because the color values are specified
+      in plain text, and they are not compressed in any way).
+      See VRML specification for exact syntax of this field.
+      </para>
+
+      <para>An alternative, often better method to <quote>inline</quote>
+      some file content inside VRML/X3D file is to use
+      the <ulink url="http://en.wikipedia.org/wiki/Data_URI_scheme">data: URI</ulink>.
+      This allows you to inline file contents everywhere where normallny URI
+      is accepted (for example, you can use normal <literal>ImageTexture</literal>
+      and it's <literal>url</literal> field),
+      so it's more general solution. It's also more standard (not specific
+      to VRML/X3D at all). And it allows to place compressed data (e.g. compressed
+      PNG, JPG or any other file format, as specified by the <firstterm>mime type</firstterm>
+      inside URI). Although compressed data will have to be encoded in base64,
+      so it's not storage-optimal, but still it's usually much better
+      than <literal>SFImage</literal> non-compressed format.</para>
+
+      <para>The <literal>data:</literal> URI is supported by most modern
+      VRML/X3D browsers (including every program using our engine).
+      So it's usually preferred over using <literal>SFImage</literal>,
+      for all but the tiniest images.</para>
+      </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><literal>SFString</literal></term>
+    <listitem><para>A string, enclosed in double quotes.
+      If you want to include double quote in a string, you
+      have to precede it with the backslash (<literal>\</literal>)
+      character, and if you want to include the backslash in a string
+      you have to write two backslashes. For example:</para>
+
+<screen>  "This is a string."
+
+  "\"To be or not to be\" said the man."
+
+  "Windows filename is
+     c:\\3dmodels\\tree.wrl"
+</screen>
+
+      <para>Note that in VRML 2.0
+      this string can contain characters encoded in utf8
+      <footnote><para>But also note that our engine doesn't support utf8
+      yet. In particular, when rendering <literal>Text</literal> node,
+      the string is treated as a sequence of 8-bit characters
+      in ISO-8859-1 encoding.</para></footnote>.</para></listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term><literal>SFNode</literal></term>
+    <listitem><para>This is a special VRML 2.0 field type that contains
+      other node as it's value (or a special value <literal>NULL</literal>).
+      More about this in <xref linkend="section.grouping"/>.</para></listitem>
+  </varlistentry>
+</variablelist>
+
+<para>All names of field types above start with <literal>SF</literal>,
+which stands for <quote>single-value field</quote>. Most of these field types
+have a counterpart, <quote>multiple-value field</quote>, with a name
+starting with <literal>MF</literal>. For example <literal>MFFloat</literal>,
+<literal>MFLong</literal>, <literal>MFInt32</literal>,
+<literal>MFVec2f</literal> and <literal>MFVec3f</literal>.
+The MF-field value is a sequence of any number
+(possibly zero) of single field values. For example,
+<literal>MFVec3f</literal> field specifies any number of 3-component
+vectors and can be used to specify a set of 3D positions.</para>
+
+<para>Syntax of multiple-value fields is:</para>
+
+<orderedlist>
+  <listitem><para>An opening bracket (<literal>[</literal>).</para></listitem>
+  <listitem><para>A list of single field values separated
+    by commas (in VRML 1.0) or whitespaces (in VRML 2.0). Note that
+    <emphasis>in VRML 2.0 comma is also a whitespace</emphasis>,
+    so if you write commas between values your syntax is valid
+    in all VRML versions.
+    </para></listitem>
+  <listitem><para>A closing bracket (<literal>]</literal>).
+    Note that you can omit both brackets if your MF-field has
+    exactly one value.</para></listitem>
+</orderedlist>
+
+</sect2>
+
+<sect2 id="section.fields_within_nodes">
+<title>Placing fields within nodes</title>
+
+<para>Each node has a set of fields given by VRML specification.
+VRML file can specify value of some (maybe all, maybe none) node's fields.
+You can <emphasis>always</emphasis> leave the value of a
+field unspecified in VRML file, and it <emphasis>always</emphasis>
+is equivalent to explicitly specifying the default value
+for given field.</para>
+
+<para>VRML syntax for specifying node fields is simple:
+within node's braces (<literal>{</literal> and <literal>}</literal>)
+place field's name followed by field's value.</para>
+
+</sect2>
+
+<sect2 id="section.fields_examples">
+<title>Examples</title>
+
+<para>Let's see some examples of specifying field values.</para>
+
+<para><literal>Sphere</literal> node has a field named
+<literal>radius</literal> of type <literal>SFFloat</literal>
+with a default value 1.0. So the file below is exactly
+equivalent to our first sphere example in previous section:</para>
+
+<screen>#VRML V1.0 ascii
+
+Sphere {
+  radius 1
+}
+</screen>
+
+<para>And this is a sphere with radius 2.0:</para>
+
+<screen>#VRML V1.0 ascii
+
+Sphere {
+  radius 2
+}
+</screen>
+
+<para>Here's a VRML 2.0 file that specifies a cylinder that should be rendered
+without bottom and top parts (thus creating a tube), with a
+radius 2.0 and height 4.0. Three <literal>SFBool</literal>
+fields of <literal>Cylinder</literal> are used:
+<literal>bottom</literal>, <literal>side</literal>,
+<literal>top</literal> (by default all are <literal>TRUE</literal>,
+so actually we didn't have to write <literal>side TRUE</literal>).
+And two <literal>SFFloat</literal> fields, <literal>radius</literal>
+and <literal>height</literal>, are used.</para>
+
+<para>Remember that in VRML 2.0 we can't just write the <literal>Cylinder</literal>
+node. Instead we have to use the <literal>Shape</literal> node.
+The <literal>Shape</literal> node has a field <literal>geometry</literal>
+of type <literal>SFNode</literal>. By default, value of this field
+is <literal>NULL</literal>, which means that no shape is actually defined.
+We can place our <literal>Cylinder</literal> node as a value
+of this field to correctly define a cylinder.</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/cylinder_fields.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>Cylinder example, rendered in wireframe mode
+    (because it's unlit, non-wireframe rendering would look
+    confusing)</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/cylinder_fields_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/cylinder_fields_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/cylinder_fields_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>Here's a VRML 2.0 file that specifies two points.
+Just like in the previous example, we had to use a <literal>Shape</literal> node
+and place <literal>PointSet</literal> node in it's <literal>geometry</literal>
+field. <literal>PointSet</literal> node, in turn, has two more
+<literal>SFNode</literal> fields: <literal>coord</literal>
+(that can contain <literal>Coordinate</literal> node)
+and <literal>color</literal> (that can contain <literal>Color</literal> node).
+<literal>Coordinate</literal> node has a <literal>point</literal> field
+of type <literal>MFVec3f</literal> &mdash; these are positions
+of defined points. <literal>Color</literal> node has a
+<literal>color</literal> field of type <literal>MFColor</literal> &mdash;
+these are colors of points, specified in the same order as in
+the <literal>Coordinate</literal> node.</para>
+
+<para>Note that <literal>PointSet</literal> and <literal>Color</literal>
+nodes have the same field name: <literal>color</literal>.
+In the first case, this is an <literal>SFNode</literal> field,
+in the second case it's an <literal>MFVec3f</literal> field.</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/pointset.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>VRML points example: yellow point
+    at the bottom, blue point at the top</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/pointset_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/pointset_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/pointset_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="section.grouping">
+<title>Children nodes</title>
+
+<para>Now we're approaching the fundamental idea of VRML: some
+nodes can be placed as a children of other nodes. We already
+saw some examples of this idea in VRML 2.0 examples
+above: we placed various nodes inside <literal>geometry</literal>
+field of <literal>Shape</literal> node. VRML 1.0 has a little different
+way of specifying children nodes (inherited from Inventor format)
+than VRML 2.0 and X3D &mdash; we will see both methods.</para>
+
+<sect2 id="section.group_examples">
+<title>Group node examples</title>
+
+<para>In VRML 1.0, you just place children nodes inside the parent node.
+Like this:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/group_1.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>A cube and a sphere in VRML 1.0</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/group_1_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/group_1_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/group_1_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para><literal>Group</literal> is the simplest grouping node.
+It has no fields, and it's only purpose is just to treat a couple of nodes
+as one node.</para>
+
+<para>Note that in VRML 1.0 it's required that a whole
+VRML file consists of exactly one root node, so we actually
+had to use some grouping node here. For example the following
+file is invalid according to VRML 1.0 specification:</para>
+
+<screen>#VRML V1.0 ascii
+
+Sphere { }
+Cube { width 1.5 height 1.5 depth 1.5 }
+</screen>
+
+<para>Nevertheless the above example is handled by many VRML engines,
+including our engine described in this document.</para>
+
+<para>In VRML 2.0, you don't place children nodes directly
+inside the parent node. Instead you place children nodes inside
+fields of type <literal>SFNode</literal> (this contains
+zero (<literal>NULL</literal>) or one node) or
+<literal>MFNode</literal> (this contains any number (possibly zero)
+of nodes). For example, in VRML 2.0 <literal>Group</literal>
+node has an <literal>MFNode</literal> field <literal>children</literal>,
+so the example file in VRML 2.0 equivalent to previous example looks like
+this:
+</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/group_2.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<para>Syntax of <literal>MFNode</literal> is just like for other multiple-valued
+fields: a sequence of values, inside brackets (<literal>[</literal>
+and <literal>]</literal>).</para>
+
+<para>Example above also shows a couple of other differences
+between VRML 1.0 and 2.0:</para>
+
+<orderedlist>
+  <listitem><para>In VRML 2.0 we have to wrap <literal>Sphere</literal> and
+    <literal>Box</literal> nodes inside a <literal>Shape</literal> node.
+    </para></listitem>
+
+  <listitem><para>Node <literal>Cube</literal> from VRML 1.0 was renamed
+    to <literal>Box</literal> in VRML 2.0.</para></listitem>
+
+  <listitem><para>Size of the box in VRML 2.0 is specified
+    using <literal>size</literal> field of type <literal>SFVec3f</literal>,
+    while in VRML 1.0 we had three fields (<literal>width</literal>,
+    <literal>height</literal>, <literal>depth</literal>) of type
+    <literal>SFFloat</literal>.</para></listitem>
+</orderedlist>
+
+<para>While we're talking about VRML versions differences, note also that
+in VRML 2.0 a file can have any number of root nodes. So actually
+we didn't have to use <literal>Group</literal> node in our example,
+and the following would be correct VRML 2.0 file too:</para>
+
+<screen>#VRML V2.0 utf8
+
+Shape { geometry Sphere { } }
+Shape { geometry Box { size 1.5 1.5 1.5 } }
+</screen>
+
+<para>To be honest, we have to point one more VRML difference:
+as was mentioned before, in VRML 2.0 shapes are unlit by default.
+So our VRML 2.0 examples above look like this:</para>
+
+<figure>
+  <title>An unlit box and a sphere in VRML 2.0</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/group_2_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/group_2_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/group_2_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>To make them lit, we must assign a <firstterm>material</firstterm>
+for them. In VRML 2.0 you do this by placing a <literal>Material</literal>
+node inside <literal>material</literal> field of <literal>Appearance</literal>
+node. Then you place <literal>Appearance</literal> node inside
+<literal>appearance</literal> field of
+appropriate <literal>Shape</literal> node. Result looks like this:</para>
+
+<screen>#VRML V2.0 utf8
+
+Group {
+  children [
+    Shape {
+      appearance Appearance { material Material { } }
+      geometry Sphere { }
+    }
+    Shape {
+      appearance Appearance { material Material { } }
+      geometry Box { size 1.5 1.5 1.5 }
+    }
+  ]
+}
+</screen>
+
+<para>We didn't specify any <literal>Material</literal> node's fields,
+so the default properties will be used. Default VRML 2.0 material properties
+are the same as for VRML 1.0: light gray diffuse color and a slight
+ambient color.</para>
+
+<para>As you can see, VRML 2.0 description gets significantly more verbose than
+VRML 1.0, but it has many advantages:</para>
+
+<orderedlist>
+  <listitem><para>The way how children nodes are specified
+    in VRML 2.0 requires you to always write an <literal>SFNode</literal>
+    or <literal>MFNode</literal> field name
+    (as opposed to VRML 1.0 where you just write the children nodes).
+    But the advantages are obvious: in VRML 2.0 you can explicitly
+    assign different meaning to different children nodes
+    by placing them within different fields. In VRML 1.0 all the
+    children nodes had to be treated in the same manner &mdash;
+    the only thing that differentiated children nodes was their
+    position within the parent.</para></listitem>
+
+  <listitem><para>As mentioned earlier, the default behavior
+    of various VRML 2.0 parts is the one that is the easiest to render.
+    That's why the default behavior is to render unlit, and
+    you have to explicitly specify material to get lit objects.
+    </para>
+
+    <para>This is a good thing, since it makes VRML authors
+    more conscious about using features, and hopefully it will
+    force them to create VRML worlds that are easier to render.
+    In the case of rendering unlit objects, this is often
+    perfectly acceptable (or even desired) solution if the
+    object has a detailed texture applied.</para>
+    </listitem>
+
+  <listitem><para>Placing the <literal>Material</literal>
+    node inside the <literal>SFNode</literal> field of
+    <literal>Appearance</literal>, and then placing
+    the <literal>Appearance</literal> node inside
+    the <literal>SFNode</literal> field of <literal>Shape</literal>
+    may seem like
+    a <quote>bondage-and-discipline language</quote>, but it allows
+    various future enhancements of the language without breaking
+    compatibility. For example you could invent a node that allows
+    to specify materials using a different properties (like
+    by describing it's BRDF function, useful for rendering realistic images)
+    and then just allow this node as a value for the <literal>material</literal>
+    field.</para>
+
+    <para>Scenario described above actually happened.
+    First versions of VRML 97 specification didn't include
+    geospatial coordinates support, including a node
+    <literal>GeoCoordinate</literal>.
+    A node <literal>IndexedFaceSet</literal> has a field
+    <literal>coord</literal> used to specify a set of points for
+    geometry, and initially you could place a
+    <literal>Coordinate</literal> node there.
+    When specification of geospatial coordinates support was formulated
+    (and added to VRML 97 specification as optional for VRML browsers),
+    all that had to be changed was to say that now you can place
+    <literal>GeoCoordinate</literal> everywhere where earlier
+    you could use only <literal>Coordinate</literal>.</para></listitem>
+
+  <listitem><para>The <literal>Shape</literal>
+    node in VRML 2.0 contains almost whole information needed to render
+    given shape. This means that it's easier to create a VRML rendering engine.
+    We will contrast this with VRML 1.0 approach that requires
+    a lot of state information in <xref linkend="section.vrml_state"/>.
+    </para></listitem>
+</orderedlist>
+
+</sect2>
+
+<sect2 id="section.transform_node">
+<title>The Transform node</title>
+
+<para>Let's take a look at another grouping node:
+VRML 2.0 <literal>Transform</literal>
+node. This node specifies a transformation (a mix
+of a translation, a rotation and a scale) for all it's children nodes.
+The default field values are such that no transformation actually
+takes place, because by default we translate by (0, 0, 0) vector,
+rotate by zero angle and scale by 1.0 factor. This means that
+the <literal>Transform</literal> node with all fields left as default
+is actually equivalent to a <literal>Group</literal> node.</para>
+
+<para>Example of a simple translation:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/transform.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>A box and a translated sphere</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/transform_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/transform_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/transform_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>Note that a child of a <literal>Transform</literal> node
+may be another <literal>Transform</literal> node. All transformations
+are accumulated. For example these two files are equivalent:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/transform_accum_1.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/transform_accum_2.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>A box, a translated sphere,
+    and a translated and scaled sphere</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/transform_accum_1_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/transform_accum_1_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/transform_accum_1_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+</sect2>
+
+<sect2 id="section.other_grouping_nodes">
+<title>Other grouping nodes</title>
+
+<itemizedlist>
+  <listitem><para>A <literal>Switch</literal> node
+    allows you to choose only one (or none) from
+    children nodes to be in the active (i.e. visible, participating
+    in collision detection etc.) part of the scene.
+    This is useful for various scripts and it's also useful
+    for hiding nodes referenced later &mdash; we will see
+    an example of this in <xref linkend="section.def_use"/>.
+    </para></listitem>
+
+  <listitem><para>A <literal>Separator</literal> and a
+    <literal>TransformSeparator</literal> nodes in VRML 1.0.
+    We will see what they do in <xref linkend="section.vrml_state"/>.
+    </para></listitem>
+
+  <listitem><para>A <literal>LOD</literal> node
+    (the name is an acronym for <firstterm>level of detail</firstterm>)
+    specifies a different versions of the same object.
+    The intention is that all children nodes represent the same object,
+    but with different level of detail: first node is the most
+    detailed one (and difficult to render, check for collisions etc.),
+    second one is less detailed, and so on, until the last node
+    has the least details (it can even be empty, which can be
+    expressed by a <literal>Group</literal> node with
+    no children).
+    VRML browser should choose the appropriate children to render
+    based on the distance between the viewer and designated
+    <firstterm>center</firstterm> point.</para></listitem>
+
+  <listitem><para>A <literal>Collision</literal> node is available
+    in VRML 2.0 and X3D. It's very useful to disable collisions
+    for particular shapes (visible but not collidable geometry),
+    or to specify a <quote>proxy</quote> shape
+    to be used for collisions. <quote>Proxy</quote> can be used
+    to perform collisions with a complicated 3D object by a simpler shape,
+    for example a complicated statue of a human could be surrounded by a simple
+    box proxy for the sake of collisions. Also, this can be used
+    to make collidable but invisible geometry.</para></listitem>
+</itemizedlist>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="section.def_use">
+<title>DEF / USE mechanism</title>
+
+<para>VRML nodes may be named and later referenced. This allows
+you to reuse the same node (which can be any VRML node type &mdash;
+like a shape, a material, or even a whole group) more than once. The syntax
+is simple: you name a node by writing
+<literal>DEF &lt;node-name&gt;</literal> before node type.
+To reuse the node, just write <literal>USE &lt;node-name&gt;</literal>.
+This mechanism is available in all VRML versions.</para>
+
+<para id="example.reuse_cone">Here's a simple example
+that uses the same <literal>Cone</literal>
+twice, each time with a different material color.</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/reuse_cone.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>Two cones with different materials</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/reuse_cone_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/reuse_cone_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/reuse_cone_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>Using DEF / USE mechanism makes your VRML files
+smaller and easier to author, and it also allows
+VRML implementations to save resources (memory, loading time...).
+That's because VRML implementation can allocate the node
+once, and then just copy the pointer to this node.
+VRML specifications are formulated to make this
+approach always correct, even when mixed with features like
+scripting or sensors. Note that some nodes
+can <quote>pull</quote> additional data with them
+(for example <literal>ImageTexture</literal> nodes will load
+texture image from file), so the memory saving may be even larger.
+Consider these two VRML files:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/reuse_texture.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/reuse_texture_no.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>A box and a translated sphere using the same texture</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/reuse_texture_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/reuse_texture_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/reuse_texture_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>Both files above look the same when rendered, but in the first case
+VRML implementation loads the texture only
+once, since we know that this is the same texture node
+<footnote><para>
+Actually, in the second case, our engine can also figure
+out that this is the same texture filename and not
+load the texture twice. But the first case is much <quote>cleaner</quote>
+and should be generally better for all decent VRML implementations.
+</para></footnote>.</para>
+
+<para>Note that the first node definition, with <literal>DEF</literal>
+keyword, not only names the node, but also includes it in the file.
+Often it's more comfortable to first define a couple of named
+nodes (without actually using them) and then use them.
+You can use the <literal>Switch</literal> node for this
+&mdash; by default <literal>Switch</literal> node doesn't
+include any of it's children nodes, so you can write
+VRML file like this:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/reuse_switch.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>Three columns of three spheres</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/reuse_switch_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/reuse_switch_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/reuse_switch_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>One last example shows a reuse of <literal>Coordinate</literal>
+node. Remember that a couple of sections earlier we defined
+a simple <literal>PointSet</literal>. <literal>PointSet</literal>
+node has an <literal>SFNode</literal> field named <literal>coord</literal>.
+You can place there a <literal>Coordinate</literal> node.
+A <literal>Coordinate</literal> node, in turn, has a <literal>point</literal>
+field of type <literal>SFVec3f</literal> that allows you to specify
+point positions. The obvious question is <quote>Why all this complexity?
+Why not just say that <literal>coord</literal> field is
+of <literal>SFVec3f</literal> type and directly include the point
+positions?</quote>. One answer was given earlier when talking
+about grouping nodes: this allowed VRML specification for painless
+addition of <literal>GeoCoordinate</literal> as an alternative
+way to specify positions. Another answer is given by the example
+below. As you can see, the same set of positions may be used
+by a couple of different nodes<footnote><para>I do not cite full VRML source
+code here, as it includes a long list of coordinates and indexes generated by
+Blender exporter. See VRML files distributed with this document:
+full source is in the file <filename>examples/reuse_coordinate.wrl</filename>.
+</para></footnote>.</para>
+
+<screen>#VRML V2.0 utf8
+
+Shape {
+  appearance Appearance { material Material { } }
+  geometry IndexedFaceSet {
+    coord DEF TowerCoordinates Coordinate {
+      point [
+        4.157832 4.157833 -1.000000,
+        4.889094 3.266788 -1.000000,
+        ......
+      ]
+    }
+
+    coordIndex [
+      63 0 31 32 -1,
+      31 30 33 32 -1,
+      ......
+    ]
+  }
+}
+
+Transform {
+  translation 30 0 0
+  children Shape {
+    geometry IndexedLineSet {
+      coordIndex [
+        63 0 31 32 63 -1,
+        31 30 33 32 31 -1,
+        ......
+      ]
+      coord USE TowerCoordinates
+    }
+  }
+}
+
+Transform {
+  translation 60 0 0
+  children Shape {
+    geometry PointSet {
+      coord USE TowerCoordinates
+    }
+  }
+}
+</screen>
+
+<figure>
+  <title>Faces, lines and point sets rendered using
+    the same <literal>Coordinate</literal> node</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/reuse_coordinate_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/reuse_coordinate_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/reuse_coordinate_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<sect2 id="section.vrml_file_graph">
+<title>VRML file as a graph</title>
+
+<para>Now that we know all about children relationships
+and DEF / USE mechanism, we can grasp the statement mentioned
+at the beginning of this chapter: every VRML file is a
+directed graph of nodes. It doesn't have cycles,
+although if we will forget about direction of edges
+(treat it as an undirected graph), we can get cycles
+(because of DEF / USE mechanism).</para>
+
+<para>Note that VRML 1.0 file must contain exactly one root node,
+while VRML 2.0 file is a sequence of any number of root nodes.
+So, being precise, VRML graph doesn't have to be a connected graph.
+But actually our engine when reading VRML file with many
+root nodes just wraps them in an <quote>invisible</quote>
+<literal>Group</literal> node. This special <literal>Group</literal>
+node acts just like any other group node, but it's not written
+back to the file (when e.g. using our engine to pretty-print VRML files).
+This way, internally, we always see VRML file as a connected graph,
+with exactly one root node.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="section.vrml_state">
+<title>VRML 1.0 state</title>
+
+<para>In previous sections most of the examples were given only in
+VRML 2.0 version. Partially that's because VRML 2.0 is just
+newer and better, so you should use it instead of VRML 1.0
+whenever possible.
+But partially that was because we avoided to explain
+one important behavior of VRML 1.0. In this section we'll fill the gap.
+Even if you're not interested
+in VRML 1.0 anymore, this information may help you understand
+why VRML 2.0 was designed the way it was, and why it's actually better
+than VRML 1.0. That's because part of the
+reasons of VRML 2.0 changes were to avoid the whole issue
+described here.</para>
+
+<para>Historically, VRML 1.0 was based on Inventor file format,
+and Inventor file format was
+designed specifically with OpenGL implementation in mind.
+Those of you who do any programming in OpenGL know that OpenGL
+works as a <firstterm>state machine</firstterm>. This means
+that OpenGL remembers a lot of <quote>global</quote> settings
+<footnote><para>
+Actually, they are remembered for each OpenGL context.
+And, ideally, they are partially <quote>remembered</quote> on graphic board.
+But we limit our thinking here only to the point of view of a typical
+program using OpenGL.</para></footnote>. When you want to render
+a vertex (aka point) in OpenGL, you just call one simple command
+(<literal>glVertex</literal>), passing only point coordinates.
+And the vertex is rendered (along with a line or even a triangle
+that it produces with other vertexes). What color does the vertex
+has? The last color specified by <literal>glColor</literal>
+call (or <literal>glMaterial</literal>, mixed with lights).
+What texture coordinate does it have? Last texture coordinate
+specified in <literal>glTexCoord</literal> call. What texture
+does it use? Last texture bound with <literal>glBindTexture</literal>.
+We can see a pattern here: when you want to know what property
+our vertex has, you just have to check what value we last assigned
+to this property. When we talk about OpenGL state, we talk
+about all the <quote>last <literal>glColor</literal></quote>,
+<quote>last <literal>glTexCoord</literal></quote> etc. values
+that OpenGL has to remember.</para>
+
+<para>Inventor, and then VRML 1.0, followed a similar approach.
+<quote>What material does a sphere use?</quote> The one specified in the last
+<literal>Material</literal> node. Take a look at the example:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/material_state.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>Spheres with various material in VRML 1.0</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/material_state_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/material_state_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/material_state_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>Similar answers are given for other questions in the form
+<quote>What is used?</quote>. Let's compare VRML 1.0
+and 2.0 answers for such questions:</para>
+
+<itemizedlist>
+  <listitem><para>What texture is used?</para>
+
+    <para><emphasis>VRML 1.0 answer:</emphasis>
+    Last <literal>Texture2</literal> node.</para>
+
+    <para><emphasis>VRML 2.0 answer:</emphasis>
+    Node specified in enclosing <literal>Shape</literal>
+    appearance's <literal>texture</literal> field.</para>
+  </listitem>
+
+  <listitem><para>What coordinates are used by
+    <literal>IndexedFaceSet</literal>?</para>
+
+    <para><emphasis>VRML 1.0 answer:</emphasis>
+    Last <literal>Coordinate3</literal> node.</para>
+
+    <para><emphasis>VRML 2.0 answer:</emphasis>
+    Node specified in <literal>coord</literal> field
+    of given <literal>IndexedFaceSet</literal>.</para>
+  </listitem>
+
+  <listitem><para>What font is used by by <literal>AsciiText</literal> node
+    (renamed to just <literal>Text</literal> in VRML 2.0)?</para>
+
+    <para><emphasis>VRML 1.0 answer:</emphasis>
+    Last <literal>FontStyle</literal> node.</para>
+
+    <para><emphasis>VRML 2.0 answer:</emphasis>
+    Node specified in <literal>fontStyle</literal> field
+    of given <literal>Text</literal> node.</para>
+  </listitem>
+</itemizedlist>
+
+<para>So VRML 1.0 approach maps easily to OpenGL.
+Simple VRML implementation can just traverse the scene graph,
+and for each node do appropriate set of OpenGL calls.
+For example, <literal>Material</literal> node will correspond
+to a couple of <literal>glMaterial</literal> and <literal>glColor</literal>
+calls. <literal>Texture2</literal> will correspond to binding
+prepared OpenGL texture. Visible geometry nodes will cause
+rendering of appropriate geometry, and so last
+<literal>Material</literal> and <literal>Texture2</literal>
+settings will be used.</para>
+
+<para>In our example with materials above you can also
+see another difference between VRML 1.0 and 2.0,
+also influenced by the way things are done in OpenGL:
+the way <literal>Transform</literal> node is used.
+In VRML 2.0, <literal>Transform</literal> affected it's children.
+In VRML 1.0, <literal>Transform</literal> node is not supposed to
+have any children. Instead, it affects <emphasis>all subsequent nodes</emphasis>.
+If we would like to translate last example to VRML 2.0,
+each <literal>Transform</literal> node would have to be placed
+as a last child of previous <literal>Transform</literal> node,
+thus creating a deep nodes hierarchy. Alternatively, we could
+keep the hierarchy shallow and just use
+<literal>Transform { translation 5 0 0 ... }</literal>
+for the first time, then <literal>Transform { translation 10 0 0 ... }</literal>,
+then <literal>Transform { translation 15 0 0 ... }</literal> and so on.
+</para>
+
+<para>This means that simple VRML 1.0 implementation will just call
+appropriate matrix transformations when processing <literal>Transform</literal>
+node. In VRML 1.0 there are even more specialized
+transformation nodes. For example a node <literal>Translation</literal>
+that has a subset of features of full <literal>Transform</literal> node:
+it can only translate. Such <literal>Translation</literal>
+has an excellent, trivial mapping to OpenGL: just call
+<literal>glTranslate</literal>.</para>
+
+<para>There's one more important feature of OpenGL
+<quote>state machine</quote> approach: stacks. OpenGL has a matrix
+stack (actually, three matrix stacks for each matrix type) and
+an attributes stack. As you can guess, there are nodes in VRML 1.0
+that, when implemented in an easy way, map perfectly
+to OpenGL push/pop stack operations: <literal>Separator</literal>
+and <literal>TransformSeparator</literal>. When you use
+<literal>Group</literal> node in VRML 1.0, the properties
+(like last used <literal>Material</literal> and <literal>Texture2</literal>,
+and also current transformation and texture transformation)
+<quote>leak</quote> outside of <literal>Group</literal> node,
+to all subsequent nodes.
+But when you use <literal>Separator</literal>,
+they do not leak out: all transformations and <quote>who's the last
+material/texture node</quote> properties are unchanged
+after we leave <literal>Separator</literal> node.
+So simple <literal>Separator</literal> implementation in OpenGL
+is trivial:</para>
+
+<orderedlist>
+  <listitem><para>At the beginning, use <literal>glPushAttrib</literal>
+    (saving all OpenGL attributes that can be changed by VRML nodes)
+    and <literal>glPushMatrix</literal> (for both modelview and
+    texture matrices).</para></listitem>
+  <listitem><para>Then process all children nodes of
+    <literal>Separator</literal>.</para></listitem>
+  <listitem><para>Then restore state by <literal>glPopAttrib</literal>
+    and <literal>glPopMatrix</literal> calls.</para></listitem>
+</orderedlist>
+
+<para><literal>TransformSeparator</literal> is a cross between
+a <literal>Separator</literal> and a <literal>Group</literal>:
+it saves only transformation matrix, and the rest of the state
+can <quote>leak out</quote>. So to implement this in OpenGL,
+you just call <literal>glPushMatrix</literal> (on modelview matrix)
+before processing children and <literal>glPopMatrix</literal>
+after.</para>
+
+<para>Below is an example how various VRML 1.0 grouping nodes allow
+<quote>leaking</quote>. Each column starts with a standard
+<literal>Sphere</literal> node. Then we enter some
+grouping node (from the left: <literal>Group</literal>,
+<literal>TransformSeparator</literal> and <literal>Separator</literal>).
+Inside the grouping node we change material, apply scaling transformation
+and put another <literal>Sphere</literal> node &mdash; middle
+row always contains a red large sphere. Then we exit
+from grouping node and put the third <literal>Sphere</literal> node.
+How does this sphere look like depends on used grouping node.
+</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/leaking.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>An example how properties <quote>leak out</quote>
+    from various grouping nodes in VRML 1.0</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/leaking_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/leaking_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/leaking_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<sect2 id="section.why_vrml_2_is_better">
+<title>Why VRML 2.0 is better</title>
+
+<para>There are some advantages of VRML 1.0
+<quote>state</quote> approach:</para>
+
+<orderedlist>
+  <listitem><para>It maps easily to OpenGL.</para>
+
+    <para>Such easy mapping may be also quite efficient.
+    For example, if two nodes use the same <literal>Material</literal>
+    node, we can just change OpenGL material once (at the time
+    <literal>Material</literal> node is processed).
+    VRML 2.0 implementation must remember last set
+    <literal>Material</literal> node to achieve this purpose.
+    </para></listitem>
+
+  <listitem><para>It's flexible. The way transformations
+    are specified in VRML 2.0 forces us often to create
+    deeper node hierarchies than in VRML 1.0.</para>
+
+    <para>And in VRML 1.0 we can easier share materials, textures, font styles
+    and other properties among a couple of nodes. In VRML 2.0 such reusing
+    requires naming nodes by
+    <link linkend="section.def_use">DEF / USE mechanism</link>.
+    In VRML 1.0 we can simply let a couple of nodes have the same
+    node as their last <literal>Material</literal> (or similar) node.
+    </para>
+  </listitem>
+</orderedlist>
+
+<para>But there are also serious problems with VRML 1.0 approach,
+that VRML 2.0 solves.</para>
+
+<orderedlist>
+  <listitem><para>The argumentation about <quote>flexibility</quote>
+    of VRML 1.0 above looks similar to
+    argumentation about various programming languages
+    <!-- TODO: this was supposed to be a footnote, but in FOP >= 0.9x
+      it fails, see http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=451258
+    <footnote><para>...programming languages that should
+    remain nameless here...</para></footnote> -->
+    (...programming languages that should
+    remain nameless here...), that are
+    indeed flexible but also allow the programmer to
+    <quote>shoot himself in the foot</quote>. It's easy to forget
+    that you changed some material or texture, and accidentally affect
+    more than you wanted.</para>
+
+    <para>Compare this with the luxury of VRML 2.0
+    author: whenever you start writing a <literal>Shape</literal>
+    node, you always start with a clean state: if you don't specify
+    a texture, shape will not be textured, if you don't specify
+    a material, shape will be unlit, and so on. If you want to know
+    how given <literal>IndexedFaceSet</literal> will look like
+    when rendered, you just have to know it's
+    enclosing <literal>Shape</literal> node. More precisely,
+    the only things that you have to know for VRML 2.0 node
+    to render it are</para>
+
+    <itemizedlist>
+      <listitem><para>enclosing <literal>Shape</literal> node,</para></listitem>
+      <listitem><para>accumulated transformation from
+        <literal>Transform</literal> nodes,</para></listitem>
+      <listitem><para>and some <quote>global</quote>
+        properties: lights that affect this shape and fog properties.
+        I call them <quote>global</quote> because usually
+        they are applied to the whole scene or at least
+        large part of it.</para></listitem>
+    </itemizedlist>
+
+    <para>On the other hand, VRML 1.0 author or reader (human or program)
+    must carefully analyze the code before given node, looking for last
+    <literal>Material</literal> node occurrence etc.
+    </para>
+  </listitem>
+
+  <listitem><para>The argumentation about <quote>simple VRML 1.0
+    implementation</quote> misses the point that such simple
+    implementation will in fact suffer from a couple of problems.
+    And fixing these problems will in fact force this implementation
+    to switch to non-trivial methods. The problems include:</para>
+
+    <itemizedlist>
+      <listitem><para>OpenGL stacks sizes are limited,
+        so a simple implementation will limit allowed depth
+        of <literal>Separator</literal> and <literal>TransformSeparator</literal>
+        nodes.
+        </para></listitem>
+
+      <listitem><para>If we will change OpenGL state each time
+        we process a state-changing
+        node, then we can waste a lot of time and resources
+        if actually there are no shapes using given property. For example
+        this code</para>
+
+<screen>Separator {
+  Texture2 { filename "texture.png" }
+}
+</screen>
+
+        <para>will trick a naive implementation into loading from file and
+        then loading to OpenGL context a completely useless texture data.</para>
+
+        <para>This seems like an irrelevant problem, but it will
+        become a large problem as soon as we will try to use any
+        technique that will have to render only parts of the scene.
+        For example, implementing material transparency using
+        OpenGL blending requires that first all non-transparent
+        shapes are rendered.
+        Also implementing culling of objects to a camera frustum
+        will make many shapes in the scene ignored
+        in some frames.</para>
+        </listitem>
+    </itemizedlist>
+  </listitem>
+
+  <listitem><para>Last but not least: in VRML 1.0, grouping nodes
+    <emphasis>must</emphasis> process their children in order,
+    to collect appropriate state information needed to render
+    each geometry. In VRML 2.0, there is no such requirement.
+    For example, to render a <literal>Group</literal> node
+    in VRML 2.0, implementation can process and render
+    children nodes in any order. Like said above,
+    VRML 2.0 must only know about current transformation
+    and global things like fog and lights. The rest of information
+    needed is always contained within appropriate <literal>Shape</literal>
+    node.</para>
+
+    <para>VRML 2.0 implementation can even ignore some
+    children in <literal>Group</literal> node if it's
+    known that they are not visible.</para>
+
+    <para>Example situations when implementation should be able
+    to freely choose which shapes (and in what order)
+    are rendered were given above: implementing transparency using blending,
+    and culling to camera frustum.</para>
+
+    <para>More about the way how we solved this problem for
+    both VRML 1.0 and 2.0 in <xref linkend="section.scene"/>.
+    More about OpenGL blending and culling to frustum in
+    <xref linkend="section.scene_gl"/>.
+    </para></listitem>
+</orderedlist>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="section.other_features">
+<title>Other important VRML features</title>
+
+<para>Now that we're accustomed with VRML syntax and concepts,
+let's take a quick look at some notable VRML features
+that weren't shown yet.</para>
+
+<sect2 id="section.inline_nodes">
+<title>Inline nodes</title>
+
+<para>A powerful tool of VRML is the ability to include one
+model as a part of another. In VRML 2.0 we do this by
+<literal>Inline</literal> node. It's <literal>url</literal>
+field specifies the URL (possibly relative) of VRML file to load.
+Note that our engine doesn't actually support URLs right now
+and treats this just as a file name.</para>
+
+<para>The content of referenced VRML file is placed at the position
+of given <literal>Inline</literal> node. This means that you
+can apply transformation to inlined content. This also
+means that including the same file more than once is sensible
+in some situations. But remember the remarks in <xref linkend="section.def_use"/>:
+if you want to include the same file more than once, you should
+name the <literal>Inline</literal> node and then just reuse it.
+Such reuse will conserve resources.</para>
+
+<para><literal>url</literal> field is actually <literal>MFString</literal>
+and is a sequence of URL values, from the most to least preferred one.
+So VRML browser will try to load files from given URLs in order,
+until a valid file will be found.</para>
+
+<para>In VRML 1.0 the node is called <literal>WWWInline</literal>,
+and the URL (only one is allowed, it's <literal>SFString</literal>
+field) is specified in the field <literal>name</literal>.</para>
+
+<para>When using our engine you can mix VRML/X3D versions
+and include VRML 1.0 file from VRML 2.0, or X3D, or the other way around.
+Moreover, you can include other 3D formats (like 3DS and Wavefront OBJ) too.</para>
+
+<para id="example.inline">An example:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/inline.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>Our earlier <link linkend="example.reuse_cone">example
+    of reusing cone</link> inlined a couple of times, each time
+    with a slight translation and rotation</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/inline_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/inline_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/inline_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+</sect2>
+
+<sect2 id="section.texture_transformation">
+<title>Texture transformation</title>
+
+<para>VRML allows you to specify
+a texture coordinate transformation. This allows you to
+translate, scale and rotate visible texture on given shape.
+</para>
+
+<para>In VRML 1.0, you do this by <literal>Texture2Transform</literal>
+node &mdash; this works analogous to <literal>Transform</literal>,
+but transformations are only 2D. Texture transformations in VRML 1.0
+accumulate, just like normal transformations. Here's an example:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/texture_transform_1.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>Textured cube with various texture transformations</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/texture_transform_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/texture_transform_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/texture_transform_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>Remember that we transform <emphasis>texture coordinates</emphasis>,
+so e.g. scale 2x means that the texture appears <emphasis>2 times
+smaller</emphasis>.</para>
+
+<para>VRML 2.0 proposes a different approach here:
+We have similar <literal>TextureTransform</literal> node, but we can
+use it only as a value for <literal>textureTransform</literal> field
+of <literal>Appearance</literal>. This also means that there
+is no way how texture transformations could accumulate.
+Here's a VRML 2.0 file equivalent to previous VRML 1.0 example:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/texture_transform_2.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+</sect2>
+
+<sect2 id="section.navigation">
+<title>Navigation</title>
+
+<para>You can specify various navigation information using
+the <literal>NavigationInfo</literal> node.</para>
+
+<itemizedlist>
+  <listitem><para><literal>type</literal> field describes
+    preferred navigation type. You can <quote>EXAMINE</quote>
+    model, <quote>WALK</quote> in the model (with collision detection
+    and gravity) and <quote>FLY</quote> (collision detection,
+    but no gravity).</para></listitem>
+  <listitem><para><literal>avatarSize</literal>
+    field sets viewer (avatar) sizes. These typically have to be
+    adjusted for each world to <quote>feel right</quote>.
+    Although you should note that VRML generally
+    suggests to treat length 1.0 in your world as <quote>1 meter</quote>.
+    If you will design your VRML world following this assumption,
+    then default <literal>avatarSize</literal> will feel quite adequate,
+    assuming that you want the viewer to have human size in your world.
+    Viewer sizes are used for collision detection.</para></listitem>
+  <listitem><para>Viewer size together with
+    <literal>visibilityLimit</literal> may be also used
+    to set VRML browsers Z-buffer near and far clipping planes.
+    This is the case with our engine. By default our engine tries to calculate
+    sensible values for near and far based on scene bounding box size.
+    </para></listitem>
+  <listitem><para>You can also specify moving speed
+    (<literal>speed</literal> field), and whether head light is on
+    (<literal>headlight</literal> field).</para></listitem>
+</itemizedlist>
+
+<para>To specify default viewer position and orientation in the
+world you use <literal>Viewpoint</literal> node. In VRML 1.0,
+instead of <literal>Viewpoint</literal> you have
+<literal>PerspectiveCamera</literal> and
+<literal>OrthogonalCamera</literal> (in VRML 2.0 viewpoint
+is always perspective). Viewpoint and camera nodes may be generally
+specified anywhere in the file. The first viewpoint/camera node
+found in the file (but only in the active part of the file &mdash;
+e.g. not in inactive children of <literal>Switch</literal>)
+will be used as the starting position/orientation.
+Note that viewpoint/camera nodes
+are also affected by transformation.</para>
+
+<para>Finally, note that my VRML viewer
+<ulink url="http://castle-engine.sourceforge.net/view3dscene.php">
+view3dscene</ulink> has a useful function to print VRML viewpoint/camera
+nodes ready to be pasted to VRML file, see menu item <quote>Console</quote>
+-> <quote>Print current camera node</quote>.</para>
+
+<para>Here's an example file. It defines a viewpoint (generated
+by <filename>view3dscene</filename>) and a navigation info
+and then includes actual world geometry from other file
+(shown in our <link linkend="example.inline">earlier example
+about inlining</link>).</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/navigation_viewpoint.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<figure>
+  <title>Viewpoint defined for our previous example with multiplied cones</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/navigation_viewpoint_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/navigation_viewpoint_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/navigation_viewpoint_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+</sect2>
+
+<sect2 id="section.indexedfaceset_features">
+<title>IndexedFaceSet features</title>
+
+<para><literal>IndexedFaceSet</literal> nodes (and a couple of other
+nodes in VRML 2.0 like <literal>ElevationGrid</literal>) have
+some notable features to make their rendering better and
+more efficient:</para>
+
+<itemizedlist>
+  <listitem><para>You can use non-convex faces if you set
+    <literal>convex</literal> field to <literal>FALSE</literal>.
+    It will be VRML browser's responsibility to correctly
+    triangulate them. By default faces are assumed to be
+    convex (following the general rule that the default behavior
+    is the easiest one to handle by VRML browsers).
+    </para></listitem>
+
+  <listitem><para>By default shapes are assumed to be
+    <literal>solid</literal> which allows to use backface
+    culling when rendering them.</para></listitem>
+
+  <listitem><para>If you don't supply pre-generated normal vectors
+    for your shapes, they will be calculated by the VRML
+    browser. You can control how they will be calculated
+    by the <literal>creaseAngle</literal> field: if the angle
+    between adjacent faces will be less than specified
+    <literal>creaseAngle</literal>, the normal vectors in
+    appropriate points will be smooth. This allows you
+    to specify preferred <quote>smoothness</quote> of the
+    shape. In VRML 2.0 by default <literal>creaseAngle</literal> is zero
+    (so all normals are flat; again this follows the rule that
+    the default behavior is the easiest one for VRML browsers).
+    See example below.</para></listitem>
+
+  <listitem><para>For VRML 1.0 the <literal>creaseAngle</literal>,
+    backface culling and convex faces settings are controlled by
+    <literal>ShapeHints</literal> node.</para></listitem>
+
+  <listitem><para>All VRML shapes have some sensible default texture mapping.
+    This means that you don't
+    have to specify texture coordinates if you want the texture
+    mapped. You only have to specify some texture.
+    For <literal>IndexedFaceSet</literal> the default
+    texture mapping adjusts to shape's bounding box (see
+    VRML specification for details).</para></listitem>
+</itemizedlist>
+
+<para>Here's an example of the <literal>creaseAngle</literal>
+use. Three times we define the same geometry in <literal>IndexedFaceSet</literal>
+node, each time using different <literal>creaseAngle</literal> values.
+The left tower uses <literal>creaseAngle 0</literal>, so all
+faces are rendered flat. Second tower uses <literal>creaseAngle 1</literal>
+and it looks good &mdash; smooth where it should be.
+The third tower uses <literal>creaseAngle 4</literal>,
+which just means that normals are smoothed everywhere (this case
+is actually optimized inside our engine, so it's calculated
+faster) &mdash; it looks bad, we can see that normals are
+smoothed where they shouldn't be.</para>
+
+<screen>#VRML V2.0 utf8
+
+Viewpoint  {
+  position 31.893 -69.771 89.662
+  orientation 0.999 0.022 -0.012 0.974
+}
+
+Transform {
+  children Shape {
+    appearance Appearance { material Material { } }
+    geometry IndexedFaceSet {
+      coord DEF TowerCoordinates Coordinate {
+        point [
+          4.157832 4.157833 -1.000000,
+          4.889094 3.266788 -1.000000,
+          ......
+        ]
+      }
+
+      coordIndex [
+        63 0 31 32 -1,
+        31 30 33 32 -1,
+        ......
+      ]
+      creaseAngle 0
+    }
+  }
+}
+
+Transform {
+  translation 30 0 0
+  children Shape {
+    appearance Appearance { material Material { } }
+    geometry IndexedFaceSet {
+      coordIndex [
+        63 0 31 32 -1,
+        31 30 33 32 -1,
+        ......
+      ]
+      coord USE TowerCoordinates
+      creaseAngle 1
+    }
+  }
+}
+
+Transform {
+  translation 60 0 0
+  children Shape {
+    appearance Appearance { material Material { } }
+    geometry IndexedFaceSet {
+      coordIndex [
+        63 0 31 32 -1,
+        31 30 33 32 -1,
+        ......
+      ]
+      coord USE TowerCoordinates
+      creaseAngle 4
+    }
+  }
+}</screen>
+
+<figure>
+  <title>Three towers with various <literal>creaseAngle</literal> settings</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/creaseangle_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/creaseangle_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/creaseangle_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+</sect2>
+
+<sect2 id="section.prototypes">
+<title>Prototypes</title>
+
+<glosslist>
+  <glossentry>
+    <glossterm><emphasis>Prototypes</emphasis></glossterm>
+    <glossdef><para>These constructions define new VRML nodes
+      in terms of already available ones. The idea is basically
+      like macros, but it works on VRML nodes level (not on textual level,
+      even not on VRML tokens level) so it's really safe.</para></glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm><emphasis>External prototypes</emphasis></glossterm>
+    <glossdef><para>These constructions define
+      syntax of new VRML nodes, without defining their implementation.
+      The implementation can be specified in other VRML file
+      (using normal prototypes mentioned above) or can be deduced
+      by particular VRML browser using some browser-specific means
+      (for example, a browser may just have some non-standard nodes
+      built-in). If a browser doesn't know how to handle given node,
+      it can at least correctly parse the node (and ignore it).</para>
+
+      <para>For example, many VRML browsers handle
+      some non-standard VRML nodes. If you use these nodes
+      and you want to make your VRML files at least readable by
+      other VRML browsers, you should declare these non-standard
+      nodes using external prototypes.</para>
+
+      <para>Even better, you can provide a list of proposed implementations
+      for each external prototype. They are checked in order,
+      VRML browser should chose the first implementation that it can use.
+      So you can make the 1st item a URN that is recognized only by your
+      VRML browser, and indicating built-in node implementation.
+      And the 2nd item may point to a URL with another VRML file
+      that at least partially emulates the functionality of this
+      non-standard node, by using normal prototype. This way
+      other VRML browsers will be able to at least partially make use
+      of your node.</para></glossdef>
+  </glossentry>
+</glosslist>
+
+<para>Our engine handles prototypes and external prototypes perfectly
+(since around September 2007). We have some VRML/X3D extensions
+(see <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php">
+Castle Game Engine extensions list</ulink>),
+and they can be declared as external prototypes
+with URN like
+<literal>"urn:castle-engine.sourceforge.net:node:KambiTriangulation"</literal>.
+So other VRML browsers should be able to at least parse them.
+</para>
+
+</sect2>
+
+<sect2 id="section.x3d_features">
+<title>X3D features</title>
+
+<para>X3D is a direct successor to VRML 2.0. X3D header even openly
+specifies <literal>#X3D V3.0 utf8</literal> (or <literal>3.1</literal>,
+or <literal>3.2</literal>) admitting that it's just a 3rd version
+of VRML.</para>
+
+<para>X3D is almost absolutely compatible with VRML 2.0, meaning
+that almost all VRML 2.0 files are also correct X3D files &mdash;
+assuming that we change the header to indicate X3D and add trivial
+<literal>PROFILE</literal> line.
+Minor incompatible changes include renaming of access specifiers
+(<literal>exposedField</literal> becomes <literal>inputOutput</literal>,
+<literal>eventIn</literal> becomes <literal>inputOnly</literal> etc.),
+and changes to some field names (<literal>Switch.choice</literal> and
+<literal>LOD.level</literal> were renamed to <literal>Switch.children</literal>
+and <literal>LOD.children</literal>, this made the <quote>containerField</quote> mechanism
+of X3D XML encoding more useful). There was no revolutionary compatibility
+break on the road to X3D,  and everything that we said in this chapter
+about VRML 2.0 applied also to X3D.</para>
+
+<para>Some of the improvements of X3D:</para>
+
+<glosslist>
+  <glossentry>
+    <glossterm><emphasis>Encodings</emphasis></glossterm>
+
+    <glossdef><para><emphasis>VRML classic</emphasis> encoding is for
+      compatibility with VRML 2.0.</para>
+
+      <para><emphasis>XML encoding</emphasis> allows to validate and process
+      X3D files with XML tools (like XML Schema, XSLT). It also allows easier
+      implementation, since most programming languages include XML reading/writing
+      support (usually using the DOM API).
+      So you don't have to write lexer and parser (like for classic VRML).</para>
+
+      <para>Finally, <emphasis>binary encoding</emphasis>
+      (not implemented in our engine yet)
+      allows smaller files and makes parsing faster.</para>
+
+      <para>There is no requirement to support all three encodings in
+      every X3D browser &mdash; you only have to support one.
+      XML encoding is the most popular and probably the simpler to implement,
+      so this is the suggested choice. All encodings are completely
+      interchangeable, which means that we can convert X3D files back and forth
+      from any encoding to any other, and no information is lost.
+      Many tools exist to convert from one encoding to the other
+      (our own engine can be used to convert between XML and classic encoding,
+      see <ulink url="http://castle-engine.sourceforge.net/view3dscene.php#section_converting"/>).</para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm><emphasis>Components and profiles</emphasis></glossterm>
+
+    <glossdef><para>VRML 2.0 standard was already quite large, and
+      implementing full VRML 2.0 browser was a difficult and long task.
+      At the same time, pretty much everyone who used VRML for more advanced
+      tasks wanted to extend it in some way. So it seemed that the standard
+      was large, and it had to grow even larger... clearly, there was
+      a problem.</para>
+
+      <para>The first part of the solution in X3D
+      is to break the standard into many small <emphasis>components</emphasis>.
+      Component is just a part of the specification dealing with particular
+      functionality. The crucial part of each component are it's nodes,
+      and some specification how these nodes cooperate with
+      the rest of the scene. For example, there is a component with 2D
+      geometry, called <literal>Geometry2D</literal>. There is a component
+      providing high-level shaders (GLSL, HLSL, Cg) support called <literal>Shaders</literal>.
+      Currently (as of X3D edition 2) there are 34 components defined by
+      the specification. Every node is part of some component.
+      Naturally, some components depend on other components.</para>
+
+      <para>Some components
+      are complicated enough to be divided even more &mdash; into <emphasis>levels</emphasis>.
+      For example, implementing component on lower level may mean that
+      some node is only optionally supported, or maybe some of it's
+      fields may be ignored, or maybe there may exist some limits on the data.
+      For example, for the <literal>Networking</literal> component, level 1
+      means that program must support only local (<literal>file://</literal>)
+      absolute URLs. For level 2, additionally <literal>http://</literal>
+      must be supported, and URLs may be relative.
+      On level 4 secure <literal>https://</literal> must be additionally supported.
+      </para>
+
+      <para>The author of X3D file can request, at the beginning
+      of X3D file, which components and on what levels
+      must be supported to handle this file. For example, in classic VRML
+      encoding lines</para>
+
+<screen>COMPONENT Networking:2
+COMPONENT NURBS:1
+</screen>
+
+      <para>mean that networking component must be support relative and
+      and absolute <literal>http://</literal> and <literal>file://</literal>
+      URLs and basic NURBS support is required.</para>
+
+      <para>Now, the components and levels only divide the standard into
+      small parts. It would be a nightmare to specify at the beginning
+      of each file all required components. It would also do no good
+      to compatibility across X3D browsers: if every browser would be
+      allowed to support any set of any components, we would have no
+      guarantee that even the most basic X3D file is supported by
+      reasonable X3D browsers. So the second part of the solution
+      are <emphasis>profiles</emphasis>. Profile is basically a set
+      of components and their levels, and some additional conditions.
+      There are only few profiles (six, as of X3D edition 2),
+      like <literal>Core</literal>, <literal>Interchange</literal>,
+      <literal>Interactive</literal> and <literal>Full</literal>.
+      The idea is that when browser claims <quote>I support Interchange
+      profile</quote>, then we already know quite a lot about what
+      it supports (Interchange includes most of the static 3D data),
+      and what it possibly doesn't support (interaction, like non-trivial sensors,
+      is not included in the Interchange profile).</para>
+
+      <para>Each X3D file <emphasis>must</emphasis> state at the beginning
+      which profile it requires to operate. For example, in classic VRML
+      encoding, the <literal>PROFILE</literal> line is required, like</para>
+
+<screen>PROFILE Interchange
+</screen>
+
+      <para>Summing it up, the X3D author specifies first the profile
+      and then optionally any number of components (and their levels)
+      which must be supported (in addition to features already requested
+      by the profile). Effectively, X3D browsers can support any
+      components at any level, but they are also strongly pushed
+      to support some high profile. X3D authors can request any profile
+      and components combination they want, and are relatively safe
+      to expect support from most browsers for Interchange
+      or even Interactive profiles.</para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm><emphasis>New graphic features</emphasis></glossterm>
+
+    <glossdef><para>As said, there are 34 X3D components, surely there
+      are many new interesting nodes, far too many to actually list them here.
+      You can take a quick look at the X3D specification table of contents
+      at this point.</para>
+
+      <para>OK, some of the more interesting additions (not present in
+      VRML 97 amendment 1), in my opinion: humanoid animation (H-Anim),
+      programmable shaders, 3D texturing, cube map environmental texturing,
+      rigid body physics, particle systems.</para>
+    </glossdef>
+  </glossentry>
+</glosslist>
+
+<para>X3D is supported in our engine since May 2008.</para>
+
+</sect2>
+
+<sect2 id="section.events_mechanism">
+<title>Events mechanism</title>
+
+<para>One of the goals of VRML 97 was to allow creating animated
+and interactive 3D worlds. This feature
+really sets VRML above other 3D formats. We can define
+basic animations and interactions in pure VRML language,
+while also easy and natural integration with scripting languages
+is possible.</para>
+
+<para>A couple of things make this working:</para>
+
+<glosslist>
+  <glossentry>
+    <glossterm><emphasis>Events</emphasis></glossterm>
+    <glossdef><para>Each node has a set of events defined by the VRML standard<footnote><para>Some
+      special nodes, like <literal>Script</literal> and
+      <literal>ComposedShader</literal>, may also specify
+      additional fields and events in the form of so-called <emphasis>interface declarations</emphasis>.
+      In this case, each instance of such node may have a different set
+      of fields and events. Like said, these are quite special and
+      serve a special purpose. For example, <literal>ComposedShader</literal>
+      fields and events are passed to uniform variables of GLSL (OpenGL
+      shading language) shader.</para>
+
+      <para>These details are not really relevant for our simple overview of event
+      mechanism... For simplicity you can just assume that all nodes define
+      their set of events, just like they define their fields.</para></footnote>.
+      There are <emphasis>input events</emphasis>,
+      that can be send to the node (by routes and scripts,
+      we will get to them soon).
+      Input event provides some value to the node and tells
+      the node to do something. There are also <emphasis>output events</emphasis>, that are
+      conceptually generated <quote>by the node</quote>, when some situation
+      occurs. Every event has a type, just like a VRML field.
+      This type says what values can this event receive (input event)
+      or send (output event).
+      Specification says what events are available, and what do they actually do.
+      </para>
+
+      <para>For example, <literal>Viewpoint</literal> node
+      has an input <literal>set_bind</literal> event of <literal>SFBool</literal> type.
+      When you send a <literal>TRUE</literal> to this event, then the
+      viewpoint becomes the current viewpoint, making camera jump to it.
+      Thus, you can place many <literal>Viewpoint</literal>s in VRML
+      file, and switch user between them.</para>
+
+      <para>As an example of output event, there is a <literal>TimeSensor</literal>
+      node that continuously sends <literal>time</literal> output event
+      (of <literal>SFTime</literal> type). It sends current time value,
+      in seconds (<literal>SFTime</literal> simply contains double-precision
+      floating point value).</para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm><emphasis>Exposed fields</emphasis></glossterm>
+    <glossdef><para>The most natural use for events is to
+      set a field's value (by input event), and to generate notification
+      when field's value changed (by output event).
+      For example, we have
+      an input event <literal>set_translation</literal> for <literal>Transform</literal>
+      node, and analogous <literal>translation_changed</literal> event.
+      Together with <literal>translation</literal> field, such triple is
+      called an <emphasis>exposed</emphasis> field.</para>
+
+      <para>A lot of fields are marked <quote>exposed</quote> in VRML standard.
+      Analogous to above <literal>Transform.translation</literal> example,
+      exposed field <literal>xxx</literal> is a normal field,
+      plus an input event named <literal>set_xxx</literal>
+      that sets field's value and generates output event
+      <literal>xxx_changed</literal>. This allows events mechanism to
+      change the VRML graph at run-time.</para>
+
+      <para>Some fields are not exposed (X3D calls them <literal>initializeOnly</literal>),
+      the idea is that VRML browser may need to do some time-consuming
+      preparation to take this field into account, and it's not very
+      common to change this value once VRML file is loaded. For example,
+      <literal>creaseAngle</literal> of <literal>IndexedFaceSet</literal>
+      is not an exposed field.</para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm><emphasis>Routes</emphasis></glossterm>
+    <glossdef><para>This is really the key idea, tying events mechanism
+      together. A route connects
+      one output event to some other input event. This means that when
+      source output event is generated, the destination input event
+      is fired. Destination event receives the value send by source event,
+      naturally.</para>
+
+      <para>For example, consider <literal>ProximitySensor</literal>,
+      that sends a couple of output events when camera is within
+      some defined box. In particular, it sends <literal>position_changed</literal>
+      event with current viewer position (as <literal>SFVec3f</literal> value).
+      Let's say we want to make a <literal>Cylinder</literal>
+      that hangs above camera, like a real cylinder hat. We can easily make
+      a cylinder:</para>
+
+<screen>DEF MyCylinder Transform {
+  # We do not want to define translation field here,
+  # it will be set by route
+  children Transform {
+    # This translation is to keep cylinder above the player
+    # (otherwise player would be inside the cylinder)
+    translation 0 2 0
+    children Shape {
+      geometry Cylinder { }
+    }
+  }
+}
+</screen>
+
+      <para>How to make the cylinder move together with the player? We have to
+      connect output event of <literal>ProximitySensor</literal> with
+      input event of <literal>MyCylinder</literal>:</para>
+
+<screen>DEF MyProx ProximitySensor { }
+
+ROUTE MyProx.position_changed TO MyCylinder.set_translation
+</screen>
+
+      <para>And that's it! As you see, the crucial statement
+      <literal>ROUTE</literal> connects two events (specifying
+      their names, qualified by node names). What is important
+      is that routes are completely independent from VRML file hierarchy,
+      they can freely connect events between different nodes,
+      no matter where in VRML hierarchy they are.
+      Many routes may lead to a single input event, many routes may come
+      out from a single output event.
+      Loops are trivially possible by routes (VRML standard
+      specifies how to avoid them: only one event is permitted to be send
+      along one route during a single timestamp, this guarantees
+      that any loop will be broken).</para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm><emphasis>Sensor nodes</emphasis></glossterm>
+    <glossdef><para>Exposed events and routes allow to propagate
+      events. But how can we generate some initial event, to start
+      processing? Sensor nodes answer this. We already saw examples
+      of <literal>TimeSensor</literal> and <literal>ProximitySensor</literal>.
+      There are many others, allowing events to be generated on
+      object pick, mouse drag, key press, collisions etc. The idea is that VRML browser
+      does the hard work of detecting situations when given sensor
+      should be activated, and generates appropriate events from this sensor.
+      Such events may be connected through routes to other events,
+      thus causing the whole VRML graph to change because user e.g.
+      clicked a mouse on some object.</para>
+
+      <para>The beauty of this is that we can do many interesting
+      things without writing anything that looks like an imperative programming
+      language. We just declare nodes, connect their events with routes,
+      and VRML browser takes care of handling everything.</para>
+    </glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm><emphasis>Interpolator nodes</emphasis></glossterm>
+    <glossdef><para>These nodes allow to do animation by interpolation
+      between a set of values. They all have a <literal>set_fraction</literal>
+      input field, and upon receiving it they generate output event
+      <literal>value_changed</literal>. How the input fraction is
+      translated to the output value is controlled by two fields:
+      <literal>key</literal> specifies ranges of fraction values,
+      and <literal>keyValue</literal> specifies corresponding output values.
+      For example, here's a simple animation of sphere traveling along
+      the square-shaped path:</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/moving.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+    </glossdef>
+  </glossentry>
+</glosslist>
+
+<para>Whole events mechanism is implemented in our engine since
+August 2008.</para>
+
+</sect2>
+
+<sect2 id="section.scripting">
+<title>Scripting</title>
+
+<para>Scripting in VRML is very nicely defined on top of events and routes
+mechanism.
+The key VRML node here is the <literal>Script</literal> node. It's
+<literal>url</literal> field specifies the script
+&mdash; it's either an URL to the file containing actual script contents
+(MIME type or eventually file extension will determine the script language),
+or an inline script (starting with special protocol like
+<literal>ecmascript:</literal> or <literal>castlescript:</literal>).</para>
+
+<para>Moreover, you can define additional
+fields and events within <literal>Script</literal> node.
+<literal>Script</literal> node is special in this regard,
+since most of the normal VRML nodes have a fixed set of fields and events.
+Within <literal>Script</literal>, each node instance may have different
+fields and events (some other VRML nodes use similar syntax,
+like <literal>ComposedShader</literal> for uniform variables).
+These <quote>dynamic</quote> fields/events are then treated as normal,
+is particular you can connect them with other nodes' fields/events,
+using normal VRML routes syntax.
+For example:</para>
+
+<screen>DEF MyScript Script {
+
+  # Special fields/events for the script.
+  inputOnly SFTime touch_time
+  initializeOnly SFBool open FALSE
+  outputOnly SFTime close_time
+  outputOnly SFTime open_time
+
+  # Script contents --- in this case in CastleScript language,
+  # specified inline (script content is directly inside VRML file).
+
+  url "castlescript:
+
+function touch_time(value, timestamp)
+if (open,
+    close_time := timestamp,
+    open_time := timestamp);
+open := not(open)
+"
+}
+
+ROUTE SomeTouchSensor.touchTime TO MyScript.touch_time
+ROUTE MyScript.close_time TO TimeSensor_CloseAnimation.startTime
+ROUTE MyScript.open_time TO TimeSensor_OpenAnimation.startTime
+</screen>
+
+<para>The idea is that you can declare fields within script nodes
+using standard VRML syntax, and you route them to/from other nodes
+using standard VRML routes. The script contents say only
+what to do when input event is received, and may generate output events.
+This way the script may be treated like a <quote>black box</quote>
+by VRML browser: browser doesn't have to understand (parse, interpret etc.)
+the particular scripting language, and still it knows how this script
+is connected to the rest of VRML scene.</para>
+
+<para>VRML 97 specification includes
+detailed description of Java and ECMAScript (JavaScript) bindings.
+X3D specification pushes this even further, by describing
+external language interface in a way that is <quote>neutral</quote>
+to actual programming language (which means that it should
+be applicable to pretty much all existing programming languages).</para>
+
+<para>My engine doesn't support ECMAScript or Java scripting for now.
+But we have two usable script protocols:</para>
+
+<orderedlist>
+  <listitem><para><literal>compiled:</literal> protocol
+    allows you to assign a compiled-in (that is, written in ObjectPascal
+    and compiled in the program) handler to the script.
+    See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_script_compiled"/>
+    for documentation.</para></listitem>
+
+  <listitem><para><literal>castlescript:</literal> protocol
+    allows you to use a simple scripting language developed specifically for our engine.
+    It allows you to receive, process and generate VRML events,
+    being powerful enough for many scripting needs.
+    Together with nodes like <literal>KeySensor</literal> this allows
+    you to write full games/toys in pure VRML/X3D (without the need
+    to compile anything).
+    See <ulink url="http://castle-engine.sourceforge.net/castle_script.php"/>
+    for full documentation and many examples.</para></listitem>
+</orderedlist>
+
+<para>Scripts are implemented in our engine since October 2008.</para>
+
+<!-- For VRML
+      authors, this is also the way to not be tied to any particular
+      VRML engine. Writing whole games in VRML is possible, and many
+      such games are on the Internet. A game done in VRML can be opened
+      and played in any VRML browser.
+-->
+</sect2>
+
+<sect2 id="section.more_features">
+<title>More features</title>
+
+<para><emphasis>Fun fact</emphasis>: this section of the documentation
+was initially called <emphasis><quote>Beyond what is implemented</quote></emphasis>.
+It was a list of various VRML 97 and X3D features
+not implemented yet in our engine. But with time,
+they were all gradually implemented, and the list of missing features got
+shorter and shorter...
+So now we list in this section many features that <emphasis>are
+implemented</emphasis>, but are documented elsewhere:</para>
+
+<glosslist>
+  <glossentry>
+    <glossterm><emphasis>NURBS</emphasis></glossterm>
+    <glossdef><para>NURBS curves and surfaces. Along with interpolators
+      to move other stuff along curves and surfaces.
+      See <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_nurbs.php" />.
+      </para></glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm><emphasis>Environmental textures</emphasis></glossterm>
+    <glossdef><para>Textures to simulate mirrors, auto-generated or loaded
+      from files.
+      See <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_cubemaptexturing.php" />.
+      </para></glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm><emphasis>Shaders</emphasis></glossterm>
+    <glossdef><para>Full access to GPU shaders (<emphasis>OpenGL Shading Language</emphasis>).
+      See <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_shaders.php" />.
+      </para></glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm><emphasis>Clicking and dragging sensors</emphasis></glossterm>
+    <glossdef><para>Sensors to detect clicking and dragging with a mouse.
+      Dragging sensors are particularly fun to allow user to visually edit
+      the 3D world.
+      See <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_pointingdevicesensor.php" />.
+      </para></glossdef>
+  </glossentry>
+
+  <glossentry>
+    <glossterm><emphasis>And much more...</emphasis></glossterm>
+    <glossdef><para>See <ulink url="http://castle-engine.sourceforge.net/vrml_x3d.php" />
+      for a complete and up-to-date list of all the VRML / X3D features
+      supported in our engine.
+      Including the standard VRML / X3D features and our extensions.</para></glossdef>
+  </glossentry>
+
+</glosslist>
+
+</sect2>
+
+</sect1>
+
+</chapter>
+
+<!--
+  Local Variables:
+  ispell-local-dictionary: "american"
+  End:
+-->

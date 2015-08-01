@@ -1,0 +1,730 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+
+<chapter id="chapter.octree">
+<title>Octrees</title>
+
+<!--
+  Source units:
+  CastleOctree,
+  Triangle,
+  ShapeOctree,
+  TriangleOctree -->
+
+<para>Octree is a tree structure used to partition a 3D space.
+Each octree node has eight children (hence the name <quote>octree</quote>,
+oct + tree). Our engine uses octrees for a couple of tasks.</para>
+
+<sect1 id="section.octree_collision_detection">
+<title>Collision detection</title>
+
+<para>Generally speaking, octree is useful for
+various collision detection tasks:</para>
+
+<orderedlist>
+  <listitem><para>First of all, for a <quote>normal</quote>
+    collision detection needed in games. That is for checking collisions
+    between the player and the world geometry. The player may be represented
+    by a sphere, and when the player moves we check that:</para>
+
+    <itemizedlist>
+      <listitem><para>The line segment between the current player position
+        and the new player position does not collide with the world.</para></listitem>
+      <listitem><para>The sphere surrounding new player position
+        does not collide with the world.</para></listitem>
+    </itemizedlist>
+
+    <para>When we detect a collision, we can simply reject player move,
+    or (much better) propose another, non-colliding new player position.
+    This way the player can <quote>slide</quote> along the wall when
+    he tries to move into it.</para>
+
+    <para>This is done within <literal>MoveCollision</literal>
+    method of the <literal>TTriangleOctree</literal> class.</para>
+
+    <para>Also, when gravity works, we want the player to preserve
+    some preferred height above the ground. This allows the player to
+    climb up and down the hills, stairs etc. It is often called
+    <firstterm>terrain-following</firstterm>. This requires calculating current
+    player height above the ground. By comparing this height with
+    a preferred height we know whether the player position should fall down
+    or raise up. This is done by checking for a collision between
+    a ray (that starts at player's position
+    and is directed down) with the world.</para>
+
+    <para>This is done by <literal>HeightCollision</literal> method
+    of <literal>TTriangleOctree</literal> class.</para></listitem>
+
+  <listitem><para>For ray-tracer, this is the most important data
+    structure. Ray-tracer checks collisions of rays with the world
+    to calculate it's image. Also when calculating shadows
+    we check for collision between light point (or a random point
+    on light's surface, in case of surface lights) and the possibly
+    shadowed geometry point.</para>
+
+    <para>This is done by <literal>RayCollision</literal> and
+    <literal>SegmentCollision</literal> methods of
+    <literal>TTriangleOctree</literal> class.</para></listitem>
+
+  <listitem><para>When player picks (for example by clicking with mouse)
+    given point on the screen showing 3D scene,
+    we want to know which object from our 3D scene (for example,
+    which VRML node) he actually picked. So again we want to do
+    collision detection between a ray (starting at player's position
+    and with direction calculated from player's looking direction,
+    screen dimensions and picked point coordinates on the screen) and
+    the world.</para>
+
+    <para>Note that there are other methods to determine which
+    object player picked. For example you could employ some OpenGL tricks:
+    rendering in selection mode, or reading color buffer contents to get results
+    of depth buffer tests. See <ulink
+      url="http://www.opengl.org/documentation/red_book/">The
+    OpenGL Programming Guide - The Redbook</ulink> for details.
+    But once we have octree already implemented,
+    it is usually easier and less cumbersome to use than these tricks.</para></listitem>
+
+  <listitem><para>When rendering using OpenGL, we don't want to pass
+    to OpenGL objects that are known to be invisible to the player.
+    For example, we know that objects outside of the camera frustum
+    are invisible. In certain cases (when e.g. dense fog is used)
+    we also know that objects further from player than certain
+    distance are not visible.</para>
+
+    <para>This means that we want to check for collision between
+    camera frustum and/or sphere with the world. This is done
+    by <literal>EnumerateCollidingOctreeItems</literal> and
+    <literal>SphereCollision</literal> methods.</para>
+
+    <para>More information about how these algorithms are used will
+    be given in <xref linkend="section.scene_gl" />.
+    </para></listitem>
+</orderedlist>
+
+</sect1>
+
+<sect1 id="section.how_octree_works">
+<title>How octree works</title>
+
+<para>Octree is a tree where each internal (non-leaf) node has eight children.
+Each node spans a particular space area, expressed
+as an axis-aligned bounding box (available as <literal>Box</literal>
+property of <literal>TOctreeNode</literal>).
+Each node also has a chosen middle point inside this box (available
+as <literal>MiddlePoint</literal> property of <literal>TOctreeNode</literal>
+class). This point defines three planes parallel to the base
+X, Y and Z planes and crossing this point.
+Each child of given octree node represents one of the eight space parts
+that are created by dividing parent space using these three planes.</para>
+
+<para>Each child, in turn, may be either</para>
+
+<orderedlist>
+  <listitem><para>Another internal node. So it has his own middle point
+    and another eight children. His middle point must be within
+    the space part that his parent node gave him.</para></listitem>
+
+  <listitem><para>Or a leaf, that simply contains actual items that
+    you wanted to store in an octree. What is an <quote>actual item</quote>
+    depends on with want items you want to calculate collisions using
+    this octree.</para>
+
+    <para>In our engine we have two octree types:</para>
+    <orderedlist>
+      <listitem><para><literal>TTriangleOctree</literal> that keeps triangles
+        </para></listitem>
+      <listitem><para><literal>TShapeOctree</literal>
+        that keeps VRML <emphasis>shapes</emphasis>.
+        <emphasis>Shape</emphasis> is a pair of
+        <literal>TVRMLGeometryNode</literal>
+        (remember from <xref linkend="section.geometry_node" /> that these
+        are the only VRML nodes that actually have some geometry visible)
+        and it's <literal>State</literal> (obtained from traversing
+        VRML graph).</para></listitem>
+    </orderedlist>
+  </listitem>
+</orderedlist>
+
+<para>What happens when given item should be included in more than
+one children? That is, item is contained in space part of more
+than one children?</para>
+
+<orderedlist>
+  <listitem><para>Simple solution is to put this item inside
+    all children where it should be. This means that we could
+    waste a lot of memory if given item should be present in
+    many leaf nodes, but this problem can be somewhat cured by just
+    keeping an array of octree items for the whole octree
+    (like <literal>TTriangleOctree.Triangles</literal> or
+    <literal>TShapeOctree.ShapesList</literal>)
+    and keeping only indexes to this array in octree leafs
+    (<literal>ItemsIndices</literal> property of <literal>TOctreeNode</literal>).
+    </para></listitem>
+
+  <listitem><para>Another possible solution is to keep such problematic item
+    only in the list of items of internal node, instead of putting
+    it inside children nodes. But each octree node has eight children,
+    and given item can be contained for example only in two of eight
+    children. In this case our collision checking routines
+    would always have to consider this item, while in fact they
+    should consider it only for a 2/8 part of the space.</para>
+
+    <para>That's why my engine doesn't use this approach.
+    Note that some hybrid approach could be possible here,
+    for example keep the item if it spans more than 4 children nodes
+    and put it inside children otherwise. This idea remains to be implemented
+    one day... For now our collision checking is fast enough for all
+    purposes when it's needed in real-time games.
+    </para></listitem>
+</orderedlist>
+
+<para>Example below shows an octree constructed by our engine.
+The sample scene contains two boxes and a sphere.
+On the screenshot yellow bounding boxes
+indicate every internal node and every non-empty leaf.
+Whole scene is contained within root node of the tree,
+so the largest yellow bounding box corresponds also to the bounding
+box of the scene. The <quote>lonely</quote> box (in the foreground)
+is placed within the two direct children on the root tree node.
+Left and right quarter on the image contain only empty children leaves
+of root node, so their bounding boxes are not shown. Finally,
+the interesting things happen in the quarter with a box and a sphere.
+Sphere has many triangles, so a detailed octree is constructed
+around it. Also the sphere caused a little more detailed octree
+around the near box.</para>
+
+<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/octree_example.wrl"
+  xmlns:xi="http://www.w3.org/2001/XInclude"
+  parse="text"/></screen>
+
+<!-- Workaround for FOP: keeping figure title+content together problem. -->
+<?page-break?>
+
+<para role="para_with_larger_screen_mini">
+<figure>
+  <title>A sample octree constructed for a scene with two boxes and a sphere</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="examples/octree_example_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="examples/octree_example_screen.png"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="examples/octree_example_screen.eps"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>You can view octree like this using
+<ulink url="http://castle-engine.sourceforge.net/view3dscene.php">
+view3dscene</ulink>. Just turn on the menu option <quote>View</quote>
+-> <quote>Show whole octree</quote>. There are also menu commands to
+investigate octree nodes only at the particular depth.</para>
+
+<sect2 id="section.octree_checking_collisions">
+<title>Checking for collisions using the octree</title>
+
+<para>Let's assume that you have some reference object (like a sphere
+or a ray or a line segment mentioned in the
+<link linkend="section.octree_collision_detection">first section</link>)
+that you want to check for collisions with all items contained in
+the octree. You start from the root node &mdash; all items, which means
+<quote>all potential colliders</quote>, are there. You check with which
+children of this node your object could possibly collide.
+Different object types will
+require various approaches here. In general, this comes down to
+checking for collision between children nodes' boxes and your
+reference object. For example:</para>
+
+<orderedlist>
+  <listitem><para>For a sphere, you check which child node contains
+    the sphere center. Then you check with which planes
+    (of the three dividing planes of this node)
+    the sphere collides.
+    This determines all the children that the sphere can collide with.
+    </para>
+
+    <para>Above approach is not as accurate as it could be &mdash;
+    since it effectively checks
+    the collision of the bounding box of the sphere with children boxes.
+    To make it more accurate you can check whether the middle point of
+    given node is within the sphere. But it's not certain whether this
+    additional check will make your collision detection faster
+    (because we will descend into less children nodes) or slower
+    (because we spend time on the additional check). In practice, this depends on
+    how large spheres you will check for collision &mdash; for small
+    (small in comparison to the world) spheres, this additional check
+    will seldom eliminate any child and probably will be worthless.
+    </para></listitem>
+
+  <listitem><para>For a ray: determine child node where ray start is.
+    Then check for collision between this ray and three base planes
+    crossing node's middle point. This will let you determine
+    into which children nodes the ray enters. Similar approach could be taken
+    for the line segment.</para></listitem>
+
+  <listitem><para>For a frustum: first note
+    that our engine stores frustum as a 6 plane equations.</para>
+
+    <para>The basic approach here is to employ the method of
+    checking for collision between a plane and a box.
+    To determine collision of a box with a plane you can check
+    8 box corners on which side of the plane they are
+    (simply by checking expression similar to the plane equation,
+    <phrase role="math">Ax + Bx + Cz + D >= 0</phrase>).
+    If all points are on the same side of the plane (and no
+    point lies precisely on the plane) then there is no collision.
+    This also tells your <emphasis>on which size of the plane</emphasis>
+    the box is located, in case there is no collision.</para>
+
+    <para>In our engine, frustum planes are correctly oriented,
+    so the answer to the question <quote>on which size of the plane</quote>
+    a box is located is meaningful to us. To check for
+    collision of frustum with a node, we check 6 frustum planes for collision
+    with this node's box. If box is on the <emphasis>inside
+    side of every plane</emphasis>, this means that the box is completely
+    inside the frustum. Otherwise, if the box is on the <emphasis>outside
+    side of at least one plane</emphasis>, then the box is completely
+    outside of the frustum. Otherwise (which means that box
+    collides with at least one plane, and it's not outside any plane)
+    we don't really know.</para>
+
+    <para>In the last case, we're pretty certain that
+    the box collides somehow with the frustum, so we assume this.
+    In case of error, nothing terrible will happen: our collision
+    checking routine using octree will just work a little slower than possible,
+    but it will still be 100% correct. In practice, in almost all cases
+    our assumption will be true, although some nasty cases are indeed possible.
+    You can see an example of such case below.
+    This is a side view showing a frustum and a box.
+    You can see that the box collides with 3 planes and is considered to be on
+    the inside of the 4th plane (the one at the bottom). You can easily
+    extend this image to 3D and imagine the remaining 2 frustum planes
+    in such way that they will intersect the box.
+    </para>
+
+    <para role="para_with_larger_screen_mini">
+    <figure>
+      <title>A nasty case when a box is considered to be
+        colliding with a frustum, but in fact it's outside of the
+        frustum</title>
+      <mediaobject>
+      <imageobject role="html">
+        <imagedata format="PNG"
+          fileref="images/frustum_box_nasty_case.png" />
+      </imageobject>
+      <!--
+        I include PNG version in FOP.
+        Although FOP can handle SVG, I couldn't get it to do it properly.
+        My results looked quite terrible: SVG was seemingly converted to
+        some raster format, so it looked completely pixelated.
+        And that partially-transparent rectangle was rendered incorrectly
+        (it was just black).
+      -->
+      <imageobject role="fo">
+        <imagedata format="PNG"
+          fileref="images/frustum_box_nasty_case_for_print.png"
+          width="4in" contentwidth="4in" />
+      </imageobject>
+      <imageobject role="dblatex">
+        <imagedata format="EPS"
+          fileref="images/frustum_box_nasty_case.eps"
+          width="4in" contentwidth="4in" />
+      </imageobject>
+      </mediaobject>
+    </figure>
+    </para>
+  </listitem>
+</orderedlist>
+
+<para>Once you can check with which octree node's children your
+object collides, you just apply this process recursively.
+That is, for each internal node you determine which of it's
+children may collide with your reference object, and recursively check
+for collisions inside these children. For each leaf node, you just
+sequentially check all it's items for collision. For example, in case of
+a triangle octree, in the leafs you will check for collision between
+triangles and your reference object.</para>
+
+<para>What's the time of this collision checking algorithm?
+Like with all tree structures, the idea is that the time
+should be logarithmic. But actually we don't use any advanced
+techniques that could ensure that our octree is really balanced.
+And the fact that items that are put inside more than one children
+are effectively multiplied in the octree doesn't help either.
+However octrees of real-world models are enough
+balanced (and multiplication is small enough) to make collision
+checking using octrees <quote>logarithmic (i.e. fast) in practice</quote>.
+</para>
+
+<para>Some more notes about collision checking using an octree:</para>
+
+<itemizedlist>
+  <listitem><para>Sometimes all you need is the information
+    that <quote>some collision occurred</quote> (for example
+    that's enough for shadow detection). Sometimes
+    you want to get the closest collision point (for example,
+    closest to the ray start, for ray-tracing).
+    The first case can obviously be optimized
+    to finish whole algorithm as soon as any collision is found.
+    In the second case you must always check all items when you
+    process a leaf node (because the items in leaf nodes are not ordered
+    in any way). But when processing internal nodes
+    it can still be optimized to not enter
+    some children nodes if collision in earlier child node was found
+    (in cases when we know that every possible collision in one
+    child node must be closer to ray start than every possible
+    collision in other node).</para></listitem>
+
+  <listitem><para>As was mentioned earlier, if an octree item
+    fits into more than one child of given node, we put it inside
+    every matching children node, thus duplicating information
+    about this item in many leafs. But this means that we can
+    lose some speed. We can be fooled into checking more than once for collision
+    between our reference object (like a ray) with <emphasis>the same
+    item, but placed within a different leaf</emphasis>.</para>
+
+    <para>This is not so terribly bad, since we are talking
+    here about tests like checking for collision between a single ray
+    and a single triangle. So this test is anyway quite fast operation,
+    in constant time. But still it requires a couple of floating point
+    operations, and it's called very often by our algorithm, so we want
+    to optimize it.</para>
+
+    <para>The solution is called <firstterm>the mailboxes</firstterm>.
+    Each octree item
+    gets a mailbox. Each reference object (like a ray) gets a unique
+    tag. Before we check for collision between our
+    reference object and an octree item, we check whether the mailbox
+    has the information about the collision test result for this
+    object tag. If yes, then we obtain the collision test result
+    from the mailbox. Otherwise, we perform normal (more time-consuming)
+    test and we store the test result along with the object tag within
+    the mailbox. This way each item will be tested for collision
+    with reference object only once. Next time we will just use
+    the mailbox.</para>
+
+    <para>This is possible to implement thanks to the fact that we
+    keep indexes to items in octree nodes, and the actual items
+    are kept in an array for a whole octree. So we can naturally place
+    our mailboxes in this array.</para></listitem>
+</itemizedlist>
+
+</sect2>
+
+<sect2 id="section.octree_constructing">
+<title>Constructing octree</title>
+
+<para>A simple algorithm starts
+with an empty tree, containing one leaf node with no items.
+Then we add our items (triangles, VRML shapes etc.) to the octree
+keeping an assertion that no leaf can have more than
+some specified number of items (<literal>LeafCapacity</literal>
+property of <literal>TOctree</literal> class).
+When we see that adding another item to some leaf would break
+this assertion, we convert the leaf to an internal node
+with eight children, and we add items (previous leaf items
+and the new item that we're trying to add) to newly created children.
+Of course, each children gets only the items that are within its
+space part.</para>
+
+<para>Note that this algorithm doesn't guarantee in any way that
+a tree is balanced. And we want the tree to be balanced,
+otherwise checking for collisions using this tree will be as slow
+(or even slower) than just sequentially checking collision with all items.
+However, for most real-world models, the items are spread more-or-less
+evenly across the scene, so in practice our tree is more-or-less balanced.
+To prevent the pathological cases that could result in extremely deep octrees
+we can add a simple limit on the allowed depth of the tree
+(<literal>MaxDepth</literal> property of <literal>TOctree</literal> class).
+When a leaf reaches <literal>MaxDepth</literal>, we will not split it
+to an internal node anymore, no matter how many items does it contain.
+So the assertion becomes <quote>leafs on depth &lt; <literal>MaxDepth</literal>
+must have at most <literal>LeafCapacity</literal> items</quote>.
+This way the nasty cases are somewhat bounded &mdash;
+our collision checking using tree cannot be <emphasis>much</emphasis>
+slower than just sequentially checking for collision with all contained items.
+</para>
+
+<para>There is a question how to calculate middle point of each node.
+The simple and most common approach is just to calculate it as an actual
+middle point of the node's box. Root tree node gets a box equal
+to the bounding box of our scene. But you could plug here other techniques.
+The basic idea is that the tree should be balanced, so ideally the
+middle point should divide the node's box into eight parts with equal
+number of triangles inside.</para>
+
+<para>For some purposes it's helpful to keep in each internal node
+a list of all items contained within it's children.
+This eats more memory, but may allow in some
+cases to terminate the collision checking operation faster.
+For example, when we want to check which octree items are inside
+a camera frustum, we often find ourselves in a situation when
+we know that some octree node is completely contained within
+the frustum. If we have all the items' indexes
+easily accessible within this internal node, we can avoid
+having to traverse all children nodes under this node.
+This is used by <literal>TShapeOctree</literal>
+in our engine.</para>
+
+</sect2>
+</sect1>
+
+<sect1 id="section.octrees_dynamic">
+<title>Octrees for dynamic worlds</title>
+
+<para>In version 1.6.0 of the engine, the octree structures were
+much improved to make them suitable
+for dynamic scenes. The crucial idea is to use a 2-level hierarchy
+of octrees (instead of a single octree).</para>
+
+<orderedlist>
+  <listitem><para>Each shape has it's own triangle octree,
+    build and stored in local shape coordinates
+    (<literal>TShape.OctreeTriangles</literal>).
+    Since everything inside this octree is stored in local coordinates,
+    nothing has to be updated when merely the transformation
+    of this shape changes (it's moved, rotated and such).
+    When the local geometry changes, the octree still has to be rebuild &mdash;
+    but now it's only the octree for this particular shape, octrees of other
+    shapes don't change.</para></listitem>
+
+  <listitem><para>There's also a single octree of all scene shapes.
+    Shapes are stored there
+    in world coordinates. Each change of geometry causes
+    the rebuild of this octree, but this is a small octree,
+    so rebuilding it is usually very fast.</para></listitem>
+</orderedlist>
+
+<para>When making a collision query, for example when testing whether
+a ray (given in world coordinates) intersects the scene,
+we start with a normal collision in the shape octree.
+At the leaves, we have a list of shapes potentially intersecting this ray.
+To test ray with each shape,
+we transform the ray into shape's local coordinates (this means
+we need to keep an inverted matrix of shape transformation,
+to convert from world space into local space). Then the ray
+in local coordinates is checked for collisions with triangle octree inside
+the shape. After the testing, we need to transform the returned
+intersection (if found) back into world coordinates.</para>
+
+<para>I dare to say that this works pretty excellent. Traversing the shape
+octree must be done efficiently, just like traversing triangles octree
+&mdash; in fact, we simply have <literal>TBaseTrianglesOctree</literal>
+class that implements the non-leaf traversing algorithms for both tree
+kinds. Triangle/shape octrees only have to handle what happens in leaf
+octree nodes. Both octrees use the <emphasis>mailbox</emphasis>
+technique to avoid checking the same item more than
+once during one collision query. For triangle octree mailboxes
+save the number of direct <emphasis>triangle vs ray/segment</emphasis> tests.
+For shape octree they save the number of <emphasis>shape vs ray/segment</emphasis>
+tests (so we will have less queries to local shape octrees,
+which is quite important saving, this makes query time more than 2 times
+faster on some scenes).</para>
+
+<sect2 id="section.octree_transforming_world_local">
+<title>Transforming between world and local coordinates</title>
+
+<para>As noted, we need to know the transformations and
+inverted transformations of the shapes, to freely switch between world
+and local coordinate space. For normal transformations (<literal>Transform</literal>
+node in VRML &gt;= 2.0) we simply calculate the inverted matrix along
+with the normal matrix when traversing VRML/X3D graph, so when doing collision
+query we have both matrices ready to use. For arbitrary 4x4 matrix
+transformations (<literal>MatrixTransform</literal> node, standard in VRML 1.0,
+and added as an extension to VRML &gt;= 2.0) we have to actually calculate
+matrix inversion. Careful reader will spot here potential problems:</para>
+
+<itemizedlist>
+  <listitem><para>What if the matrix
+    is not reversible? What if there's a scale with zero factor, for example
+    a scale <literal>(1, 1, 0)</literal> that projects shape onto Z=0 plane?
+    </para>
+
+    <para>Well, then we'll have a problem... this is simply not solved now,
+    and as far as I know it would just require special treatment (which
+    is quite difficult, since there may be many such difficult transforms
+    along the traversing way).</para></listitem>
+
+  <listitem><para>A minor problem is with arbitrary matrices, as they
+    may change a point into a direction or the other way around
+    (as we work with homogeneous coordinates, each 3D point is actually
+    a 4D vector with non-zero 4th component; each 3D direction is
+    a 4D vector with 4th component zero).
+    This is simply detected and no collision assumed &mdash; we can't do
+    anything more sensible for these cases actually. That's why I really
+    like the fact that VRML &gt;= 2.0 removed
+    <literal>MatrixTransform</literal> from the standard &mdash; forcing
+    authors to express transformations in terms of only <literal>Transform</literal>
+    node is a <emphasis>Good Idea</emphasis>.</para></listitem>
+
+  <listitem><para>Another problem is when we check for collisions
+    with axis-aligned box or sphere.
+    How to transform an axis-aligned box or sphere by a matrix?</para>
+
+    <orderedlist>
+      <listitem><para>
+        An <emphasis>axis-aligned box</emphasis> should turn into an
+        <emphasis>oriented box</emphasis> by a mere rotation.
+        If we also take into account scaling along the arbitrary axis,
+        you get something that doesn't even have to be a box. It's a <emphasis>6-DOP</emphasis>,
+        that is a set of 3 pairs of parallel planes. There are known
+        routines to detect collisions with such thing, but admittedly they
+        are a little more involved and, what's more important, much slower
+        than routines dealing with simple axis-aligned box.</para></listitem>
+
+      <listitem><para>
+        A <emphasis>sphere</emphasis> under an arbitrary transformation will turn into
+        an <emphasis>ellipsoid</emphasis>. Ellipsoid
+        is a sphere with (possibly) non-uniform scale
+        along an arbitrary 3D axis. To make collisions with it you usually
+        just un-rotate and un-scale the other object (like triangle) and
+        then make normal intersection with a sphere. Again, this is doable,
+        but is also slower (than normal, untransformed, sphere routines).</para></listitem>
+    </orderedlist>
+
+    <para>So what's our solution? Just ignore the whole issue.
+    Transform axis-aligned box into another axis-aligned box, possibly enlarging
+    it by the way. Convert sphere into axis-aligned box, and then transform
+    this into possibly even larger axis-aligned box. This way we input an
+    axis-aligned box into local sphere's octree.
+    While this looks like a lame solution, it's also simple and
+    fast. Practice shows that it's <quote>lameness</quote> is totally
+    not noticeable on real 3D scenes. That's because boxes
+    and spheres are used mainly as bounding volumes for player and
+    creatures. So the fact that they grow slightly larger during
+    collision detection is not noticeable in practice.</para>
+
+    <para>Still, implementing it better, at least using ellipsoids
+    is of course planned some day.
+    It just doesn't seem desperately needed now.</para></listitem>
+</itemizedlist>
+</sect2>
+
+<sect2 id="section.dynamic_irregular_octrees">
+<title>The future &mdash; dynamic irregular octrees</title>
+
+<para>The goal is to implement one day a really dynamic octree,
+to avoid rebuilding the shape octree at all. For details, see
+the paper <ulink url="http://www.cs.nmsu.edu/CSWS/techRpt/2003-004.pdf"><emphasis>Dynamic
+Irregular Octrees</emphasis></ulink> (from the page
+<ulink url="http://www.cs.nmsu.edu/CSWS/php/techReports.php?rpt_year=2003" />)
+by Joshua Shagam and Joseph J. Pfeiffer.
+A short summary of the idea:</para>
+
+<itemizedlist>
+  <listitem><para>First of all, updating the octree can be done simply
+    by deleting and re-inserting the octree item.</para></listitem>
+
+  <listitem><para>During delete and insertion you should try to keep
+    the octree balanced, so leafs may be split or merged to keep octree limits
+    (<literal>maxDepth</literal>, <literal>leafCapacity</literal>
+    in our implementation) satisfied. Inserting is of course already implemented
+    (that's how we construct the octree), the delete operation must be
+    done.</para></listitem>
+
+  <listitem><para>To make the deletion possible in a reasonable time,
+    you have to keep each item only once in the octree.
+    This means that some items will not be placed at octree leaves,
+    instead they will be <quote>stuck</quote> at the lowest possible internal
+    node.</para>
+
+    <para>Note that this will also make the <quote>mailbox</quote> idea
+    useless, as the only function of <quote>mailbox</quote> is to save
+    the computation when items are duplicated many times in the octree.</para>
+    </listitem>
+
+  <listitem><para>The fact that some items get <quote>stuck</quote>
+    at internal nodes is generally a bad thing. We want to move
+    items as deep as possible, to gain from octree traversing.
+    Otherwise the whole idea of octree becomes useless.</para>
+
+    <para>To counter this, we make the octree node planes
+    optional. Since a plane may be <quote>deactivated</quote>,
+    some items may be allowed to go deeper into the octree.</para></listitem>
+</itemizedlist>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="section.octree_similar">
+<title>Similar data structures</title>
+
+<para>There are other tree structures similar to the octree.
+Generally, octree is the easiest one to construct.
+Other tree structures give greater flexibility how the space
+is partitioned on each level, but to actually get the
+significant speed benefit, these trees must be also constructed
+in much smarter way.</para>
+
+<itemizedlist>
+  <listitem><para><firstterm>kd-tree</firstterm> partitions space at each node
+    by a plane parallel to one of the base planes.
+    In other words, it uses one plane where octree uses three planes.
+    This allows greater flexibility, for example it may be
+    more optimal to divide the space more often by a
+    <phrase role="math">X = const</phrase> plane than
+    <phrase role="math">Y = const</phrase>.
+    Octree is forced to divide space by all three planes at each node.</para>
+
+    <para>If you will use the simple <quote>rotational</quote>
+    strategy (X, Y, Z, then again X, Y, Z and so on) to choose
+    partitioning axes at each depth, then the kd-tree becomes
+    similar to an octree.</para>
+
+    <para>The name kd-tree comes from <quote>k-dimensional tree</quote>
+    term, since kd-tree may be used for any number of dimensions,
+    not necessarily 3D.</para></listitem>
+
+  <listitem><para><firstterm>BSP (Binary Space Partitioning) tree</firstterm>
+    partitions space in each node by a plane.
+    <emphasis>Any plane</emphasis>, not necessarily
+    parallel to one of the base X, Y, Z planes.</para>
+
+    <para>This gives even more flexibility than kd-tree,
+    but it makes constructing optimal BSP trees much harder
+    (assuming that you want to actually produce a better tree
+    than what can be achieved with kd-tree). It also
+    means that at each node you have to check for collision
+    between your reference object and an arbitrary plane (instead
+    of a plane parallel to one of the base coordinate system planes),
+    so computations get a little slower than for kd-tree.</para>
+
+    <para>Note that BSP tree is suitable for any number of dimensions,
+    just like kd-tree. You just use different equations to represent
+    hyperplanes in other dimensions.</para></listitem>
+
+  <listitem><para>Finally, note that the only thing that ties
+    octree to 3 dimensions is actually it's name. The same
+    approach could be used for any number of dimensions.
+    For N dimensions, each internal node will have
+    <phrase role="math">2<superscript>N</superscript></phrase> children.
+    For example for 2 dimensions each node has 4 children, and such
+    tree is called a <firstterm>quadtree</firstterm>.</para>
+
+    <para>Note that this approach is inadequate when
+    we have a really large number of dimensions, because then
+    <phrase role="math">2<superscript>N</superscript></phrase> will
+    be so large that <quote>organizational</quote> data of all tree nodes
+    may eat a lot of memory. But it is not a problem
+    if we stay within reasonable number of dimensions, like 2 or 3.</para></listitem>
+</itemizedlist>
+
+</sect1>
+
+</chapter>
+
+<!--
+  Local Variables:
+  ispell-local-dictionary: "american"
+  End:
+-->

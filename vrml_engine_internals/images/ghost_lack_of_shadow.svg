@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="997.61243"
+   height="750.76447"
+   id="svg12214"
+   sodipodi:version="0.32"
+   inkscape:version="0.45.1"
+   sodipodi:docbase="/home/michal/sources/vrmlengine/trunk/vrml_engine_doc/images"
+   sodipodi:docname="ghost_lack_of_shadow.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   inkscape:export-filename="/home/michal/sources/vrmlengine/trunk/vrml_engine_doc/images_shadow_volumes/ghost_lack_of_shadow.png"
+   inkscape:export-xdpi="72.169998"
+   inkscape:export-ydpi="72.169998"
+   version="1.0">
+  <defs
+     id="defs12216" />
+  <sodipodi:namedview
+     inkscape:document-units="mm"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.61399264"
+     inkscape:cx="489.66888"
+     inkscape:cy="366.501"
+     inkscape:current-layer="layer1"
+     id="namedview12218"
+     inkscape:window-width="1024"
+     inkscape:window-height="682"
+     inkscape:window-x="0"
+     inkscape:window-y="34" />
+  <metadata
+     id="metadata12220">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-28.887404,-32.918443)">
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#0000ff;stroke-width:32.31499481;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 214.20436,703.37739 L 435.64055,703.37739"
+       id="path18083" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#0000ff;stroke-width:32.31499481;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 658.02076,703.37738 L 879.45695,703.37738"
+       id="path18085" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#fafd00;stroke-width:35.43307114;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 570.85374,705.00607 L 663.68873,705.00607"
+       id="path18081" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#fafd00;stroke-width:35.43307114;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 429.97258,703.37738 L 522.80757,703.37738"
+       id="path16141" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:10.62992096;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 34.202364,703.37739 L 1021.1849,703.37739"
+       id="path15170" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1, 3;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 537.46573,60.047196 L 674.27518,768.52474"
+       id="path14199"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 487.09567,373.12644 L 375.00415,399.32099 L 437.85982,421.97874 L 525.13414,701.00628 L 572.4735,703.30958 L 659.07319,429.44754 L 707.03923,405.3926 L 638.36329,382.89855 L 594.38882,368.24039"
+       id="path12231"
+       sodipodi:nodetypes="ccccccccc"
+       inkscape:export-xdpi="72.169998"
+       inkscape:export-ydpi="72.169998" />
+    <path
+       sodipodi:type="arc"
+       style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:1;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1"
+       id="path3217"
+       sodipodi:cx="718.6568"
+       sodipodi:cy="237.57375"
+       sodipodi:rx="7.736249"
+       sodipodi:ry="8.1434202"
+       d="M 726.39305 237.57375 A 7.736249 8.1434202 0 1 1  710.92055,237.57375 A 7.736249 8.1434202 0 1 1  726.39305 237.57375 z"
+       transform="translate(-180.22987,-176.46768)" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 529.87635,71.692524 C 519.28991,81.464624 519.28991,80.650284 519.28991,80.650284 L 519.28991,82.278974"
+       id="path7095" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 540.4628,72.506864 L 540.4628,90.422394"
+       id="path7097" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 551.04924,65.992134 L 567.33608,80.650284"
+       id="path7099" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 544.53451,54.591343 L 556.74964,39.118843"
+       id="path7103" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:0.90492427px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 527.48087,61.872874 L 511.09894,63.596634"
+       id="path7107" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 551.04924,60.291733 C 568.15043,60.291733 568.15043,60.291733 568.15043,60.291733"
+       id="path7111" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 532.31938,52.962653 C 520.10425,41.561863 520.10425,41.561863 520.10425,41.561863"
+       id="path7113" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 538.01977,48.890943 C 538.01977,33.418443 538.01977,33.418443 538.01977,33.418443"
+       id="path7115" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1, 4;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 539.09441,61.67588 L 182.41261,783.1829"
+       id="path12255" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1, 3;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 543.98046,63.304564 L 882.74674,757.12395"
+       id="path13226" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:#000000;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:1, 3;stroke-dashoffset:0;stroke-opacity:1"
+       d="M 537.46572,61.67588 L 418.57179,783.1829"
+       id="path14197"
+       sodipodi:nodetypes="cc" />
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="39.088413"
+       y="100.76435"
+       id="text20025"><tspan
+         sodipodi:role="line"
+         id="tspan20027"
+         x="39.088413"
+         y="100.76435">Blue is proper shadow</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20px;font-style:normal;font-weight:normal;fill:#000000;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="35.831039"
+       y="157.76823"
+       id="text20029"><tspan
+         sodipodi:role="line"
+         x="35.831039"
+         y="157.76823"
+         id="tspan20033">Yellow areas should be in shadow too,</tspan><tspan
+         sodipodi:role="line"
+         x="35.831039"
+         y="182.76823"
+         id="tspan20035">but they are not --- border edges cause effect</tspan><tspan
+         sodipodi:role="line"
+         x="35.831039"
+         y="207.76823"
+         id="tspan20039">similar to ghost shadows, but here they prevent</tspan><tspan
+         sodipodi:role="line"
+         x="35.831039"
+         y="232.76823"
+         id="tspan20041">shadows.</tspan></text>
+  </g>
+</svg>

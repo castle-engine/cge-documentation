@@ -1,0 +1,455 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+
+<chapter id="chapter.shadows">
+<title>Shadow Volumes</title>
+
+<para>You can easily render shadow volume for any <literal>TCastleScene</literal>
+by <literal>TCastleScene.RenderShadowVolume</literal> method.
+Some features (see any article about shadow volumes to know what they mean) :</para>
+
+<itemizedlist>
+  <listitem><para>Silhouette edge detection is done, of course the model
+    must be 2-manifold for this to work.</para>
+
+    <para>ManifoldEdges structure is prepared once during pre-processing step
+    (by <literal>PrepareRender</literal> call with
+    <literal>prShadowVolume</literal>, or simply on first call to
+    <literal>RenderShadowVolume</literal>).
+    This allows rendering shadow quads with silhouette detection in
+    <phrase role="math">O(n+m)</phrase>
+    time, where n is a number of edges and m is a number of triangles
+    (these are roughly equal since on a perfect 2-manifold
+    <phrase role="math">3 * m = 2 * n</phrase>).
+    Without calculated ManifoldEdges, this would have to take square time,
+    <phrase role="math">O(m<superscript>2</superscript>)</phrase>.</para>
+
+    <para>To account also models that are not completely
+    2-manifold, we have BorderEdges list with edges that have only
+    one neighbor triangle. Actually, it lists edges with any odd number
+    of neighbors (each neighbor pair makes one edge in ManifoldEdges,
+    and then one left neighbor makes one BorderEdges item).
+    All BorderEdges are always considered part of the silhouette.
+    This is not a perfect solution, further in this chapter I present
+    when this fails. When it fails, there are two solutions:</para>
+
+    <orderedlist spacing="compact">
+      <listitem><para>fix the model to be 2-manifold.</para></listitem>
+      <listitem><para>or use the much slower algorithm version
+         that doesn't do silhouette edge detection.</para></listitem>
+    </orderedlist>
+  </listitem>
+
+  <listitem><para>Both <emphasis>Z-pass</emphasis> and
+    <emphasis>Z-fail</emphasis> approaches are done.
+    We automatically detect when <emphasis>Z-fail</emphasis> is needed,
+    and in 99% of the cases
+    we can use faster <emphasis>Z-pass</emphasis> approach.</para></listitem>
+
+  <listitem><para>Both positional and directional lights are supported.</para></listitem>
+
+  <listitem><para>Using homogeneous coordinates tricks: we render
+    shadow quads vertexes in real infinity, and we can use perspective projection
+    that has no far clipping plane.</para></listitem>
+
+  <listitem><para>We do shadow volume culling for scenes
+    (that is, we try to avoid rendering shadow quads when it's obvious
+    the scene shadow can't be visible within current camera frustum).
+    Implemented in  <literal>TGLShadowVolumeRenderer.InitScene</literal>.
+    It's not fully implemented, we could take more conservative convex hull
+    between light position and frustum. But it seems
+    that this wouldn't improve culling significantly, current approach gives
+    us almost as much as we can get from frustum culling.</para>
+
+    <para>More drastic improvements can only come from the use of portals.</para>
+  </listitem>
+</itemizedlist>
+
+<sect1 id="section.quick_shadow_volumes_overview">
+<title>Quick overview how to use shadow volumes in our engine</title>
+
+<para>Actually, our <literal>TCastleSceneManager</literal> does pretty much
+everything for you. Just set <literal>ShadowVolumesPossible</literal> and
+<literal>ShadowVolumes</literal> to <literal>true</literal>.
+That's it &mdash; we will take care to render with shadow volumes.</para>
+
+<itemizedlist>
+  <listitem><para>You can change <literal>ShadowVolumes</literal> dynamically during
+    the game (for example, if user changes video preferences).</para></listitem>
+
+  <listitem><para><literal>ShadowVolumesPossible</literal> should remain constant and reflect
+    whether we have stencil buffer available.
+    Dynamically changing <literal>ShadowVolumesPossible</literal> is actually allowed,
+    but it may cause costly recalculation once the models are actually loaded.
+    Also, projection may need to be reapplied (only when <literal>ShadowVolumesPossible</literal>,
+    we force infinite far plane, which is needed for z-fail,
+    when camera near plane is inside the shadow volume).</para></listitem>
+</itemizedlist>
+
+<para>You should also take care to initialize OpenGL context requiring
+stencil buffer (8-bit should be enough for practical uses).
+This is something that has to be requested outside of scene manager.
+The simplest way to do this is to use <literal>TCastleWindow.OpenOptionalMultiSamplingAndStencil</literal>
+method instead of <literal>TCastleWindow.Open</literal>,
+see <literal>examples/vrml/simplest_vrml_browser_with_shadow_volumes.lpr</literal>.</para>
+
+<para>To actually define what lights are used for shadow volumes,
+set <literal>shadowVolumes</literal> and <literal>shadowVolumesMain</literal>
+to true on some VRML/X3D light node. See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_shadows" />
+for details. Alternatively, you can control the main light source
+by overriding <literal>TCastleSceneManager.MainLightForShadows</literal>.</para>
+
+<para>If you define your own <literal>T3D</literal> descendant,
+be sure to override <literal>T3D.RenderShadowVolume</literal> method.
+See API reference for details now to handle it.</para>
+
+<para>You can change <literal>ReceiveShadowVolumes</literal>
+and <literal>CastShadowVolumes</literal> properties of every
+<literal>T3D</literal> descendant.</para>
+
+<para>The whole approach is quite flexible and is used throughout my whole engine,
+and it will use all implemented shadow volume optimizations
+under the hood. For example, see "The Castle" game, where almost
+everything may have a shadow rendered by shadow volumes &mdash; creatures,
+level scene, level objects. And everything goes through this same
+approach, getting all optimizations.</para>
+
+</sect1>
+
+<sect1 id="section.shadow_volumes_inspecting">
+<title>Inspecting models manifold edges</title>
+
+<para>You can see how silhouette edge detection goes, which
+edges from ManifoldEdges (2 neighbors) are qualified as silhouette and
+which edges were detected as BorderEdges. This is available in
+<literal>view3dscene</literal>
+by <emphasis>View -&gt; Fill mode -&gt; Silhouette and Border Edges</emphasis>
+menu item.</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>Fountain level, no shadows</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/fountain_screen_0_no_shadows.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="PNG"
+        fileref="images/fountain_screen_0_no_shadows.png"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>Fountain level, shadows turned on</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/fountain_screen_1_shadows.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="PNG"
+        fileref="images/fountain_screen_1_shadows.png"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>Now, turn edges on. Silhouette edges detected are drawn yellow
+(these depend on light position relative to the model).
+Blue edges are BorderEdges (these are independent from light position,
+they are simply edges with only 1 neighbor triangle).</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>Fountain level, edges marked</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/fountain_screen_2_edges.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="PNG"
+        fileref="images/fountain_screen_2_edges.png"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>Fountain level, only edges</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/fountain_screen_3_only_edges.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="PNG"
+        fileref="images/fountain_screen_3_only_edges.png"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+</sect1>
+
+<sect1 id="section.ghost_shadows">
+<title>Ghost shadows</title>
+
+<para>Well known, practically unavoidable problem with shadow volume algorithm
+are ghost shadows. See example below:</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>Ghost shadows</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/ghost_shadow.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="SVG"
+        fileref="images/ghost_shadow.svg"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>This is practically unavoidable, since to fix this, you would have
+to cap shadow quads where the room 1 ends. This is very computationally
+intensive task (for real-time graphics at least), since you must calculate
+the common part of two 3D objects.</para>
+
+</sect1>
+
+<sect1 id="section.problems_with_borderedges">
+<title>Problems with BorderEdges (models not 2-manifold)</title>
+
+<sect2 id="section.lack_of_shadows">
+<title>Lack of shadows (analogous to ghost shadows)</title>
+
+<para>Using BorderEdges idea, to force silhouette edge
+detection even with non-2-manifold models, can cause artifacts for similar
+reasons as "ghost shadows".
+But in this case, the effect is that <emphasis>not enough
+of the area is covered by shadow</emphasis> (as opposed by normal ghost
+shadows artifacts that cause too much area to be covered by shadow).
+This artifacts are similarly unavoidable, on the same reasoning.</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>Lack of shadows, problem analogous to ghost shadows</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/ghost_lack_of_shadow.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="SVG"
+        fileref="images/ghost_lack_of_shadow.svg"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+</sect2>
+
+<sect2 id="section.not_closed_silhouettes">
+<title>Not closed silhouettes due to BorderEdges</title>
+
+<para>Yet another problem related to BorderEdges is the fact that silhouettes
+may be not closed properly. Why? Because part of the silhouette
+goes on the border edges. To make silhouettes closed,
+we would have to render shadow quads for some border edges twice
+(or not at all), yet I'm not sure for now how can I do this easily.</para>
+
+<para>Illustrated example why and when this problem occurs is below.
+Consider a cylinder capped at the top and open at the bottom.</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>A cylinder capped at the top, open at the bottom</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/button_view.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="PNG"
+        fileref="images/button_view.png"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>Now assume a positional light above this cylinder.
+The light is above, but not precisely above &mdash; that is, the light
+lights the top and some sides of the cylinder. Image below shows
+generated shadows quads, silhouette (yellow) edges and border (blue)
+edges.</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>Cylinder open at the bottom with shadow quads</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/button_view_shadow.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="PNG"
+        fileref="images/button_view_shadow.png"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>The last image shows the same thing as above, but the cylinder
+geometry is not rendered, to make things clear. You should be able to see
+what's going wrong here: part of the blue (border) edges should be part
+of the silhouette too. The blue edges on the right side should either produce
+two shadow quads, or none at all. Otherwise the shadow volume is not correctly
+closed, and the shadows appear on completely wrong places of the screen.</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>Cylinder open at the bottom with shadow edges</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/button_view_shadow_edges.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="PNG"
+        fileref="images/button_view_shadow_edges.png"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>Solution, as usual for BorderEdges problems, is to avoid them:
+make your models truly 2-manifold, or use slower version of algorithm
+without silhouette edge detection.</para>
+</sect2>
+
+<sect2 id="section.invalid_capping_z_fail">
+<title>Invalid capping for z-fail method</title>
+
+<para>Another artifact is painfully visible when rendering such models
+using z-fail method (used when camera is inside shadow volume).
+Z-fail requires that shadows volume is capped, i.e. we have to render
+<emphasis>light cap</emphasis> (triangles facing light, on shadow caster position)
+and <emphasis>dark cap</emphasis> (triangles facing light, extruded to infinity).
+But in case of non-2-manifold models, triangles facing light may not cap
+the volume fully. In fact, for non-2-manifold models, it's possible
+that no triangles will face the light &mdash; even when shadow volume
+exists !</para>
+
+<para>Below we see screenshots of <literal>triangle.x3dv</literal>
+test (see engine demo models, <literal>shadow_volumes</literal> dir).
+All screenshors were done with z-fail method forced.
+The shadow caster in this case is a simple single triangle.
+It's not 2-manifold, it has 3 BorderEdges.
+The first screenshot shows the correct result: triangle correctly
+shadows the environment. Second screenshot shows the same scene
+with shadow volumes drawn, so that we can see what's going on.</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>Good shadow from a single triangle</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/sv_triangle_good_nosv.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="PNG"
+        fileref="images/sv_triangle_good_nosv.png"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>Good shadow from a single triangle, with shadow volumes drawn</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/sv_triangle_good.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="PNG"
+        fileref="images/sv_triangle_good.png"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>Now, what happens if we simply rotate the triangle, so that the other side
+of it is visible? The situation seems completely analogous, so we would expect to
+see the same effect... But we don't.</para>
+
+<para role="para_with_figure_850">
+<figure>
+  <title>Bad shadow from a single triangle</title>
+  <mediaobject>
+    <imageobject role="html">
+      <imagedata format="PNG"
+        fileref="images/sv_triangle_bad.png" />
+    </imageobject>
+    <imageobject role="fo">
+      <imagedata format="PNG"
+        fileref="images/sv_triangle_bad.png"
+        width="5in" contentwidth="5in" />
+    </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>We see that triangle is incorrectly in it's
+own shadow, and we see another strange shadow of the triangle.
+What happened here? These are both the
+effects of lacking the caps for z-fail method:</para>
+
+<orderedlist  spacing="compact">
+  <listitem><para>Lack of light cap means that triangle is considered in it's own shadow.
+    In fact, anything between the triangle and the camera (regardless of light position !)
+    would be considered in shadow, because the shadow cap is "open" there.</para></listitem>
+  <listitem><para>Lack of dark cap means that somewhere in infinity there's a place
+    where one front facing shadow quad is visible, but no back facing shadow quads.
+    This means that value in stencil buffer is -1, so it's not zero, so the pixels
+    are considered in shadow.</para></listitem>
+</orderedlist>
+
+<para>Now, why both the caps are lacking? Because there are no triangles in the model
+that are front-facing to the light. In this simple scene, there's only one triangle:
+when it's front-facing to the light, we're lucky and things work fine, but when it's
+back-facing to the light, errors occur.</para>
+
+</sect2>
+</sect1>
+
+</chapter>
+
+<!--
+  Local Variables:
+  ispell-local-dictionary: "american"
+  End:
+-->

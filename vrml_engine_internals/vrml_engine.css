@@ -1,0 +1,43 @@
+/* CSS style for HTML version of vrml_engine documentation. */
+
+PRE.screen {
+  border: 1px solid #aaaaaa;
+  background-color: #f9f9f9;
+  padding: 0.3em;
+}
+
+P.para_with_larger_screen_mini + DIV.figure {
+  border: 1px solid black;
+
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-bottom: 1em;
+
+  /* This must be synchronized with screenshot mini size set by
+     examples/Makefile for LARGER_MINI */
+  width: 650px;
+}
+
+P.para_with_figure_850 + DIV.figure {
+  border: 1px solid black;
+
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-bottom: 1em;
+
+  width: 850px;
+}
+
+DIV.figure {
+  border: 1px solid black;
+
+  padding-left: 1em;
+  padding-right: 1em;
+  padding-bottom: 1em;
+
+  /* This must be synchronized with screenshot mini size set by
+     examples/Makefile */
+  width: 350px;
+}
+
+body { font-family: sans-serif; }

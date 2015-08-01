@@ -1,0 +1,146 @@
+<?xml version='1.0'?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+
+<!--
+  Offline version of this DTD (as installed from Debian testing package) is
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd"
+  Online version of this DTD is
+  "http://www.oasis-open.org/docbook/xml/4.4/docbookx.dtd"
+-->
+
+<!--
+  The way screenshot images are specified here:
+
+  - For FOP PDF output:
+    We use full screenshot image (not mini), so it looks good even
+    when PDF is viewed with a large scale (and will hopefully
+    look good in print too).
+
+    We use width="3in" to make the image reasonably sized on the
+    output page.
+
+    We use contentwidth="3in" to workaround FOP bug.
+    FOP ignores contentwidth actually (as far as I tested),
+    but when contentwidth is not specifed but width is specified,
+    FO file contains something like 'scale-to-fit' values in
+    contentwidth, and FOP doesn't understand them (it tries to
+    convert them to inches or something, and fails...).
+
+    I set role="fo" for this version, based on
+    [http://www.sagehill.net/docbookxsl/GraphicSelection.html]
+
+  - For HTML output: I use mini PNG versions.
+    I set role="html" for them.
+
+  - For dblatex PDF output: We use EPS version of images,
+    since this format is understood by dblatex.
+
+    Since dblatex PDF output turned out to be worse than FOP PDF,
+    and EPS images take up a lot of disk space (200 MB for one copy,
+    SVN keeps another inside .svn dirs), EPS images are not
+    present in SVN repository now. If you want to generate them yourself:
+    fix ALL_OUTPUT var to include EPS_OUTPUT
+    in images/Makefile and examples/Makefile,
+    and run "make -C images/ && make -C examples/".
+
+    For the same reason as for FOP PDF, we use full images
+    (not mini) and we set their width. (I could possibly
+    leave contentwidth unset; not tested).
+
+    Note that I couldn't figure out a sane way to force
+    dblatex to use it's EPS images. When I tried to use dvips
+    backend, it always tried to use PNG images and then
+    complained about no BoundingBox in the image, that's
+    typical LaTeX problem... When I tried to use pdftex
+    backend it was able to use PNG images, but selected
+    the smaller html variant. I don't know how to force
+    dblatex to just use the EPS version with dvips backend,
+    [http://dblatex.sourceforge.net/doc/sec-figinclude.html]
+    doesn't help. It would be nice if dblatex XSL supported
+    preferred.mediaobject.role parameter, but it seems they don't.
+    For now, just manually modify the document each time
+    you want to get dblatex version:
+
+    (query-replace-regexp "<imageobject role=\"html\">
+    <imagedata format=\"PNG\"
+      fileref=\"examples/.*_mini.png\" />
+  </imageobject>
+  <imageobject role=\"fo\">
+    <imagedata format=\"PNG\"
+      fileref=\"examples/.*_screen.png\"
+      width=\"3in\" contentwidth=\"3in\" />
+  </imageobject>
+  " "" nil nil nil)
+-->
+
+<book>
+
+<bookinfo>
+  <title>Castle Game Engine documentation</title>
+  <author>
+    <firstname>Michalis</firstname>
+    <surname>Kamburelis</surname>
+  </author>
+  <copyright>
+    <year>2006</year>
+    <year>2007</year>
+    <year>2008</year>
+    <year>2009</year>
+    <year>2010</year>
+    <year>2011</year>
+    <year>2012</year>
+    <year>2013</year>
+    <year>2014</year>
+    <holder>Michalis Kamburelis</holder>
+  </copyright>
+  <legalnotice><para>You can redistribute and/or modify
+    this document under the terms of the
+    <ulink url="http://www.gnu.org/licenses/gpl.html">GNU General Public
+    License</ulink> as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.</para>
+  </legalnotice>
+</bookinfo>
+
+<xi:include href="preface.xml"                   xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="chapter_vrml_overview.xml"     xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="chapter_scene_manager.xml"     xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="chapter_scene_graph.xml"       xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="chapter_octree.xml"            xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="chapter_ray_tracer.xml"        xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="chapter_opengl_rendering.xml"  xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="chapter_animation.xml"         xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="chapter_shadows.xml"           xmlns:xi="http://www.w3.org/2001/XInclude" />
+<xi:include href="chapter_links.xml"             xmlns:xi="http://www.w3.org/2001/XInclude" />
+
+<colophon id="colophon">
+<title>Version of this document</title>
+
+<!-- We have to surround Polish characters with
+     <phrase role="polish-characters">. The Polish (DejaVuSerif) font
+     is slightly different than the regular font. So to not make it
+     too obvious, in the below paragraph we use <phrase role="polish-characters">
+     around *all* emphasized text.
+-->
+
+<para>This documentation started it's life as my master's thesis,
+under the title <emphasis><phrase role="polish-characters">VRML processing and rendering engine</phrase></emphasis>,
+and under the supervision of <emphasis><phrase role="polish-characters">dr Andrzej Łukaszewski</phrase></emphasis>.
+It was submitted and passed in <emphasis><phrase role="polish-characters">September 2006</phrase></emphasis>
+by the <emphasis><phrase role="polish-characters">Institute of Computer Science</phrase></emphasis> at
+<emphasis><phrase role="polish-characters">University of Wrocław</phrase></emphasis> in Poland.
+If you're curious, you can find this old version at
+<ulink url="http://www.ii.uni.wroc.pl/~anl/MGR/" />.</para>
+
+<para>Our engine evolved quite a lot since that time, and so this documentation
+was heavily updated and extended since then.</para>
+</colophon>
+
+</book>
+
+<!--
+  Local Variables:
+  ispell-local-dictionary: "american"
+  End:
+-->

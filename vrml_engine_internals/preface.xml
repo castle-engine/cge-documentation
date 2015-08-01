@@ -1,0 +1,181 @@
+<?xml version='1.0'?>
+<!DOCTYPE preface PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+
+<preface id="preface">
+<title>Goals</title>
+
+<para>This document describes the implementation of a
+3D engine based on the VRML and X3D languages.</para>
+
+<para>The <firstterm>VRML language</firstterm> is used to define 3D worlds.
+<firstterm>X3D</firstterm> is simply VRML 3.0,
+also supported by our engine (since May 2008).
+We will have some introduction to the language in <xref linkend="chapter.vrml" />.
+VRML has many advantages over other 3D languages:</para>
+
+<itemizedlist>
+  <listitem><para>The specification of the language is open.</para></listitem>
+
+  <listitem><para>The language is implementation-neutral,
+    which means that it's not <quote>tied</quote> to any
+    particular rendering method or library. It's suitable
+    for real-time rendering (e.g. using OpenGL or DirectX),
+    it's also suitable for various software methods like ray-tracing.
+    This neutrality includes the material and lighting model
+    described in VRML 2.0 specification.</para>
+
+    <para>Inventor, an ancestor of the VRML, lacked such neutrality.
+    Inventor was closely tied to the OpenGL rendering methods, including
+    the OpenGL lighting model.</para></listitem>
+
+  <listitem><para>The language is quite popular and many
+    3D authoring programs can import and export models in this format.
+    Some well-known open-source 3D modeling programs that can
+    export to VRML are <ulink url="http://www.blender3d.org/">
+    Blender</ulink> and <ulink url="http://aoi.sourceforge.net/">Art Of Illusion</ulink>.
+    <ulink url="http://vrml.cip.ica.uni-stuttgart.de/dune/">White Dune</ulink>
+    is a modeller especially oriented towards VRML.</para></listitem>
+
+  <listitem><para>The language can describe geometry of 3D objects
+    with all typical properties like materials, textures and normal
+    vectors. More advanced features like multi-texturing,
+    environment cube map texturing,
+    shaders (in GLSL, NVidia Cg, HLSL) are also available in newest
+    version (X3D).</para></listitem>
+
+  <listitem><para>The language is not limited to 3D objects.
+    Other important environment properties, like lights, the sky,
+    the fog, viewpoints, collision properties and many
+    other can be expressed. Events mechanism allows to describe
+    animations and user interactions with the scene.</para></listitem>
+
+  <listitem><para>The language is easy to extend.
+    You can easily add your own nodes and fields
+    (and I did, see <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php">
+    the list of my VRML extensions</ulink>).
+    </para></listitem>
+  <!--
+  <listitem><para>VRML 2.0 language also defines various
+    interactive environment properties (so-called sensors).
+    Also objects animations can be expressed by interpolators.
+    The language also defines scripting.
+
+    Sensors, interpolators and scripting
+    not implemented yet, so let's not brag about them here :)
+    But I'm not cheating - these things are mentioned in section
+    "Beyond" lower.
+  -->
+</itemizedlist>
+
+<para>Implementation goals were to make an engine that</para>
+
+<itemizedlist>
+  <listitem><para>Uses VRML / X3D. Some other 3D file formats are also
+    supported (like 3DS, MD3, Wavefront OBJ and Collada) by
+    silently converting them to VRML/X3D graph.</para></listitem>
+
+  <listitem><para>Allows to make a general-purpose VRML browser.
+    See <ulink url="http://castle-engine.sourceforge.net/view3dscene.php">
+    view3dscene</ulink>.</para></listitem>
+
+  <listitem><para>Allows to make more specialized programs,
+    that use the engine and VRML models as part of their job.
+    For example, a game can use VRML models for various parts
+    of the world:</para>
+
+    <itemizedlist spacing="compact">
+      <listitem><para>Static environment parts (like the ground
+        and the sky) can be stored and rendered as one VRML model.
+        </para></listitem>
+
+      <listitem><para>Each creature, each item,
+        each <quote>dynamic</quote> object of the world
+        (door that can open, building that can explode etc.)
+        can be stored and rendered as a separate VRML model.
+        </para></listitem>
+    </itemizedlist>
+
+    <para>When rendering, all these VRML objects can be rendered
+    within the same frame, so that user sees the complete world
+    with all objects.</para>
+
+    <para>Example game that uses my engine this way is
+    <ulink url="http://castle-engine.sourceforge.net/castle.php">
+    <quote>The Castle</quote></ulink>.
+    </para>
+  </listitem>
+
+  <listitem>
+    <para>Using the engine should be as easy as possible,
+    but at the same time OpenGL rendering must be as fast as possible.
+    This means that a programmer gets some control over how
+    the engine will optimize given VRML model (or part of it).
+    Different world parts may require entirely different optimization
+    methods:</para>
+
+    <itemizedlist spacing="compact">
+      <listitem><para>static parts of the scene,</para></listitem>
+      <listitem><para>parts of the scene that move (or rotate or scale etc.)
+        only relatively to the static parts,</para></listitem>
+      <listitem><para>parts of the scene that frequently
+        change inside (e.g. a texture changes or creature's arm rotates).
+        </para></listitem>
+    </itemizedlist>
+
+    <para>All details about optimization and animation methods
+    will be given in later chapters (see <xref linkend="chapter.opengl_rendering"/>
+    and <xref linkend="chapter.animation"/>).</para>
+  </listitem>
+
+  <listitem><para>The primary focus of the engine was
+    always on 3D games, but, as described above, VRML models
+    can be used and combined in various ways.
+    This makes the engine suitable for various 3D simulation
+    programs (oh, and various game types).</para></listitem>
+
+  <listitem><para>The engine is free open-source software (licensed
+    on GNU General Public License).</para></listitem>
+
+  <listitem><para>Developed in object-oriented language.
+    For me, the language of choice is ObjectPascal,
+    as implemented in the <ulink url="http://www.freepascal.org">Free
+    Pascal compiler</ulink>.
+    </para></listitem>
+
+</itemizedlist>
+
+<!--
+I think that major points of text below are summarized
+(or at least mentioned) above. Details from text below
+should be mentioned in later chapters.
+
+<para>Basic implementation goal was to provide a way to read
+VRML files and then render them, as efficiently as possible,
+using OpenGL. Achieved goals include:</para>
+
+<itemizedlist>
+  <listitem><para>VRML models can be read from files,
+    stored and processed in memory, and then written back to files.
+    This allows us to do any kind of processing of VRML models,
+    and then write the resulting model to file (and/or render it).
+    </para></listitem>
+  <listitem><para>
+    You can also construct whole VRML model in memory,
+    which allows to easily make converters from other 3D formats
+    to VRML/X3D (3DS, OBJ converter to X3D was done as part of
+    this project).</para></listitem>
+  <listitem><para>VRML models can be rendered using OpenGL.
+    Various optimizations methods are used, like using octree
+    to render only items within camera frustum, and wrapping
+    as large pieces of the scene as possible in OpenGL display
+    lists.</para></listitem>
+
+-->
+</preface>
+
+<!--
+  Local Variables:
+  ispell-local-dictionary: "american"
+  End:
+-->

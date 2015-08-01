@@ -1,0 +1,323 @@
+# -*- mode: makefile -*-
+#
+# This is a general Michalis Makefile that allows to generate
+# from docbook file $(BASE_DOCUMENT_NAME).xml various output
+# formats using various scripts.
+#
+# Before including this define BASE_DOCUMENT_NAME.
+# You can also define:
+#
+#   HTML_POST:
+#     This is a make function to do at the end of creating HTML documentation.
+#     Can be used for example to copy external files to HTML subdirs,
+#     like files referenced in mediaobject or admonition images.
+#     When run, $(1) will be set to output path (with final slash).
+#
+#   HTML_CHUNKS_XLS, HTML_NOCHUNKS_XLS, FO_XLS:
+#     This will be used with XLS toolchain that uses official
+#     DocBook XLS stylesheets (IOW the toolchain
+#     using xmlto for html or using fop or PassiveTex for PDF / PS).
+#     This specifies a filename of alternative stylesheet to use
+#     instead of the default one.
+#     HTML_xxx_XLS will be used for html (single or chunks) outputs,
+#     FO_XLS will be used for fo (pdf, ps, dvi) outputs.
+#
+#   FOP_JAVA_MAX_HEAP_SIZE:
+#     You should define it for fop if you get errors like
+#     Exception in thread "main" java.lang.OutOfMemoryError: Java heap space
+#     Syntax is like for java -Xms option, for example "512M"
+#
+#   FOP_OPTIONS:
+#     For example -c cfg.xml
+#
+# Then include this file like "include Makefile-docbook"
+#
+# There are a couple of possibilities:
+#
+# 1. Use jade, this uses DSSSL stylesheets.
+#    This can handle both SGML and XML docbook flavors.
+#
+#    Scripts like jw and docbook2xxx are just wrappers that call jade.
+#
+# 2. Use xsltproc, this uses XSL stylesheets.
+#    This can handle only XML flavor of docbook.
+#    (As far as I know ?)
+#
+#    This is the preferred way, as far as I know, basing on
+#    ESR's "DocBook demyst howto" and generally knowing that XML + XSL
+#    are supposed to be better than SGML.
+#
+#    For print outputs (pdf, ps) there are two more possibilities:
+#
+#    2.1. Use xmltex, pdfxmltex to process xstlproc to actual PDF/PS.
+#         As it turns out for me, this simply doesn't work on Debian
+#         (see kambi_docbook_notes), so I don't use it.
+#    2.2. Use FOP, which is a program developed as part by Apache people,
+#         that can generate PDF/PS files on it's own (i.e. without
+#         relying on old TeX code, tools, structure, whatever ---
+#         it's a new, shiny thing).
+#
+#    xmlto script wrap for me using xsltproc and then possibly calling
+#    xmltex / pdfxmltex.
+#
+# 3. Also another version of XSL stylesheets is available,
+#    maintained by dblatex package. dblatex was started from
+#    DB2LaTex that started from original docbook XSL (used by xmlto
+#    above), but then the stylesheets were modified and they
+#    are made specifically for making TeX output.
+#    This means that dblatex toolchain is only for making TeX output
+#    formats like PDF and PS, not HTML (we know that converters
+#    like tex4ht and latex2html are generally poor, so we can forget
+#    about them). On the other hand, it looks quite good.
+#
+
+.PHONY: default-docbook-makefile
+default-docbook-makefile: validate-xmllint
+
+.PHONY: all
+all: html html-nochunks pdf ps txt \
+  dblatex_pdf dblatex_ps \
+  jade_rtf jade_html jade_pdf jade_dvi jade_ps jade_txt
+
+DOCUMENT_NAME := $(BASE_DOCUMENT_NAME).xml
+
+# ------------------------------------------------------------
+# Toolchain based on XSL
+
+.PHONY: html
+html:
+	mkdir -p output/xsl/html/
+	xmlto html -o output/xsl/html/ $(DOCUMENT_NAME) \
+	  $(if $(HTML_CHUNKS_XSL), -x $(HTML_CHUNKS_XSL),)
+	$(call html_post, output/xsl/html/)
+
+.PHONY: html-nochunks
+html-nochunks:
+	mkdir -p output/xsl/html-nochunks/
+	xmlto html-nochunks -o output/xsl/html-nochunks/ $(DOCUMENT_NAME) \
+	  $(if $(HTML_NOCHUNKS_XSL), -x $(HTML_NOCHUNKS_XSL),)
+	$(call html_post, output/xsl/html-nochunks/)
+
+ifdef FO_XSL
+XMLTO_FO_ARGS := -x $(FO_XSL)
+else
+XMLTO_FO_ARGS :=
+endif
+
+.PHONY: passivetex_pdf
+passivetex_pdf:
+	mkdir -p output/xsl/passivetex/
+	xmlto pdf -o output/xsl/passivetex/ $(DOCUMENT_NAME) $(XMLTO_FO_ARGS)
+
+.PHONY: passivetex_ps
+passivetex_ps:
+	mkdir -p output/xsl/passivetex/
+	xmlto ps -o output/xsl/passivetex/ $(DOCUMENT_NAME) $(XMLTO_FO_ARGS)
+
+# xmlto doesn't allow me to configure what xslt processor to use
+# (manual says that I can set XSLT_PROCESSOR env variable, but this
+# seems to be ignored...). So I just do it by hand, because I want to
+# try using xalan with passive_tex.
+#
+# Note that stupid xmltex/pdfxmltex doesn't understand me
+# when "_" is used within input filename (this is known bug,
+# xmlto scripts also workaround this) so I don't use
+# $(BASE_DOCUMENT_NAME).fo below -- instead I use out.fo.
+
+.PHONY: xalan_passivetex_pdf
+xalan_passivetex_pdf:
+	xalan -in $(DOCUMENT_NAME) \
+	  -xsl $(REAL_FO_XSL) \
+	  -out output/xsl/passivetex/out.fo \
+	  -param passivetex.extensions 1
+	cd output/xsl/passivetex/; \
+	  pdfxmltex out.fo; \
+	  pdfxmltex out.fo; \
+	  mv out.pdf $(BASE_DOCUMENT_NAME).pdf
+
+# Below we could use FOP to do the XSL transformation, calling fop like
+#   fop -xml "$INPUT_FILE_NAME" \
+#     -xsl "/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/fo/docbook.xsl" \
+#     output.pdf
+#
+# Advantage of using xslt processor explicitly: I can pass
+# some arguments to it. In particular, argument fop1.extensions
+# (was fop.extensions previously) is important.
+#
+# With FOP 0.20, without fop.extensions PDF and PS outputs from FOP have
+# slightly broken table of contents (see kambi_docbook_notes for more
+# info). Later note: fop.extensions 1 actually breaks with FOP >= 0.93.
+# It uses fox:destination attributes, which is no longer supported
+# in FOP 0.93 [http://xmlgraphics.apache.org/fop/0.93/upgrading.html].
+# Fortunately, fop.extensions is also not needed anymore, the bug
+# in kambi_docbook_notes is fixed in FOP 0.93.
+#
+# However, fop1.extensions is now useful.
+# Without fop1.extensions, it seems that PDF doesn't have Table Of Contents
+# (the one "built-in inside PDF", i.e. the one shown on sidebar by evince).
+
+ifdef FO_XSL
+REAL_FO_XSL := $(FO_XSL)
+else
+REAL_FO_XSL := "/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/fo/docbook.xsl"
+# Online version:
+#REAL_FO_XSL := "http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl"
+endif
+
+# Once upon a time I used xalan instead of xsltproc.
+# Reason: I was able to get really strange
+# errors with xsltproc, including errors when the same XML content
+# under different filename could produce a malformed XML-FO file...
+# I couldn't reliably investigate this, I decided to just use xalan.
+# Later, I switched back to xsltproc because it supports --xinclude.
+#
+# It seems that xsltproc failures depend on length of output filename,
+# so to workaround xsltptoc bugs I just always output to short filename
+# xout.fo instead of $(BASE_DOCUMENT_NAME).fo
+
+XSLT_FOR_FOP := xsltproc --xinclude \
+  -o output/xsl/xout.fo \
+  --stringparam fop1.extensions 1 \
+  $(REAL_FO_XSL) $(DOCUMENT_NAME)
+
+# XSLT_FOR_FOP := xalan -in $(DOCUMENT_NAME) \
+#   -xsl $(REAL_FO_XSL) \
+#   -out output/xsl/$(BASE_DOCUMENT_NAME).fo \
+#   -param fop1.extensions 1
+
+ifdef FOP_JAVA_MAX_HEAP_SIZE
+BEFORE_FOP := export JAVA_OPTS=-Xmx$(FOP_JAVA_MAX_HEAP_SIZE) ;
+else
+BEFORE_FOP :=
+endif
+
+BEFORE_FOP := $(BEFORE_FOP) \
+  export FOP_HYPHENATION_PATH=fop/hyphenation/fop-hyph.jar ;
+
+.PHONY: pdf
+pdf:
+	mkdir -p output/xsl/
+	$(XSLT_FOR_FOP)
+	$(call fo_process_for_fop, output/xsl/xout.fo)
+	$(BEFORE_FOP) fop $(FOP_OPTIONS) -fo output/xsl/xout.fo output/xsl/$(BASE_DOCUMENT_NAME).pdf
+	rm -f output/xsl/xout.fo
+
+.PHONY: ps
+ps:
+	mkdir -p output/xsl/
+	$(XSLT_FOR_FOP)
+	$(call fo_process_for_fop, output/xsl/xout.fo)
+	$(BEFORE_FOP) fop $(FOP_OPTIONS) -fo output/xsl/xout.fo output/xsl/$(BASE_DOCUMENT_NAME).ps
+	rm -f output/xsl/xout.fo
+
+.PHONY: txt
+txt:
+	mkdir -p output/xsl/
+	$(XSLT_FOR_FOP)
+	$(call fo_process_for_fop, output/xsl/xout.fo)
+	$(BEFORE_FOP) fop $(FOP_OPTIONS) -fo output/xsl/xout.fo -txt output/xsl/$(BASE_DOCUMENT_NAME).txt
+	rm -f output/xsl/xout.fo
+
+# ------------------------------------------------------------
+# XSL in dblatex toolchain
+
+.PHONY: dblatex_pdf
+dblatex_pdf:
+	mkdir -p output/dblatex/
+	dblatex -o output/dblatex/$(BASE_DOCUMENT_NAME).pdf $(DOCUMENT_NAME)
+
+.PHONY: dblatex_ps
+dblatex_ps:
+	mkdir -p output/dblatex/
+	dblatex -o output/dblatex/$(BASE_DOCUMENT_NAME).ps $(DOCUMENT_NAME)
+
+# ------------------------------------------------------------
+# Toolchain based on Jade (DSSSL, for both SGML and XML)
+
+# Instead of using docbook2rtf, you can also call
+# SGML_DSSSL_PATH := /usr/share/sgml/docbook/stylesheet/dsssl/modular/
+# openjade -t rtf -d $(SGML_DSSSL_PATH)print/docbook.dsl typical_book.sgml
+
+.PHONY: jade_rtf
+jade_rtf:
+	mkdir -p output/jade/
+	docbook2rtf -o output/jade/ $(DOCUMENT_NAME)
+
+# Instead of using docbook2html, you can also call
+# openjade -t sgml -d $(SGML_DSSSL_PATH)html/docbook.dsl typical_book.sgml
+
+.PHONY: jade_html
+jade_html:
+	mkdir -p output/jade/html/
+	docbook2html -o output/jade/html/ $(DOCUMENT_NAME)
+	$(call html_post, output/jade/html/)
+
+.PHONY: jade_pdf
+jade_pdf:
+	mkdir -p output/jade/
+	docbook2pdf -o output/jade/ $(DOCUMENT_NAME)
+
+.PHONY: jade_dvi
+jade_dvi:
+	mkdir -p output/jade/
+	docbook2dvi -o output/jade/ $(DOCUMENT_NAME)
+
+.PHONY: jade_ps
+jade_ps:
+	mkdir -p output/jade/
+	docbook2ps -o output/jade/ $(DOCUMENT_NAME)
+
+.PHONY: jade_txt
+jade_txt:
+	mkdir -p output/jade/
+	docbook2txt -o output/jade/ $(DOCUMENT_NAME)
+
+# ------------------------------------------------------------
+# cleaning
+
+.PHONY: clean
+clean:
+	rm -Rf output/
+
+# ------------------------------------------------------------
+# validate using xmllint, this goes better than onsgmls because
+# onsgmls bombs with a lot of errors in DTD like
+# /usr/bin/onsgmls:/usr/share/xml/docbook/schema/dtd/4.4/docbookx.dtd:116:17:E: "X20AC" is not a function name
+
+VALIDATE_FILES := $(DOCUMENT_NAME)
+
+# For non-xinclude documents I could just use --valid,
+# for xinclude I should use --xinclude --postvalid according
+# to [http://www.sagehill.net/docbookxsl/ValidXinclude.html].
+XMLLINT_VALIDATE := xmllint --noout --xinclude --postvalid --noent
+
+.PHONY: validate-xmllint
+validate-xmllint:
+	$(XMLLINT_VALIDATE) $(VALIDATE_FILES)
+
+# ------------------------------------------------------------
+# NSGMLS smart definition from
+# /usr/share/doc/docbook/examples/Makefile from Debian.
+
+NSGMLS	:= $(shell if command -v onsgmls 2>/dev/null; then	 \
+			:					;\
+		   elif command -v nsgmls 2>/dev/null; then	 \
+			:					;\
+		   else						 \
+			echo "false"				;\
+			echo "warning: no nsgmls found" >&2	;\
+		   fi)
+
+# onsgmls args explanation:
+# -w all : show all warnings
+# -g, -e : show open elements and entities in error messages
+# -s : no output
+# -u : same as -wundef (?)
+
+NSGMLS_VALIDATE := $(NSGMLS) -gues
+
+.PHONY: validate-nsgmls
+validate-nsgmls:
+	$(NSGMLS_VALIDATE) $(VALIDATE_FILES)
+
+# ------------------------------------------------------------

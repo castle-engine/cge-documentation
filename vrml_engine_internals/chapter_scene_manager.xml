@@ -1,0 +1,284 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+
+<chapter id="chapter.scene_manager">
+<title>Scene Manager</title>
+
+<para>The best way to use our engine is through the <emphasis>scene
+manager</emphasis>.
+Scene manager knows everything about your 3D world,
+everything that is needed to perform collision detection, rendering and
+other useful operations.
+By default, scene manager is also a viewport, that allows you to actually
+see the 3D world.</para>
+
+<sect1 id="section.scene_manager_basic">
+<title>Scene manager, and basic example of using our engine</title>
+
+<figure>
+  <title>Three 3D objects are rendered here: precalculated
+    dinosaur animation, scripted (could be interactive) fountain animation,
+    and static tower.</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="images/scene_manager_demos_1_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="images/scene_manager_demos_1_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="images/scene_manager_demos_1_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>In the simplest case, you just create <literal>TCastleWindow</literal> instance
+which gives you a ready-to-use scene manager inside
+the <literal>TCastleWindow.SceneManager</literal> property.</para>
+
+<para>Example code below uses scene manager to trivially make a full 3D model viewer.
+This correctly handles collisions,
+renders in an optimal manner (frustum culling etc.),
+handles animations and interactive behavior and generally takes care
+of everything.</para>
+
+<screen>var
+  Window: TCastleWindow;
+  Scene: TCastleScene;
+begin
+  Scene := TCastleScene.Create(Application
+    { Owner that will free the Scene });
+  Scene.Load('models/boxes.x3dv');
+  Scene.Spatial := [ssRendering, ssDynamicCollisions];
+  Scene.ProcessEvents := true;
+
+  Window := TCastleWindow.Create(Application);
+  Window.SceneManager.Items.Add(Scene);
+  Window.SceneManager.MainScene := Scene;
+
+  Window.OpenAndRun;
+end.
+</screen>
+
+<para>The source code of this program is in
+<literal>examples/3d_rendering_processing/view_3d_model_basic.lpr</literal> in engine sources.
+You can compile it and see that it actually works.
+There's also more extensive demo of scene manager in the
+<literal>examples/3d_rendering_processing/scene_manager_demos.lpr</literal>,
+and demo of other engine stuff in
+<literal>examples/3d_rendering_processing/view_3d_model_advanced.lpr</literal>.</para>
+
+<para>This looks nice and relatively straightforward, right? You create
+3D object (<literal>Scene</literal>), and a window to display the 3D world
+(<literal>Window</literal>). It's obvious how to add a second 3D object:
+just create <literal>Scene2</literal>, and add it to
+<literal>Window.SceneManager.Items</literal>.</para>
+
+<para>The Lazarus component equivalent to <literal>TCastleWindow</literal>
+is called  <literal>TCastleControl</literal>. It works the same, but you
+can drop it on a Lazarus form.</para>
+
+<para>A <emphasis>3D object</emphasis> is anything descending from a base class
+<literal>T3D</literal>. <emphasis>All</emphasis> 3D objects in our engine are
+derived from the <literal>T3D</literal> class.
+The most important non-abstract 3D objects are <literal>TCastleScene</literal>
+(3D model, possibly interactive VRML / X3D) and
+<literal>TCastlePrecalculatedAnimation</literal> (non-interactive animation).
+There are also some helper 3D objects
+(<literal>T3DList</literal> - list of other 3D objects,
+and <literal>T3DTranslated</literal> - translated other 3D object).
+And the real beauty is that you
+can easily derive your own <literal>T3D</literal> descendants,
+just override a couple methods and you get 3D objects that can be visible,
+can collide etc. in 3D world.</para>
+
+<para>Any <literal>T3D</literal> descendant may be added to the scene manager
+<literal>Items</literal>.
+In every 3D program you have an instance of scene manager
+(<literal>TCastleSceneManager</literal> class,
+or your customized descendant of it),
+and you add your 3D objects to the scene manager.
+Scene manager keeps the whole knowledge about your 3D world,
+as a tree of <literal>T3D</literal> objects.
+Scene manager should also be present on the <literal>Controls</literal>
+list of the window, to receive all the necessary events from your window,
+and pass them to all interested 3D objects.
+If you use <literal>TCastleWindow</literal>, suggested in the example above,
+then scene manager is already created and added to the <literal>Controls</literal>
+list for you. Scene manager also connects your camera,
+and defines your viewport where 3D world is rendered through this camera.</para>
+
+</sect1>
+
+<sect1 id="section.custom_scene_manager">
+<title>Manage your own scene manager</title>
+
+<para>For more advanced uses, you may use
+<literal>TCastleCustomWindow</literal>, which doesn't create scene manager
+automatically for you. Instead, you have to create and manage scene manager
+instance yourself. You create yourself an instance of <literal>TCastleSceneManager</literal>
+(or any descendant of this class), and you add it to
+<literal>TCastleCustomWindow.Controls</literal>.
+This is slightly more complex, but also allows more flexibility:</para>
+
+<itemizedlist>
+  <listitem><para>You can implement and use your own descendant of
+    <literal>TCastleSceneManager</literal>,
+    overriding some methods, and thus making some special rendering tricks.</para></listitem>
+
+  <listitem><para>Sometimes, you don't want your scene manager
+    to be present on controls all the time.
+    For example, if you create new scene manager for every level of your game,
+    you probably want to manually remove/add chosen scene manager
+    instance from/to <literal>TCastleCustomWindow.Controls</literal>.</para></listitem>
+</itemizedlist>
+
+<para>Example using this approach:</para>
+
+<screen>var
+  Window: TCastleWindowCustom;
+  SceneManager: TCastleSceneManager;
+  Scene: TCastleScene;
+begin
+  Scene := TCastleScene.Create(Application
+    { Owner that will free the Scene });
+  Scene.Load('my_scene.x3d');
+  Scene.Spatial := [ssRendering, ssDynamicCollisions];
+  Scene.ProcessEvents := true;
+
+  SceneManager := TCastleSceneManager.Create(Application);
+  SceneManager.Items.Add(Scene);
+  SceneManager.MainScene := Scene;
+
+  Window := TCastleWindowCustom.Create(Application);
+  Window.Controls.Add(SceneManager);
+  Window.InitAndRun;
+end.
+</screen>
+
+<para>This still looks relatively straightforward, right? You create
+3D object (<literal>Scene</literal>), you create 3D world
+(<literal>SceneManager</literal>), and a window to display the 3D world
+(<literal>Window</literal>).
+The Lazarus component equivalent to <literal>TCastleWindowCustom</literal>
+is called  <literal>TCastleControlCustom</literal>.</para>
+
+</sect1>
+
+<sect1 id="section.2d_controls_manager">
+<title>2D controls manager</title>
+
+<para>A related topic is the 2D controls management.
+This is quite similar to the scene manager approach, except that now
+it's for 2D and some details are different.</para>
+
+<para>Everything that has to receive window events must derive from
+<literal>TUIControl</literal> class. For example <literal>TCastleOnScreenMenu</literal>,
+and <literal>TCastleButton</literal> are all descendants of
+<literal>TUIControl</literal>. Even the <literal>TCastleSceneManager</literal>
+is <literal>TUIControl</literal> descendant, since
+scene manager by default acts as a viewport (2D rectangle)
+through which you can see your 3D world.</para>
+
+<para>To actually use the <literal>TUIControl</literal>,
+you add it to the window's <literal>Controls</literal> list.
+If you use Lazarus component, then you're interested
+in <literal>TCastleControlCustom.Controls</literal>
+list. If you use our own window library, you're interested in
+the <literal>TCastleWindowCustom.Controls</literal>.
+Once control is added to the controls list, it will automatically
+receive all interesting events from our window.</para>
+
+</sect1>
+
+<sect1 id="section.custom_viewports">
+<title>Custom viewports</title>
+
+<para>A viewport is just a 2D rectangular control that provides a view
+of 3D world.
+As said previously, scene manager by default acts as a viewport.
+But you can also have additional, custom viewports, offering simultaneous
+different views of the same 3D world. This is done by the
+<literal>TCastleViewport</literal> class.</para>
+
+<para>You can have many viewports on the 2D window to observe
+your 3D world from various cameras. You can make e.g.
+split-screen games (each view displays different player),
+3D modeling programs (where you usually like to see the scene
+from various angles at once), or just show a view from some
+special world place (like a security camera).</para>
+
+<para>Your viewports may be placed in any way you like on the screen,
+they can even be overlapping (one viewport partially obscures another).
+Each viewport has it's own dimensions, own camera,
+but they can share the same 3D world (the same scene manager). Each viewport
+has also it's own rendering methods, so you can derive e.g.
+a specialized viewport that always shows wireframe view of the 3D world.</para>
+
+<para>The scene manager itself also acts as a viewport,
+if <literal>DefaultViewport</literal> is true. This is comfortable
+for simple programs where one viewport is enough.
+When <literal>DefaultViewport</literal> is false,
+scene manager is merely a container for your 3D world,
+referenced by custom viewports (<literal>TCastleViewport</literal> classes).</para>
+
+<para>See the example in engine sources
+<literal>examples/3d_rendering_processing/multiple_viewports.lpr</literal>
+for demo of using custom viewports.</para>
+
+<figure>
+  <title>Simple scene, viewed from various viewports simultaneously.</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="images/multiple_viewports_teapot_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="images/multiple_viewports_teapot_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="images/multiple_viewports_teapot_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<figure>
+  <title>Interactive scene, with shadows and mirors,
+    viewed from various viewports.</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="images/multiple_viewports_dynamic_world_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="images/multiple_viewports_dynamic_world_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="images/multiple_viewports_dynamic_world_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+</sect1>
+
+</chapter>
+
+<!--
+  Local Variables:
+  ispell-local-dictionary: "american"
+  End:
+-->

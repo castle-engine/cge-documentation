@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://web.resource.org/cc/"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="301.04001"
+   width="500"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.44"
+   version="1.0"
+   sodipodi:docbase="/win/uniwerek/pracamag/vrml_engine_doc/images"
+   sodipodi:docname="frustum_box_nasty_case.svg"
+   inkscape:export-filename="/win/uniwerek/pracamag/vrml_engine_doc/images/frustum_box_nasty_case.png"
+   inkscape:export-xdpi="180"
+   inkscape:export-ydpi="180">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="white"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="1"
+     inkscape:pageshadow="2"
+     inkscape:cx="267.32863"
+     inkscape:cy="172.06244"
+     inkscape:zoom="1.1750568"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     width="500px"
+     height="301.04001px"
+     showborder="true"
+     inkscape:window-width="1016"
+     inkscape:window-height="689"
+     inkscape:window-x="0"
+     inkscape:window-y="27"
+     borderlayer="false" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:groupmode="layer"
+     inkscape:label="Warstwa 1"
+     id="layer1"
+     transform="translate(-493.4845,-285.3719)">
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:black;stroke-width:0.45085254px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 600.45701,277.68736 L 599.22928,596.65449"
+       id="path1872" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:black;stroke-width:0.3018744px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 727.74874,278.33707 L 728.70702,599.72176"
+       id="path1874" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:black;stroke-width:0.79321933px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 411.74677,509.82868 L 1073.0562,337.74601"
+       id="path1876" />
+    <path
+       style="fill:none;fill-opacity:0.75;fill-rule:evenodd;stroke:black;stroke-width:0.57235032px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 431.34129,467.27433 L 1009.275,590.34619"
+       id="path1878" />
+    <rect
+       style="fill:black;fill-opacity:0.16810345;fill-rule:evenodd;stroke:black;stroke-width:0.70785052px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       id="rect2768"
+       width="404.62894"
+       height="86.346458"
+       x="531.14777"
+       y="318.83862" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="1077.6031"
+       y="-36.841991"
+       id="text3657"><tspan
+         sodipodi:role="line"
+         id="tspan3659"
+         x="1077.6031"
+         y="-36.841991" /></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="838.18164"
+       y="330.20731"
+       id="text3663"><tspan
+         sodipodi:role="line"
+         id="tspan3665"
+         x="838.18164"
+         y="330.20731">Colliding object</tspan></text>
+    <path
+       style="fill:none;fill-opacity:1;fill-rule:evenodd;stroke:black;stroke-width:5.996;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+       d="M 599.99646,461.42387 L 599.99454,503.07748 L 727.97107,529.24651 L 727.97107,427.54407 L 599.99646,461.42387 z "
+       id="path3667"
+       sodipodi:nodetypes="ccccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="607.74017"
+       y="474.71536"
+       id="text5441"><tspan
+         sodipodi:role="line"
+         id="tspan5443"
+         x="607.74017"
+         y="474.71536">Thick lines</tspan><tspan
+         sodipodi:role="line"
+         x="607.74017"
+         y="489.71536"
+         id="tspan5445">outline the frustum</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:12px;font-style:normal;font-weight:normal;fill:black;fill-opacity:1;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;font-family:Bitstream Vera Sans"
+       x="841.99567"
+       y="492.43652"
+       id="text5447"><tspan
+         sodipodi:role="line"
+         x="841.99567"
+         y="492.43652"
+         id="tspan5451">Thin lines represent the </tspan><tspan
+         sodipodi:role="line"
+         x="841.99567"
+         y="507.43652"
+         id="tspan5459">frustum planes,</tspan><tspan
+         sodipodi:role="line"
+         x="841.99567"
+         y="522.43652"
+         id="tspan5453">which are just frustum </tspan><tspan
+         sodipodi:role="line"
+         x="841.99567"
+         y="537.43652"
+         id="tspan5461">border segments </tspan><tspan
+         sodipodi:role="line"
+         x="841.99567"
+         y="552.43652"
+         id="tspan5457">streched into infinity</tspan></text>
+  </g>
+</svg>

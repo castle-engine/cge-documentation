@@ -1,0 +1,81 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+
+<chapter id="chapter.links">
+<title>Links</title>
+
+<sect1 id="section.links_vrml_spec">
+<title>VRML / X3D specifications</title>
+
+<itemizedlist spacing="compact">
+  <listitem><para><ulink url="http://www.web3d.org/x3d/specifications/vrml/VRML1.0/index.html">
+    VRML 1.0 specification
+    </ulink></para></listitem>
+  <listitem><para><ulink url="http://www.web3d.org/x3d/specifications/vrml/">
+    VRML 2.0 (also called VRML 97) specifications
+    </ulink></para></listitem>
+  <listitem><para><ulink url="http://accad.osu.edu/~pgerstma/class/vnv/resources/info/AnnotatedVrmlRef/Book.html">
+    The Annotated VRML 97 Reference
+    </ulink></para></listitem>
+  <listitem><para><ulink url="http://www.web3d.org/x3d/specifications/">
+    X3D specifications
+    </ulink></para></listitem>
+</itemizedlist>
+
+</sect1>
+
+<sect1 id="section.links_my">
+<title>Author's resources</title>
+
+<para><ulink url="http://castle-engine.sourceforge.net/">Our VRML / X3D engine
+homepage</ulink>, including:</para>
+
+<itemizedlist>
+  <listitem><para><ulink
+    url="http://castle-engine.sourceforge.net/engine_doc.php">
+    Engine documentation</ulink> &mdash; the document that you're reading
+    right now</para></listitem>
+
+  <listitem><para><ulink
+    url="http://castle-engine.sourceforge.net/view3dscene.php">view3dscene</ulink>
+    &mdash; VRML (1.0, 2.0), X3D browser, and a viewer for other 3D formats
+    (3DS, OBJ, Collada, MD3, others)</para></listitem>
+
+  <listitem><para><ulink
+    url="http://castle-engine.sourceforge.net/rayhunter.php">rayhunter</ulink>
+    &mdash; command-line ray-tracer, and it's
+    <ulink url="http://castle-engine.sourceforge.net/raytr_gallery.php">
+    gallery</ulink></para></listitem>
+
+  <listitem><para><ulink
+    url="http://castle-engine.sourceforge.net/engine.php">
+    overview and sources of my engine</ulink> and their <ulink
+    url="http://castle-engine.sourceforge.net/reference.php">
+    reference</ulink></para></listitem>
+
+  <listitem><para><ulink
+    url="http://castle-engine.sourceforge.net/x3d_implementation_status.php">
+    VRML / X3D implementation status</ulink></para></listitem>
+
+  <listitem><para><ulink
+    url="http://castle-engine.sourceforge.net/demo_models.php">
+    VRML / X3D test suite</ulink></para></listitem>
+
+  <listitem><para><ulink
+    url="http://castle-engine.sourceforge.net/x3d_extensions.php">
+    Specification of my extensions to VRML / X3D</ulink></para></listitem>
+</itemizedlist>
+
+<para>See also <ulink url="http://michalis.ii.uni.wroc.pl/~michalis/">author's
+private homepage</ulink>.</para>
+
+</sect1>
+
+</chapter>
+
+<!--
+  Local Variables:
+  ispell-local-dictionary: "american"
+  End:
+-->

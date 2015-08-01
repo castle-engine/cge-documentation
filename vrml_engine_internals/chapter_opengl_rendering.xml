@@ -1,0 +1,1129 @@
+<?xml version='1.0'?>
+<!DOCTYPE chapter PUBLIC "-//OASIS//DTD DocBook XML V4.4//EN"
+  "/usr/share/sgml/docbook/dtd/xml/4.4/docbookx.dtd">
+
+<chapter id="chapter.opengl_rendering">
+<title>OpenGL rendering</title>
+
+<!-- Source units: GLRendererLights, GLRenderer, CastleScene -->
+
+<sect1 id="section.vrml_lights">
+<title>VRML lights rendering</title>
+
+<!-- Source units: GLRendererLights -->
+
+<sect2 id="section.lighting_model">
+<title>Lighting model</title>
+
+<para>When rendering using the OpenGL we try to get results as close
+as possible to the <ulink
+  url="http://www.web3d.org/x3d/specifications/vrml/ISO-IEC-14772-VRML97/part1/concepts.html#4.14">VRML
+2.0 lighting equations</ulink> and <ulink
+  url="http://www.web3d.org/x3d/specifications/ISO-IEC-19775-1.2-X3D-AbstractSpecification/Part01/components/lighting.html#Lightingequations">X3D
+lighting equations</ulink>. We set OpenGL lights and materials properties
+to achieve the required look.</para>
+
+<para>Note that there are bits when it is not possible to exactly match
+VRML 2.0 / X3D requirements with fixed-function rendering:</para>
+
+<orderedlist>
+  <listitem><para>VRML 2.0 / X3D specify the spot light falloff
+    by a <literal>beamWidth</literal> field.
+    This cannot be precisely translated to a
+    standard OpenGL spotlight exponent.</para>
+
+    <para>Let <?alpha?> be the angle between
+    the spot light's direction and the ray from spot light's position
+    to the considered geometry point.</para>
+
+    <itemizedlist spacing="compact">
+      <listitem><para>OpenGL spot light uses cosinus drop-off,
+        which means that the light intensity within the spot
+        <literal>cutOffAngle</literal> is calculated as a
+        <phrase role="math">Cos(<?alpha?>)<superscript>spotExponent</superscript></phrase>.
+        </para></listitem>
+
+      <listitem><para>VRML 2.0 / X3D have a <literal>beamWidth</literal>.
+        When <phrase role="math"><?alpha?> &lt; beamWidth</phrase>,
+        the light intensity is constant (1.0). For larger angles,
+        the intensity is linearly interpolated (down to 0.0) until angle reaches
+        <literal>cutOffAngle</literal>.
+        </para></listitem>
+    </itemizedlist>
+
+    <para>There is just no sensible translation from <literal>beamWidth</literal>
+    idea to OpenGL <literal>spotExponent</literal>.</para>
+
+    <para>An exception is the case when
+    <phrase role="math">beamWidth >= cutOffAngle</phrase>.
+    Then spot has constant intensity, which has be accurately expressed
+    with GL_SPOT_EXPONENT = 0. Fortunately, this is the default situation
+    for all spot lights.</para>
+
+    <para>We have considered an extension to define <literal>SpotLight.dropOffRate</literal>
+    as an extension for VRML >= 2.0 lights. With definition like
+    <quote>default value of dropOffRate = -1 means
+    to try to approximate beamWidth, otherwise dropOffRate is used as an
+    exponent</quote>. But it didn't prove useful enough, especially since it would
+    be our own extension.</para>
+
+    <para>Looking at how other VRML/X3D implementations handle this:</para>
+
+    <itemizedlist>
+      <listitem><para>Seems that most of them ignore the issue, leaving spot exponent
+      always 0 and ignoring beamWidth entirely.</para></listitem>
+
+      <listitem><para>One implementation <ulink
+        url="http://arteclab.artec.uni-bremen.de/courses/mixed-reality/material/ARToolkit/ARToolKit2.52vrml/lib/libvrml/libvrml97gl/src/vrml97gl/old_ViewerOpenGL.cpp" />
+      checks <phrase role="math">beamWidth &lt; cutOffAngle</phrase>
+      and sets spot_exponent to 0 or 1.
+      This is what we were doing in engine versions &lt;= 3.0.0.</para></listitem>
+
+      <listitem>
+        <para>Xj3D (see <literal>src/java/org/web3d/vrml/renderer/ogl/nodes/lighting/OGLSpotLight.java</literal>)
+        sets <literal>GL_SPOT_EXPONENT</literal> to
+        <phrase role="math">0.5 / beamWidth</phrase>.</para>
+
+        <para>It's not <quote>more precise</quote> in any way,
+        the value <phrase role="math">0.5</phrase> is just a "rule of thumb"
+        as far as we know.
+        But at least it allows to control exponent by <literal>beamWidth</literal>.
+        This is an important advantage,
+        as you can at least change the drop off rate by changing the beamWidth.
+        Even if beamWidth is not interpreted following the specification,
+        at least it's interpreted <emphasis>somehow</emphasis>, and allows
+        to achieve a range of different effects.</para>
+      </listitem>
+
+      <listitem>
+        <para>FreeWRL (see
+        <ulink url="http://search.cpan.org/src/LUKKA/FreeWRL-0.14/VRMLRend.pm" />,
+        <literal>freewrl-1.22.13/src/lib/scenegraph/Component_Lighting.c</literal> in later version)
+        uses approach similar to Xj3D, setting
+        <literal>GL_SPOT_EXPONENT</literal> to <phrase role="math">0.5 / (beamWidth + 0.1)</phrase>.</para>
+
+        <para>For example, this results in</para>
+
+        <itemizedlist spacing="compact">
+          <listitem><para>beamWidth = 0 => GL_SPOT_EXPONENT = 5</para></listitem>
+          <listitem><para>beamWidth = Pi/4 => GL_SPOT_EXPONENT =~ 0.5 / 0.9 =~ 1/2</para></listitem>
+          <listitem><para>beamWidth = Pi/2 => GL_SPOT_EXPONENT =~ 0.5 / 1.67 =~ 1/3</para></listitem>
+        </itemizedlist>
+
+        <para>It's similar to Xj3D, and the <phrase role="math">+0.1</phrase>
+        seems to be just to prevent division by (something close to) zero
+        in case beamWidth is very very small.
+        Unfortunately, this addition also limits the possible values
+        of <literal>GL_SPOT_EXPONENT</literal>: it's at most 5 (<phrase role="math">0.5 / 0.1 = 5</phrase>,
+        as beamWidth must be > 0),
+        and sometimes larger values would be useful.
+        </para>
+      </listitem>
+
+      <listitem>
+        <para>In our engine current version, we do it like this:</para>
+
+        <itemizedlist spacing="compact">
+          <listitem><para>If beamWidth >= cutOffAngle, then GL_SPOT_EXPONENT is 0.</para></listitem>
+          <listitem><para>Otherwise we follow Xj3D version: <literal>GL_SPOT_EXPONENT</literal> is <phrase role="math">0.5 / max(beamWidth, epsilon)</phrase></para></listitem>
+        </itemizedlist>
+
+        <para>If you want to convert VRML 1.0 <literal>dropOffRate</literal>
+        to VRML 2.0 / X3D <literal>beamWidth</literal> precisely:</para>
+
+        <itemizedlist spacing="compact">
+          <listitem><para>If dropOffRate = 0, then leave beamWidth at default Pi/2.
+            This makes beamWidth &gt;= cutOffAngle (because cutOffAngle must be &lt;= Pi/2
+            according to spec), which means no smooth falloff.</para></listitem>
+
+          <listitem><para>Otherwise <phrase role="math">beamWidth :=
+            0.5 / (128 * dropOffRate) = 1 / (256 * dropOffRate)</phrase>.
+            </para></listitem>
+        </itemizedlist>
+      </listitem>
+    </itemizedlist>
+    </listitem>
+
+  <listitem><para>The exponential fog of VRML 2.0 also uses different
+    equations than OpenGL exponential fog and cannot be matched
+    perfectly. See VRML and OpenGL specifications for details.</para></listitem>
+
+  <listitem><para>Fixed-function renderer uses Gouraud shading,
+    with it's limitations.</para></listitem>
+</orderedlist>
+
+<para>Shader pipeline overcomes above problems. We program spot falloff
+ourselves in GLSL, honoring <literal>beamWidth</literal> correctly.
+We also do per-pixel lighting calculation (Phong shading).
+See <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_lighting.php" />.</para>
+
+<para>You can also use classic ray-tracer of our engine to see the correct
+lighting.</para>
+
+</sect2>
+
+<sect2 id="section.rendering_lights_separately">
+<title>Rendering lights</title>
+
+<para>VRML/X3D lights are translated to the appropriate OpenGL calls using
+the <literal>TGLRendererLights</literal> class.
+This is used internally by the <literal>TGLRenderer</literal>
+discussed in next sections.
+<emphasis>For now</emphasis> if you implement custom OpenGL rendering of 3D stuff,
+for have to also implement custom handling of OpenGL lights.
+(This is scheduled to be improved in engine 2.6.0, by making an instance
+of <literal>TGLRendererLights</literal> more widely available.)
+<!--This is normally used internally
+by <literal>TGLRenderer</literal> class that will be discussed
+in next sections, but it can also be used separately for special purposes.
+For example, if you make your own rendering using direct OpenGL calls,
+but still you would like to add lights from VRML/X3D scene,
+then you can use <literal>TGLRendererLights</literal> directly.
+--></para>
+
+<para>When you render 3D models using our engine classes,
+like <literal>TCastleScene</literal>, everything related to lights
+is automatically taken care of.
+All lights (including the headlight, see <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_headlight" />)
+can be described and animated inside the VRML/X3D model. Programmers
+can also control lights by code.
+Some useful things are <literal>TCastleSceneCore.HeadlightOn</literal>
+and <literal>TCastleSceneCore.CustomHeadlight</literal> to control the headlight
+of given scene. You can also control headlight globally by overriding
+the viewport and scene manager method <literal>TCastleAbstractViewport.Headlight</literal>.
+<literal>TCastleSceneCore.Attributes.UseSceneLights</literal> controls normal
+scene lights.</para>
+
+<para>To use main scene lights on other 3D objects as well,
+you have a comfortable <literal>TCastleAbstractViewport.UseGlobalLights</literal>.
+You can also override <literal>TCastleAbstractViewport.InitializeLights</literal>.
+For example, in games you may want to render various 3D things:
+for example you have one mostly static 3D model for level
+and various creature models. And it may be desirable to use level lights
+for everything. Using <literal>TCastleAbstractViewport.UseGlobalLights = true</literal>
+does this for you.</para>
+
+<para>I use this technique in my games. For example see <ulink
+  url="http://castle-engine.sourceforge.net/castle.php">
+<quote>The Castle</quote></ulink> levels.</para>
+
+</sect2>
+
+</sect1>
+
+<sect1 id="section.vrml_arrays">
+<title>Geometry arrays</title>
+
+<para>The key moment of our rendering process is the
+<literal>TGeometryArrays</literal> class.  An instance of this class
+stores all the per-vertex information about the given VRML/X3D
+shape. For every VRML/X3D shape, we can generate an instance of
+TGeometryArrays by appropriate TArraysGenerator descendant (see
+ArraysGenerator unit and ArraysGenerator function). The renderer
+can use such TGeometryArrays instance to easily render the shape with
+OpenGL.</para>
+
+<para>TGeometryArrays stores the information about vertex positions, normal
+vectors, optional colors, texture coordinates (for all texture units),
+GLSL attributes and more. This information is split into two arrays:</para>
+
+<orderedlist>
+  <listitem><para>one array keeps interleaved vertex positions and normals.
+    We call it the <firstterm>coordinate array</firstterm>.</para></listitem>
+
+  <listitem><para>one array keeps interleaved other optional vertex data,
+    like colors, texture coordinates, GLSL attributes etc.
+    We call it the <firstterm>attribute array</firstterm>.</para></listitem>
+</orderedlist>
+
+<para>Both arrays are interleaved, allowing for fast rendering.</para>
+
+<para>Separating the information into two arrays is good for dynamic
+shapes. When the shape coordinate changes, we have to change vertex
+positions and normal vectors, but the other attributes stay the
+same. Thanks to the fact that we have separate <firstterm>coordinate</firstterm> and
+<firstterm>attribute arrays</firstterm>, we can update only one of them when
+needed. Currently, we even have two separate VBO for <firstterm>coordinate</firstterm> and
+<firstterm>attribute</firstterm> arrays.</para>
+
+<para>Together, the <firstterm>coordinate</firstterm> and
+<firstterm>attribute</firstterm> arrays describe the
+complete per-vertex information. TGeometryArrays.Count is the number
+of vertexes. TGeometryArrays.AttributeSize is the size (in bytes) of
+one vertex in attribute arrays, and a similar
+TGeometryArrays.CoordinateSize is the size of one vertex in coordinate
+array. Currently, coordinate arrays always stores vertex positions and
+normals, so CoordinateSize is actually a constant (6 * size of a
+single-precision float).</para>
+
+<para>There is a a third, optional, array stored inside
+TGeometryArrays: the <firstterm>indexes array</firstterm>.</para>
+
+<itemizedlist>
+  <listitem><para>When Indexes exist, then you can render shape using
+    glDrawElements. Each index (item on Indexes array) is an integer
+    between 0 and TGeometryArrays.Count - 1). Indexes.Count vertexes will
+    be drawn. A single vertex (in coordinate / attribute arrays) may be
+    accessed many times, by using the same index many times in the Indexes
+    array.</para></listitem>
+
+  <listitem><para>When Indexes do not exist, you can render using
+    glDrawArrays. In this case, exactly TGeometryArrays.Count vertexes will be
+    drawn.</para></listitem>
+</itemizedlist>
+
+<para>Rendering with indexes is nice, as we conserve memory, and allow
+OpenGL to cache and reuse transformation and lighting calculation
+results for repeated indexes. Unfortunately, it's often not
+possible. Consider e.g. a cube with per-face normal vectors. Although
+you have only 8 different vertex positions, each vertex is present on
+3 faces, and on each face must be rendered with different normal. This
+means that you have to pass to OpenGL 8 * 3 vertexes (or, equivalent,
+6 * 4 = 6 faces * 4 vertexes). There's no point using indexes, and
+OpenGL couldn't reuse lighting calculation results anyway.</para>
+
+<para>Our generator always tries to create indexes, if possible. Run
+view3dscene with --debug-log, load your scene, and look for the lines
+<literal>Renderer: Shape XXX is rendered with indexes:
+FALSE/TRUE</literal> in the log. This will show you how well it works
+for your shapes.</para>
+
+<sect2 id="section.vrml_arrays_rendering">
+<title>Rendering using geometry arrays and VBO</title>
+
+<para>For each shape that needs to be rendered, our renderer wants to generate
+a corresponding TGeometryArray. If an array is not created yet,
+a temporary generator (TArraysGenerator instance) is created,
+that in turn creates TGeometryArray instance corresponding to given VRML/X3D
+geometry.</para>
+
+<para>Then the geometry array data is loaded into OpenGL vertex buffer objects.
+We use separate vertex buffer objects for <firstterm>coordinate</firstterm> array,
+<firstterm>attribute</firstterm> array and <firstterm>indexes</firstterm> array.</para>
+
+<para>After loading the data to VBO (which means that the data is hopefully
+copied into fast GPU memory), we release the allocated memory inside
+TGeometryArray instance. Since that point, the data is only inside VBO,
+and TGeometryArray.DataFreed is true. This is a very nice memory conservation
+technique, the data is freed immediately after loading it to GPU.
+We have to keep the TGeometryArray instance (but with underlying array
+memory freed), as TGeometryArray knows the offsets of various attributes
+(colors, texture coords etc.) in the data. Effectively, TGeometryArray
+describes the layout of memory that is loaded into VBO.</para>
+
+<para>When we detect a change to VRML/X3D model, we only regenerate and reload
+to VBO needed information. For example, if you animate a shape coordinate,
+we only need to reload VBO containing the <firstterm>coordinate</firstterm> array (vertex
+positions and normal vectors). You can see this optimization if
+you run view3dscene with --debug-log and load a model where shape coordinates
+change (for example, try <literal>demo_models/x3d/worm_crawl.x3dv</literal>).
+Log lines like <literal>Renderer: Loading data to existing VBOs (1,2,3),
+reloading [Coordinate]</literal> indicate that only coordinates needed to
+be reloaded.</para>
+
+<!--We reload the VBO data by glBufferSubData when possible. This may
+be faster than using glBufferData each time, but doesn't make any
+noticeable difference in practice.-->
+
+</sect2>
+
+<sect2>
+<title>Caching of shapes arrays and VBOs</title>
+
+<para>To conserve memory usage, in case you use the same geometry many times,
+the process is actually a little more complicated than described in the previous section.
+We have a cache, that stores TGeometryArrays instance and three VBO
+identifiers, in a TShapeCache class. Many shapes can use the same
+TShapeCache instance (and thus share the same TGeometryArrays and VBO),
+for example when you reUSE VRML/X3D geometry, or when you have
+precalculated animation with the same geometry static for a number of frames.
+This cache allows to conserve memory and speedup rendering and loading time,
+in some cases making a large improvement.</para>
+
+<orderedlist>
+  <listitem><para>If you use precalculated animation (through
+    the <literal>TCastlePrecalculatedAnimation</literal>, for details
+    see later <xref linkend="chapter.animation" />) then this
+    allows to conserve memory. The shapes that are still
+    (or change only stuff outside of arrays/VBOs,
+    for example only change transformation) will share the same arrays/VBO.
+    This can be a huge memory saving, as only a single array/VBO triple
+    may be needed for many animation frames.
+    Very important since
+    generating many arrays/VBOs for <literal>TCastlePrecalculatedAnimation</literal>
+    is generally very memory-hungry operation.</para>
+
+    <para>For example, a robot moves
+    by bending it's legs at the knees. But the thighs and
+    the calves' shapes remain the same, only the transformations
+    of the calves change.</para>
+  </listitem>
+
+  <listitem><para>When you have a scene that uses the same
+    shape many times but with a different transformation.
+    For example a forest using the same tree models scattered
+    around. In this case all the trees can share resources,
+    this can be a huge memory saving if we
+    have many trees in our forest.</para>
+
+    <para role="para_with_larger_screen_mini">
+    <figure>
+      <title>All the trees visible on this screenshot are
+        actually the same tree model, only moved and rotated
+        differently.</title>
+      <mediaobject>
+      <imageobject role="html">
+        <imagedata format="PNG"
+          fileref="images/castle_forest_screen_mini.png" />
+      </imageobject>
+      <imageobject role="fo">
+        <imagedata format="PNG"
+          fileref="images/castle_forest_screen.png"
+          width="4in" contentwidth="4in" />
+      </imageobject>
+      <imageobject role="dblatex">
+        <imagedata format="EPS"
+          fileref="images/castle_forest_screen.eps"
+          width="4in" contentwidth="4in" />
+      </imageobject>
+      </mediaobject>
+    </figure>
+    </para>
+  </listitem>
+</orderedlist>
+
+<para>Note that for some features, the caching cannot
+be as efficient. This includes things like <literal>Attributes.OnBeforeVertex</literal>
+and the volumetric fog. In these cases, two shapes must have equal transformation
+to look exactly the same. So in these cases (this is automatically
+detected by the engine) we have a little less sharing,
+and use more memory.</para>
+
+<para>For example, look at these two trees on a scene that uses
+the blue volumetric fog.</para>
+
+<figure>
+  <title>The correct rendering of the trees with volumetric fog</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="images/break_no_transform_correct_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="images/break_no_transform_correct_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="images/break_no_transform_correct_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<figure>
+  <title>The wrong rendering of the trees with volumetric fog,
+    if we would use the same arrays/VBO
+    (containing fog coordinate for each vertex) for both trees.</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="images/break_no_transform_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="images/break_no_transform_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="images/break_no_transform_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+</sect2>
+</sect1>
+
+<sect1 id="section.vrml_opengl_renderer">
+<title>Basic OpenGL rendering</title>
+
+<!-- Source units: GLRenderer -->
+
+<para><literal>TGLRenderer</literal> class does
+the basic OpenGL rendering of VRML nodes.</para>
+
+<para><quote>Basic</quote> rendering means that this class is not supposed to
+choose the order of rendering of VRML nodes.
+This implicates that <literal>TGLRenderer</literal> is
+not responsible for doing optimizations that
+pick only some subset of VRML nodes for rendering
+(for example, only the nodes visible within the camera frustum).
+This also implicates that it's not responsible for arranging
+the rendering order for OpenGL blending, see
+<xref linkend="section.material_transparency_by_gl_blending" />.
+In fact, it doesn't set any OpenGL blending parameters
+(aside from setting colors alpha values as appropriate).</para>
+
+<para>This limitation is done by design. A higher-level
+routines will internally use an instance of this class to perform rendering.
+These higher-level routines should choose in what shapes to render,
+and in which order.
+In the next <xref linkend="section.scene_gl" /> we will get familiar
+with such higher-level class.</para>
+
+<para>The way to use <literal>TGLRenderer</literal> looks
+like this:</para>
+
+<orderedlist>
+  <listitem><para>First you must call <literal>Prepare</literal>
+    method for all the <literal>State</literal> instances
+    that you want to later use for rendering.
+    You can obtain such <literal>State</literal> instances
+    for example by a traverse callback discussed earlier in
+    <xref linkend="section.vrml_node_traverse" />. The order
+    of calling <literal>Prepare</literal> methods doesn't matter &mdash;
+    it's only important for you to prepare <emphasis>all states</emphasis>
+    before you will render them.</para>
+
+    <para>For example <literal>Prepare</literal> calls may load
+    textures into OpenGL, and triangulate outline fonts
+    (used by VRML <literal>Text</literal>
+    and <literal>AsciiText</literal> nodes).</para>
+
+    <para>You are free to mix <literal>Prepare</literal> calls with
+    any other rendering calls to OpenGL. This doesn't matter,
+    as <literal>Prepare</literal> only prepares some resources,
+    without changing OpenGL state. You cannot delete yourself
+    any resources (texture names, display lists, buffer objects etc.)
+    reserved inside <literal>Prepare</literal> calls.
+    A properly written OpenGL program should always allocate
+    free resource names using calls like <literal>glGenTextures</literal>
+    anyway.</para></listitem>
+
+  <listitem><para>Call <literal>RenderBegin</literal>
+    to start actual rendering. This will set up some OpenGL state
+    that will be assumed by further rendering calls.</para>
+
+    <para>If <literal>Attributes.PreserveOpenGLState</literal>,
+    this also does a <firstterm>push</firstterm> of OpenGL attributes stack,
+    so that everything can be restored later by <literal>RenderEnd</literal>.
+    Unfortunately, this is quite costly operation, and it's often not needed
+    (when you don't do any custom OpenGL rendering), so
+    <literal>Attributes.PreserveOpenGLState</literal> is false by default.</para></listitem>
+
+  <listitem><para>Then you should call <literal>RenderShape</literal>
+    for each VRML/X3D shape that you want to render.
+    As mentioned earlier, all the shapes have to be previously
+    prepared by a <literal>Prepare</literal> call.</para></listitem>
+
+  <listitem><para>Finally after you rendered all your shapes,
+    you should call <literal>RenderEnd</literal>.</para>
+
+    <para>Between <literal>RenderBegin</literal> and
+    <literal>RenderEnd</literal> you are not allowed to change OpenGL
+    state in any way except for calling other
+    <literal>TGLRenderer</literal> methods.
+    Well, actually there are some exceptions,
+    things that you can legitimately do &mdash; these include e.g. setting
+    enabled state of OpenGL blending. But generally you should limit
+    yourself to calling other <literal>TGLRenderer</literal> methods
+    between <literal>RenderBegin</literal> and
+    <literal>RenderEnd</literal>.</para></listitem>
+</orderedlist>
+
+<para>Of course the scenario above may be repeated as many times as you want.
+The key is that you will not have to repeat <literal>Prepare</literal>
+calls each time &mdash; once a state is prepared, you can use it in
+<literal>RenderShape</literal> calls as many times as you want.
+If you will not need some state anymore then you can release some
+resources allocated by it's <literal>Prepare</literal> call
+by using <literal>UnPrepare</literal> or <literal>UnPrepareAll</literal>
+methods.</para>
+
+<para>Note that <literal>TGLRenderer</literal>
+doesn't try to control whole OpenGL state. It controls only the state
+that it needs to, to accurately render VRML nodes. Some OpenGL
+settings that are not controlled include:</para>
+
+<itemizedlist spacing="compact">
+  <listitem><para>global ambient light value (<literal>glLightModel</literal>
+    with <literal>GL_LIGHT_MODEL_AMBIENT</literal> parameter),</para></listitem>
+  <listitem><para>polygon mode (filled or wireframe?),</para></listitem>
+  <listitem><para>blending settings.</para></listitem>
+</itemizedlist>
+
+<para>So you can adjust some rendering properties simply by
+using normal OpenGL commands. Also you can transform rendered
+VRML models simply by setting appropriate modelview matrix
+before calling <literal>RenderBegin</literal>. So rendering
+done by <literal>TGLRenderer</literal> tries to cooperate
+with OpenGL nicely, acting just like a <quote>complex
+OpenGL operation</quote>, that plays nicely when mixed with other OpenGL
+operations.</para>
+
+<para>However, for various implementation reasons, many other
+VRML rendering properties cannot be controlled by just setting
+OpenGL state before using <literal>RenderBegin</literal>.
+Instead you can adjust them by setting <literal>Attributes</literal>
+property of <literal>TGLRenderer</literal>.</para>
+
+<sect2 id="section.opengl_resource_cache">
+<title>OpenGL resource cache</title>
+
+<para>Often when you render various VRML models, you will
+use various <literal>TGLRenderer</literal> instances. But still
+you want those <literal>TGLRenderer</literal> instances
+to share some common resources. For example, each texture has to
+be loaded into OpenGL context only once. It would be ridiculous
+to load the same texture as many times as there are VRML models
+using it. That's why we have <literal>TGLRendererContextCache</literal>.
+It can be used by various renderers to store common resources,
+like an OpenGL texture name associated with given texture filename.</para>
+
+<para>Things that are cached include:</para>
+
+<itemizedlist>
+  <listitem><para>Fonts display lists.</para></listitem>
+
+  <listitem><para>Texture names. This way you can make your whole OpenGL
+    context to share common <quote>texture pool</quote>
+    &mdash; and all you have to do is to pass the same
+    <literal>TGLRendererContextCache</literal>
+    instance around.</para></listitem>
+
+  <listitem><para>Shape information: arrays and VBOs mentioned in previous
+    chapter.</para></listitem>
+</itemizedlist>
+
+<para>By default, each <literal>TGLRenderer</literal> creates and uses his own
+cache, but you can create <literal>TGLRendererContextCache</literal>
+instance explicitly and just pass it down to every OpenGL renderer that
+you will create. All higher-level objects that use <literal>TGLRenderer</literal>
+renderer allow you to pass your desired <literal>TGLRendererContextCache</literal>.
+And you should use it, if you want to seriously conserve memory
+usage of your program.</para>
+
+<para>Also note that when animating, all animation frames of given animation
+object (<literal>TCastlePrecalculatedAnimation</literal> instance, that will be described
+in details in <xref linkend="chapter.animation" />) always use the same
+renderer. So they also always use the same cache instance, which already
+gives you some memory savings thanks to cache automatically.</para>
+
+</sect2>
+
+<sect2 id="section.specialized_vs_triangulate">
+<title>Specialized OpenGL rendering routines vs Triangulate approach</title>
+
+<para>Historically, we used to have many rendering routines for various nodes.
+This turned out to be extremely cumbersome to maintain.
+The new "geometry arrays" approach unifies this, translating every
+shape to only a couple of primitives that map nicely to OpenGL
+(triangles, quads, quad strips etc.).
+The "geometry arrays" are also be used to implement
+<literal>TShape.LocalTriangulate</literal> and
+<literal>TShape.Triangulate</literal>.
+Thus, rendering and triangulating is nicely unified.</para>
+
+<para>We also have an alternative, debugging renderer that
+will be used if you define <literal>USE_VRML_TRIANGULATION</literal>
+symbol for compilation of <literal>GLRenderer</literal>
+unit. Each node will be triangulated
+using <literal>TShape.LocalTriangulate</literal> method
+(mentioned earlier in <xref linkend="section.triangulating" />)
+and each triangle will be passed to OpenGL. This is a very limited rendering
+method, only to show that <literal>TShape.LocalTriangulate</literal>
+works correctly:</para>
+
+<orderedlist>
+  <listitem><para>It's slower than normal rendering through arrays
+    and VBOs.</para></listitem>
+
+  <listitem><para>Things that are not expressed as triangles
+    (<literal>IndexedLineSet</literal>, <literal>PointSet</literal>)
+    will not be rendered at all.</para></listitem>
+
+  <listitem><para>It lacks some features, because the triangulating routines
+    do not return enough information. For example, only the first texture
+    unit gets correct texture coordinates, so multi-texturing doesn't work
+    (correctly).</para></listitem>
+</orderedlist>
+
+</sect2>
+</sect1>
+
+<sect1 id="section.scene_gl">
+<title>VRML scene class for OpenGL</title>
+
+<para><literal>TCastleScene</literal> is a descendant of
+<literal>TCastleSceneCore</literal> (which was introduced earlier in
+<xref linkend="section.scene" />). Internally it uses
+<literal>TGLRenderer</literal> (introduced in last section,
+<xref linkend="section.vrml_opengl_renderer" />) to render scene
+to OpenGL. It also provides higher-level optimizations and features for
+OpenGL rendering. In short, this is the most comfortable
+and complete class that you should use to load and render static
+VRML models. In addition to <literal>TCastleSceneCore</literal> features,
+it allows you to:</para>
+
+<itemizedlist>
+  <listitem><para>Render all shapes (i.e. whole VRML scene).
+    Use <literal>Render</literal> method with <literal>nil</literal>
+    as <literal>TestShapeVisibility</literal> parameter for
+    the simplest rendering method.</para></listitem>
+
+  <listitem><para>You can render only the shapes
+    that are within current camera frustum by <literal>RenderFrustum</literal>.
+    This works by checking each shape for collision
+    with frustum before rendering. Generally, it makes a great
+    rendering optimization if user doesn't usually see the whole scene
+    at once.</para></listitem>
+
+  <listitem><para>When you initialize shape octree for rendering,
+    by adding <literal>ssRendering</literal> to <literal>TCastleScene.Spatial</literal>,
+    then <literal>RenderFrustum</literal> will work even better.
+    The shapes within the frustum will be determined by traversing the
+    shape octree. If your scene has many shapes
+    then this will be faster than without octree.
+    </para></listitem>
+
+  <listitem><para>In special cases you may be able to create
+    a specialized test whether given shape is visible.
+    You can call <literal>Render</literal> method passing
+    as a parameter pointer to your specialized test routine.
+    This way you may be able to add some special optimizations
+    in particular cases.</para>
+
+    <para>For example if you know that the scene uses a dense fog and it has
+    a matching background color (for example by <literal>Background</literal>
+    VRML node) then it's sensible to ignore shapes
+    that are further then fog's visibility range. In other words,
+    you only draw shapes within a sphere around the player position.</para>
+
+    <para>A working example program that uses exactly this approach
+    is available in our engine sources in the file
+    <filename>castle_game_engine/examples/vrml/fog_culling.lpr</filename>.</para>
+
+    <para>On the screenshot below the fog is turned off.
+    Camera frustum culling is used to optimize rendering, and so
+    only 297 spheres out of all 866 spheres on the scene need to be rendered.
+    </para>
+
+    <figure>
+      <title>Rendering without the fog (camera frustum culling is used)</title>
+      <mediaobject>
+      <imageobject role="html">
+        <imagedata format="PNG"
+          fileref="images/fog_culling_no_fog_screen_mini.png" />
+      </imageobject>
+      <imageobject role="fo">
+        <imagedata format="PNG"
+          fileref="images/fog_culling_no_fog_screen.png"
+          width="3in" contentwidth="3in" />
+      </imageobject>
+      <imageobject role="dblatex">
+        <imagedata format="EPS"
+          fileref="images/fog_culling_no_fog_screen.eps"
+          width="3in" contentwidth="3in" />
+      </imageobject>
+      </mediaobject>
+    </figure>
+
+    <para>On the next screenshot the fog is turned on.
+    The same view is rendered.
+    We render only the objects within fog visibility range,
+    and easily achieve a drastic improvement: only 65 spheres
+    are passed to OpenGL now. Actually we could improve this
+    result even more: in this case, both camera frustum culling
+    and culling to the fog range could be used. Screenshot suggests
+    that only 9 spheres would be rendered then.</para>
+
+    <figure>
+      <title>Rendering with the fog (only objects within the fog visibility range
+        need to be rendered)</title>
+      <mediaobject>
+      <imageobject role="html">
+        <imagedata format="PNG"
+          fileref="images/fog_culling_fog_screen_mini.png" />
+      </imageobject>
+      <imageobject role="fo">
+        <imagedata format="PNG"
+          fileref="images/fog_culling_fog_screen.png"
+          width="3in" contentwidth="3in" />
+      </imageobject>
+      <imageobject role="dblatex">
+        <imagedata format="EPS"
+          fileref="images/fog_culling_fog_screen.eps"
+          width="3in" contentwidth="3in" />
+      </imageobject>
+      </mediaobject>
+    </figure>
+
+    </listitem>
+
+  <listitem><para><literal>TCastleScene</literal> implements material
+    transparency by OpenGL alpha blending. This requires rearranging
+    the order in which shapes are rendered, that's
+    why it must be done in this class (instead of being done inside
+    <literal>TGLRenderer</literal>).
+    </para>
+
+    <para>Details about this will be revealed soon in
+    <xref linkend="section.material_transparency_by_gl_blending" />.</para>
+    </listitem>
+
+  <listitem><para><literal>TCastleScene</literal> has also
+    comfortable methods to handle and render VRML
+    <literal>Background</literal> node of your scene.</para></listitem>
+</itemizedlist>
+
+<sect2 id="section.material_transparency_by_gl_blending">
+<title>Material transparency using OpenGL alpha blending</title>
+
+<para>To understand the issue you have to understand how OpenGL
+works. OpenGL doesn't <quote>remember</quote> all the triangles sent to it.
+As soon as you finish passing a triangle to OpenGL (which means
+making <literal>glVertex</literal> call that completes the triangle)
+OpenGL implementation is free to immediately render it.
+This means mapping the given triangle to 2D window and updating data
+in various buffers &mdash; most notably the color buffer, but also
+the depth buffer, the stencil buffer and possibly others.
+Right after triangle is rendered this way, OpenGL implementation
+can completely <quote>forget</quote> about the fact that it just
+rendered the triangle. All triangle geometry, materials etc.
+information doesn't have to be kept anywhere. The only trace
+after rendering the triangle is left in the buffers (but these
+are large 2D arrays of data, and only the human eye can reconstruct
+the geometry of the triangle by looking at the color buffer contents).
+</para>
+
+<para>In summary, this means that the order in which you pass
+the triangles to OpenGL is significant. Rendering opaque
+objects with the help of depth buffer is the particular and
+simple case when this order doesn't matter (aside for issues
+related to depth buffer inaccuracy or overlapping geometry).
+But generally the order matters. Using alpha blending is one
+such case.</para>
+
+<para>To implement VRML material transparency we use materials
+with <firstterm>alpha</firstterm> (4th color component) set to
+value lower than 1.0. When the triangle is specified, OpenGL
+renders it. A special operation mode
+is done for updating color buffer: instead of overriding old
+color values, the new and old colors are mixed, taking into account
+alpha (which acts as opacity factor here) value.
+Of course when rendering transparent triangles they still must be
+tested versus depth buffer, that contains at this point information
+about <emphasis>all the triangles rendered so far within this frame</emphasis>.
+</para>
+
+<para>Now observe that depth buffer should not be updated as a result of rendering
+partially transparent triangle. Reason: partially transparent triangle
+doesn't hide the geometry behind it. If we will happen to render later
+other triangle (partially transparent or opaque) behind current
+partially transparent triangle, then the future triangle should not be eliminated
+by the current triangle. So only rendering opaque objects can change
+depth buffer data, and thus opaque objects hide all (partially
+transparent or opaque) objects behind them.</para>
+
+<para>But what will happen now if you render opaque triangle that is behind
+already rendered partially transparent triangle? The opaque triangle
+will cover the partially transparent one, because the information
+about partially transparent triangle was not recorded in depth buffer.
+For example you will get this incorrect result:</para>
+
+<figure>
+  <title>The ghost creature on this screenshot is actually
+    very close to the player. But it's transparent and is rendered incorrectly:
+    gets covered by the ground and trees.</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="images/castle_alpha_bad_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="images/castle_alpha_bad_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="images/castle_alpha_bad_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>The solution is to avoid this situation and <emphasis>render all partially
+transparent objects after all opaque objects</emphasis>. This will
+give correct result, like this:</para>
+
+<figure>
+  <title>The transparent ghost rendered correctly:
+    you can see that it's floating right before the player.</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="images/castle_alpha_good_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="images/castle_alpha_good_screen.png"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="images/castle_alpha_good_screen.eps"
+      width="3in" contentwidth="3in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+
+<para>Actually, in a general situation, rendering all partially
+transparent objects after opaque objects is not enough.
+That's because if more than one transparent object is visible on the
+same screen pixel, then the order in which they are rendered matters &mdash;
+because they are blended with color buffer in the same order as they
+are passed to OpenGL. For example if you set your blending functions
+to standard (<literal>GL_SRC_ALPHA</literal>,
+<literal>GL_ONE_MINUS_SRC_ALPHA</literal>) then each time
+you render a triangle with color (Red, Green, Blue) and opacity <?alpha?>,
+the current screen pixel color (Screen<subscript>Red</subscript>,
+Screen<subscript>Green</subscript>, Screen<subscript>Blue</subscript>)
+changes to</para>
+
+<para><phrase role="math">
+  (Screen<subscript>Red</subscript>,
+    Screen<subscript>Green</subscript>,
+    Screen<subscript>Blue</subscript>) * (1 - <?alpha?>) +
+    (Red, Green, Blue) * <?alpha?></phrase>
+</para>
+
+<para>Consider for example two partially transparent triangles,
+one of them red and the second one green, both with <?alpha?> set to 0.9.
+Suppose that they are both visible on the same pixel.
+If you render the red triangle first, then the pixel color will
+be</para>
+
+<para><phrase role="math">ScreenColor * (1 - <?alpha?>) * (1 - <?alpha?>) +
+  RedColor * <?alpha?> * (1 - <?alpha?>)  + GreenColor * <?alpha?> =<?lb?>
+  ScreenColor * 0.01 + RedColor * 0.09 + GreenColor * 0.9 =<?lb?>
+  visible as GreenColor in practice</phrase>
+</para>
+
+<para>If you render green triangle first then the analogous calculations
+will get you pixel color close to the red.</para>
+
+<para>So the more correct solution to this problem is to sort your transparent
+triangles with respect to their distance from the viewer.
+You should render first the objects that are more distant.
+Since April 2009 you can activate sorting shapes of transparent
+objects by setting <literal>Attributes.BlendingSort := true</literal>.</para>
+
+<para>However, this solution isn't really perfect. Sorting shapes is only
+an approximation, in more general case you should sort single triangles.
+Sorting all triangles at each frame (or after each camera move)
+doesn't seem like a good idea
+for a 3D simulation that must be done in real-time as fast as possible.
+Moreover, there are pathological cases when even sorting triangles
+is not enough and you
+will have to split triangles to get things 100% right. So it's just not
+possible to overcome the problem without effectively sorting at each screen
+pixel separately, which is not doable without hardware help.</para>
+
+<para>That's why our engine by default just ignores the order problem
+(<literal>Attributes.BlendingSort</literal> is <literal>false</literal>
+by default). We do not
+pay any attention to the order of rendering of transparent
+objects &mdash; as long as they are rendered after all opaque objects.
+In practice, rendering artifacts will occur only in some complex combinations of
+transparent objects. If you seldom use a transparent object,
+then you have small chance of ever hitting the situation that actually
+requires you to sort the triangles. Moreover, even in these situations,
+the rendering artifacts are usually not noticeable to casual user. Fast real-time
+rendering is far more important that 100% accuracy here.</para>
+
+<para>Moreover, our engine right now by default uses
+(<literal>GL_SRC_ALPHA</literal>, <literal>GL_ONE</literal>)
+blending functions, which means that the resulting pixel color
+is calculated as</para>
+
+<para><phrase role="math">
+  (Screen<subscript>Red</subscript>,
+    Screen<subscript>Green</subscript>,
+    Screen<subscript>Blue</subscript>) +
+    (Red, Green, Blue) * <?alpha?></phrase>
+</para>
+
+<para>That is, the current screen color is not scaled by (1 - <?alpha?>).
+We only add new color, scaled by it's alpha. This way rendering
+order of the transparent triangles doesn't matter &mdash; any order will
+produce the same results. For some uses
+(<literal>GL_SRC_ALPHA</literal>, <literal>GL_ONE</literal>)
+functions look better than (<literal>GL_SRC_ALPHA</literal>,
+<literal>GL_ONE_MINUS_SRC_ALPHA</literal>), for some uses they are worse.
+(<literal>GL_SRC_ALPHA</literal>, <literal>GL_ONE</literal>) tend
+to make image too bright (since transparent objects only increase the
+color values), that's actually good as long as your transparent objects
+represent some bright-colored and dense objects (a thick plastic glass,
+for example). (<literal>GL_SRC_ALPHA</literal>,
+<literal>GL_ONE_MINUS_SRC_ALPHA</literal>) on the other hand can
+sometimes unnaturally darken the opaque objects behind (since that's
+what these functions will do for a dark transparent object with large alpha).</para>
+
+</sect2>
+
+<sect2 id="section.material_transparency_by_stipple">
+<title>Material transparency using polygon stipple</title>
+
+<para>Other method of rendering material transparency deserves a quick
+note here. It's done by polygon stipple, which means that transparent triangles
+are rendered using special bit mask. This way part of their pixels
+are rendered as opaque, and part of them are not rendered at all.
+This creates a transparent look on sufficiently large resolution.
+Order of rendering transparent objects doesn't matter in this case.</para>
+
+<para>However, the practical disadvantages of this method is that
+it looks quite, well, ugly. When we use random stipples (to precisely
+show different transparency of different objects) then the random
+stipples look very ugly:</para>
+
+<para role="para_with_larger_screen_mini">
+<figure>
+  <title>Material transparency with random stipples</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="images/material_transparency_stipple_random_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="images/material_transparency_stipple_random_screen.png"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="images/material_transparency_stipple_random_screen.eps"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+<para>Instead of using random stipples, we can use a couple of
+special good-looking prepared regular stipples.
+But then we don't have much ability
+to accurately represent various transparency values (especially
+for very transparent objects). And still the results look quite bad:</para>
+
+<para role="para_with_larger_screen_mini">
+<figure>
+  <title>Material transparency with regular stipples</title>
+  <mediaobject>
+  <imageobject role="html">
+    <imagedata format="PNG"
+      fileref="images/material_transparency_stipple_regular_screen_mini.png" />
+  </imageobject>
+  <imageobject role="fo">
+    <imagedata format="PNG"
+      fileref="images/material_transparency_stipple_regular_screen.png"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  <imageobject role="dblatex">
+    <imagedata format="EPS"
+      fileref="images/material_transparency_stipple_regular_screen.eps"
+      width="4in" contentwidth="4in" />
+  </imageobject>
+  </mediaobject>
+</figure>
+</para>
+
+</sect2>
+
+<sect2 id="section.shape_granularity">
+<title>Shape granularity</title>
+
+<para>Optimizations done by <literal>TCastleScene</literal>
+(in particular, frustum culling) work best when the scene
+is sensibly divided into a number of small shapes.
+This means that <quote>internal</quote> design of VRML model (how it's
+divided into shapes) matters a lot. Here are some guidelines for
+VRML authors:</para>
+
+<itemizedlist>
+  <listitem><para>Don't define your entire world model as one
+    <literal>IndexedFaceSet</literal> node, as this makes frustum
+    culling compare frustum only with bounding box of the whole scene.
+    Unless your scene is usually
+    visible completely / not visible at all on the screen,
+    in which case this is actually a good idea.</para></listitem>
+
+  <listitem><para>Avoid <literal>IndexedFaceSet</literal> nodes with
+    triangles that are scattered all around the whole scene.
+    Such nodes will have very large bounding box and will be judged
+    as visible from almost every camera position in the scene,
+    thus making optimizations like frustum culling less efficient.</para></listitem>
+
+  <listitem><para>An ideal VRML model is split into many shapes
+    that have small bounding boxes. It's hard to specify a
+    precise <quote>optimal</quote> number of shapes,
+    so  you should just test your VRML model as much as you can.
+    Generally, <literal>RenderFrustum</literal> with <literal>ssRendering</literal>
+    octree should be able to
+    handle efficiently even models with a lot of shapes.
+    </para></listitem>
+</itemizedlist>
+
+<sect3 id="section.triangle_granularity">
+<title>Triangle granularity?</title>
+
+<para>Then comes an idea to use scene division into triangles
+instead of shapes. This would mean that our optimization
+doesn't depend on shape division so much. Large shapes
+would no longer be a problematic case.</para>
+
+<para>To make this work we would have to traverse triangle octree to decide which
+triangles are in the visibility frustum. Doing this
+without the octree, i.e. testing each triangle against the frustum,
+would be pointless, since this is what OpenGL already does by itself.</para>
+
+<para>Such traversing of the octree would have to be the first pass,
+used only to mark visible triangles. In the second pass we would
+take each shape and render marked triangles from it.
+The reason for this two-pass approach is that otherwise
+(if we would try to render triangles immediately
+when traversing the octree) we would produce too much overhead
+for OpenGL. Overhead would come from changing material/texture/etc. properties
+very often, since we would probably find triangles from various nodes
+(with various properties) very close in some octree leafs. </para>
+
+<para>But this approach creates problems:</para>
+<itemizedlist>
+  <listitem><para>The rendering routines would have to be written
+    much more intelligently to avoid rendering unmarked triangles.
+    This is not as easy as it seems as it collides with some
+    smart tricks to improve vertex sharing, like
+    using OpenGL primitives (<literal>GL_QUAD_STRIP</literal> etc.).</para></listitem>
+
+  <listitem><para>We would be unable to put large parts of
+    rendering pipeline into OpenGL arrays.
+    Constructing separate VBO for each triangle has little sense.
+    </para></listitem>
+</itemizedlist>
+
+<para>That's why this approach is not implemented.</para>
+
+</sect3>
+
+</sect2>
+
+</sect1>
+
+</chapter>
+
+<!--
+  Local Variables:
+  ispell-local-dictionary: "american"
+  End:
+-->

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<locatingRules xmlns="http://thaiopensource.com/ns/locating-rules/1.0">
+  <uri resource="section_scene.xml" uri="/usr/share/emacs/site-lisp/nxml-mode/schema/docbook.rnc"/>
+  <uri resource="chapter_opengl_rendering.xml" uri="/usr/share/emacs/site-lisp/nxml-mode/schema/docbook.rnc"/>
+  <uri resource="chapter_animation.xml" uri="/usr/share/emacs/site-lisp/nxml-mode/schema/docbook.rnc"/>
+  <uri resource="chapter_links.xml" uri="/usr/share/emacs/site-lisp/nxml-mode/schema/docbook.rnc"/>
+  <uri resource="chapter_ray_tracer.xml" uri="/usr/share/emacs/site-lisp/nxml-mode/schema/docbook.rnc"/>
+  <uri resource="chapter_octree.xml" uri="/usr/share/emacs/site-lisp/nxml-mode/schema/docbook.rnc"/>
+  <uri resource="chapter_vrml_overview.xml" uri="/usr/share/emacs/site-lisp/nxml-mode/schema/docbook.rnc"/>
+  <uri resource="chapter_scene_graph.xml" uri="/usr/share/emacs/site-lisp/nxml-mode/schema/docbook.rnc"/>
+  <uri resource="preface.xml" uri="/usr/share/emacs/site-lisp/nxml-mode/schema/docbook.rnc"/>
+</locatingRules>
