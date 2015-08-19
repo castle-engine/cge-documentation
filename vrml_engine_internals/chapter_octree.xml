@@ -194,7 +194,7 @@ Sphere has many triangles, so a detailed octree is constructed
 around it. Also the sphere caused a little more detailed octree
 around the near box.</para>
 
-<screen><xi:include href="../demo_models/vrml_engine_doc_simple_examples/octree_example.wrl"
+<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/octree_example.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
