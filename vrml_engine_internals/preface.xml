@@ -34,7 +34,7 @@ VRML has many advantages over other 3D languages:</para>
     Some well-known open-source 3D modeling programs that can
     export to VRML are <ulink url="http://www.blender3d.org/">
     Blender</ulink> and <ulink url="http://aoi.sourceforge.net/">Art Of Illusion</ulink>.
-    <ulink url="http://vrml.cip.ica.uni-stuttgart.de/dune/">White Dune</ulink>
+    <ulink url="http://wdune.ourproject.org/">White Dune</ulink>
     is a modeller especially oriented towards VRML.</para></listitem>
 
   <listitem><para>The language can describe geometry of 3D objects

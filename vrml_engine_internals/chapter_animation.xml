@@ -317,7 +317,7 @@ them in my engine.</para>
 
 <para>On the positive side, there is at least one open-source program
 that can design animations with VRML interpolators:
-<ulink url="http://vrml.cip.ica.uni-stuttgart.de/dune/">White Dune</ulink>.
+<ulink url="http://wdune.ourproject.org/">White Dune</ulink>.
 Since version 0.29beta987, <emphasis>White Dune</emphasis> can even
 export animations with interpolators to a sequence of VRML files
 with Kanim file format, suitable for our engine.</para>
