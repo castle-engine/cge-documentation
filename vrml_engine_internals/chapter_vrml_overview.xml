@@ -30,7 +30,7 @@ will be enhanced some day.</para>
 in any text editor. Here's a very simple VRML 1.0 file that defines
 a sphere:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/simplest_sphere_1.wrl"
+<screen><xi:include href="example_models/simplest_sphere_1.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -105,7 +105,7 @@ the default material properties. These make a light gray diffuse color
 
 <para>An equivalent VRML 2.0 file looks like this:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/simplest_sphere_2.wrl"
+<screen><xi:include href="example_models/simplest_sphere_2.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -425,7 +425,7 @@ is <literal>NULL</literal>, which means that no shape is actually defined.
 We can place our <literal>Cylinder</literal> node as a value
 of this field to correctly define a cylinder.</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/cylinder_fields.wrl"
+<screen><xi:include href="example_models/cylinder_fields.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -470,7 +470,7 @@ nodes have the same field name: <literal>color</literal>.
 In the first case, this is an <literal>SFNode</literal> field,
 in the second case it's an <literal>MFVec3f</literal> field.</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/pointset.wrl"
+<screen><xi:include href="example_models/pointset.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -516,7 +516,7 @@ than VRML 2.0 and X3D &mdash; we will see both methods.</para>
 <para>In VRML 1.0, you just place children nodes inside the parent node.
 Like this:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/group_1.wrl"
+<screen><xi:include href="example_models/group_1.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -569,7 +569,7 @@ so the example file in VRML 2.0 equivalent to previous example looks like
 this:
 </para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/group_2.wrl"
+<screen><xi:include href="example_models/group_2.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -740,7 +740,7 @@ is actually equivalent to a <literal>Group</literal> node.</para>
 
 <para>Example of a simple translation:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/transform.wrl"
+<screen><xi:include href="example_models/transform.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -768,11 +768,11 @@ is actually equivalent to a <literal>Group</literal> node.</para>
 may be another <literal>Transform</literal> node. All transformations
 are accumulated. For example these two files are equivalent:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/transform_accum_1.wrl"
+<screen><xi:include href="example_models/transform_accum_1.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/transform_accum_2.wrl"
+<screen><xi:include href="example_models/transform_accum_2.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -861,7 +861,7 @@ This mechanism is available in all VRML versions.</para>
 that uses the same <literal>Cone</literal>
 twice, each time with a different material color.</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/reuse_cone.wrl"
+<screen><xi:include href="example_models/reuse_cone.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -898,11 +898,11 @@ can <quote>pull</quote> additional data with them
 texture image from file), so the memory saving may be even larger.
 Consider these two VRML files:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/reuse_texture.wrl"
+<screen><xi:include href="example_models/reuse_texture.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/reuse_texture_no.wrl"
+<screen><xi:include href="example_models/reuse_texture_no.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -945,7 +945,7 @@ You can use the <literal>Switch</literal> node for this
 include any of it's children nodes, so you can write
 VRML file like this:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/reuse_switch.wrl"
+<screen><xi:include href="example_models/reuse_switch.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -1129,7 +1129,7 @@ that OpenGL has to remember.</para>
 <quote>What material does a sphere use?</quote> The one specified in the last
 <literal>Material</literal> node. Take a look at the example:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/material_state.wrl"
+<screen><xi:include href="example_models/material_state.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -1278,7 +1278,7 @@ from grouping node and put the third <literal>Sphere</literal> node.
 How does this sphere look like depends on used grouping node.
 </para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/leaking.wrl"
+<screen><xi:include href="example_models/leaking.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -1493,7 +1493,7 @@ Moreover, you can include other 3D formats (like 3DS and Wavefront OBJ) too.</pa
 
 <para id="example.inline">An example:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/inline.wrl"
+<screen><xi:include href="example_models/inline.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -1534,7 +1534,7 @@ node &mdash; this works analogous to <literal>Transform</literal>,
 but transformations are only 2D. Texture transformations in VRML 1.0
 accumulate, just like normal transformations. Here's an example:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/texture_transform_1.wrl"
+<screen><xi:include href="example_models/texture_transform_1.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -1569,7 +1569,7 @@ of <literal>Appearance</literal>. This also means that there
 is no way how texture transformations could accumulate.
 Here's a VRML 2.0 file equivalent to previous VRML 1.0 example:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/texture_transform_2.wrl"
+<screen><xi:include href="example_models/texture_transform_2.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -1632,7 +1632,7 @@ and then includes actual world geometry from other file
 (shown in our <link linkend="example.inline">earlier example
 about inlining</link>).</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/navigation_viewpoint.wrl"
+<screen><xi:include href="example_models/navigation_viewpoint.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -2182,7 +2182,7 @@ ROUTE MyProx.position_changed TO MyCylinder.set_translation
       For example, here's a simple animation of sphere traveling along
       the square-shaped path:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/moving.wrl"
+<screen><xi:include href="example_models/moving.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
     </glossdef>

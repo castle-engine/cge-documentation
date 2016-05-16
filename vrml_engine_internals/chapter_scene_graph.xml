@@ -291,7 +291,7 @@ that when reading VRML 1.0, many VRML 2.0 constructs
 are allowed, and the other way around too. That's why you can actually
 mix VRML 1.0 and 2.0 code in my engine. Consider this strange file:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/sum_1_2.wrl"
+<screen><xi:include href="example_models/sum_1_2.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 
@@ -727,7 +727,7 @@ parameter.</para>
 
 <para>Let's take a look at the following example:</para>
 
-<screen><xi:include href="../../demo_models/vrml_engine_doc_simple_examples/over_triangulating.wrl"
+<screen><xi:include href="example_models/over_triangulating.wrl"
   xmlns:xi="http://www.w3.org/2001/XInclude"
   parse="text"/></screen>
 

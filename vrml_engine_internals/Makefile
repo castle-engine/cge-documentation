@@ -1,3 +1,8 @@
+# Before making docs, create examples/ symlink, like
+#   ln -s ../../demo-models/vrml_engine_doc_simple_examples/ example_models/
+# Depends on where you checked out
+#  https://github.com/castle-engine/demo-models
+
 BASE_DOCUMENT_NAME := vrml_engine
 
 html_post = mkdir -p $(1)admonitions/ ; \
