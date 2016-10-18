@@ -735,10 +735,9 @@ parameter.</para>
 with various triangulation.
 Leftmost column has no over-triangulation, next columns
 have more and more over-triangulation.
-The VRML code uses the <literal>KambiTriangulation</literal> node
-to control the triangulation. This node is my VRML extension
-(hence the prefix <literal>Kambi</literal>), see the page
-<ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#ext_kambi_triangulation"/>
+We use our own extensions to control the triangulation,
+see
+<ulink url="http://castle-engine.sourceforge.net/x3d_implementation_geometry3d_extensions.php"/>
 for details.</para>
 
 <para>Spot lights shine on every object.
@@ -827,13 +826,15 @@ cones and cylinders) doesn't matter here at all.</para>
 <para>If you want to control how detailed the triangulation should be:</para>
 
 <itemizedlist>
-  <listitem><para>Programmers can use <literal>Detail_QuadricSlices</literal>,
-    <literal>Detail_QuadricStacks</literal> and <literal>Detail_RectDivisions</literal>
+  <listitem><para>Programmers can use
+    <literal>DefaultTriangulationSlices</literal>,
+    <literal>DefaultTriangulationStacks</literal> and
+    <literal>DefaultTriangulationDivisions</literal>
     global variables.</para></listitem>
 
-  <listitem><para>VRML authors can use the
-    <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#ext_kambi_triangulation">
-    KambiTriangulation</ulink> VRML node to control this.</para></listitem>
+  <listitem><para>VRML / X3D authors can use the
+    <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_geometry3d_extensions.php">
+    custom triangulation fields</ulink> in VRML node to control this.</para></listitem>
 
   <listitem><para>Finally, my programs
     <ulink url="http://castle-engine.sourceforge.net/view3dscene.php">view3dscene</ulink> and
