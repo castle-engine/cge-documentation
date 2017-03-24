@@ -36,6 +36,13 @@ p.figure_2_column + div.figure {
   width: 850px;
 }
 
+/* Break table into 1 column on narrow (mobile) screens */
+@media (max-width: 900px) {
+  p.figure_2_column + div.figure table td {
+    display: inline-block;
+  }
+}
+
 div.figure {
   border: 1px solid black;
   padding-left: 1em;
@@ -44,6 +51,10 @@ div.figure {
 
   /* This must be synchronized with HTML image size set by images/html/Makefile */
   width: 450px;
+
+  /* mobile-friendly (look correct on narrow screens) */
+  max-width: 100%;
+  box-sizing: border-box; /* https://developer.mozilla.org/en/docs/Web/CSS/box-sizing */
 }
 
 /* fo_vertical_space should not appear in HTML. */
@@ -67,3 +78,9 @@ div.book-titlepage {
 
 p.copyright { font-size: small; }
 div.legalnotice { font-size: small; }
+
+.book-titlepage img,
+.figure-contents img {
+  /* mobile-friendly (look correct on narrow screens) */
+  max-width: 100%;
+}
