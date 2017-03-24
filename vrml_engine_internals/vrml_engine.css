@@ -1,12 +1,14 @@
 /* CSS style for HTML version of vrml_engine documentation. */
 
-PRE.screen {
+body { font-family: sans-serif; }
+
+pre.screen {
   border: 1px solid #aaaaaa;
   background-color: #f9f9f9;
   padding: 0.3em;
 }
 
-P.para_with_larger_screen_mini + DIV.figure {
+p.para_with_larger_screen_mini + div.figure {
   border: 1px solid black;
 
   padding-left: 1em;
@@ -18,7 +20,7 @@ P.para_with_larger_screen_mini + DIV.figure {
   width: 650px;
 }
 
-P.para_with_figure_850 + DIV.figure {
+p.para_with_figure_850 + div.figure {
   border: 1px solid black;
 
   padding-left: 1em;
@@ -28,7 +30,7 @@ P.para_with_figure_850 + DIV.figure {
   width: 850px;
 }
 
-DIV.figure {
+div.figure {
   border: 1px solid black;
 
   padding-left: 1em;
@@ -38,6 +40,13 @@ DIV.figure {
   /* This must be synchronized with screenshot mini size set by
      examples/Makefile */
   width: 350px;
+
+  /* mobile-friendly (look correct on narrow screens) */
+  max-width: 100%;
+  box-sizing: border-box; /* https://developer.mozilla.org/en/docs/Web/CSS/box-sizing */
 }
 
-body { font-family: sans-serif; }
+.figure-contents img {
+  /* mobile-friendly (look correct on narrow screens) */
+  max-width: 100%;
+}
