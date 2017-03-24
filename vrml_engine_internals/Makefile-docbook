@@ -164,6 +164,13 @@ REAL_FO_XSL := "/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/fo/docbook.xsl"
 #REAL_FO_XSL := "http://docbook.sourceforge.net/release/xsl/current/fo/docbook.xsl"
 endif
 
+# The xout.fo cannot be placed in output/xxx/ subdirectory, as then all image
+# URLs in DocBook sources (and some other things, like images from titlepages,
+# and font metrics) would be resolved with respect to that subdirectory.
+# This would cause our URLs to look a bit ugly, and be incompatible with what
+# HTML processor expects.
+FO_OUTPUT=temporary-xout.fo
+
 # Once upon a time I used xalan instead of xsltproc.
 # Reason: I was able to get really strange
 # errors with xsltproc, including errors when the same XML content
@@ -176,7 +183,7 @@ endif
 # xout.fo instead of $(BASE_DOCUMENT_NAME).fo
 
 XSLT_FOR_FOP := xsltproc --xinclude \
-  -o output/xsl/xout.fo \
+  -o $(FO_OUTPUT) \
   --stringparam fop1.extensions 1 \
   $(REAL_FO_XSL) $(DOCUMENT_NAME)
 
@@ -198,25 +205,25 @@ BEFORE_FOP := $(BEFORE_FOP) \
 pdf:
 	mkdir -p output/xsl/
 	$(XSLT_FOR_FOP)
-	$(call fo_process_for_fop, output/xsl/xout.fo)
-	$(BEFORE_FOP) fop $(FOP_OPTIONS) -fo output/xsl/xout.fo output/xsl/$(BASE_DOCUMENT_NAME).pdf
-	rm -f output/xsl/xout.fo
+	$(call fo_process_for_fop, $(FO_OUTPUT))
+	$(BEFORE_FOP) fop $(FOP_OPTIONS) -fo $(FO_OUTPUT) output/xsl/$(BASE_DOCUMENT_NAME).pdf
+	rm -f $(FO_OUTPUT)
 
 .PHONY: ps
 ps:
 	mkdir -p output/xsl/
 	$(XSLT_FOR_FOP)
-	$(call fo_process_for_fop, output/xsl/xout.fo)
-	$(BEFORE_FOP) fop $(FOP_OPTIONS) -fo output/xsl/xout.fo output/xsl/$(BASE_DOCUMENT_NAME).ps
-	rm -f output/xsl/xout.fo
+	$(call fo_process_for_fop, $(FO_OUTPUT))
+	$(BEFORE_FOP) fop $(FOP_OPTIONS) -fo $(FO_OUTPUT) output/xsl/$(BASE_DOCUMENT_NAME).ps
+	rm -f $(FO_OUTPUT)
 
 .PHONY: txt
 txt:
 	mkdir -p output/xsl/
 	$(XSLT_FOR_FOP)
-	$(call fo_process_for_fop, output/xsl/xout.fo)
-	$(BEFORE_FOP) fop $(FOP_OPTIONS) -fo output/xsl/xout.fo -txt output/xsl/$(BASE_DOCUMENT_NAME).txt
-	rm -f output/xsl/xout.fo
+	$(call fo_process_for_fop, $(FO_OUTPUT))
+	$(BEFORE_FOP) fop $(FOP_OPTIONS) -fo $(FO_OUTPUT) -txt output/xsl/$(BASE_DOCUMENT_NAME).txt
+	rm -f $(FO_OUTPUT)
 
 # ------------------------------------------------------------
 # XSL in dblatex toolchain
@@ -277,7 +284,7 @@ jade_txt:
 
 .PHONY: clean
 clean:
-	rm -Rf output/
+	rm -Rf output/ $(FO_OUTPUT)
 
 # ------------------------------------------------------------
 # validate using xmllint, this goes better than onsgmls because
