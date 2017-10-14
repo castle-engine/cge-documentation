@@ -1222,15 +1222,14 @@ are documented in <xref linkend="appendix.plugs" />.</para>
   effects Effect { language "GLSL"
     parts EffectPart { type "FRAGMENT"
       url "data:text/plain,
+        uniform vec3 castle_LightSource0SpotDirection;
+
         <emphasis role="bold">void PLUG_light_scale(inout float light_scale,
           const in vec3 normal_eye,
-          const in vec3 light_dir,
-          const in gl_LightSourceParameters light_source,
-          const in gl_LightProducts light_products,
-          const in gl_MaterialParameters material)
+          const in vec3 light_dir)
         {
           light_scale *= pow(dot(normalize(
-            light_source.spotDirection), -light_dir), 10.0) * 2.0;
+            castle_LightSource0SpotDirection), -light_dir), 10.0) * 2.0;
         }</emphasis>"
     } } } <!-- page break is near, so close blocks quickly, no newlines -->
 </screen>
@@ -2867,10 +2866,9 @@ at the same shader stage where the lighting is calculated.</para>
 
 <itemizedlist>
   <listitem><para>For <emphasis>Phong shading</emphasis>
-    (used by default on desktop, if the shader pipeline is used)
     they are available at the <emphasis>fragment stage</emphasis>.</para></listitem>
   <listitem><para>For <emphasis>Gouraud shading</emphasis>
-    (used by default on mobile)
+    (used by default)
     they are available at the <emphasis>vertex stage</emphasis>.</para></listitem>
 </itemizedlist>
 
@@ -2882,23 +2880,13 @@ A simple solution would be to allow a stage name like
 depending on the current shading model (that may change for
 each <literal>Shape</literal> node).</para>
 
-<para>Please treat these plus as <emphasis role='bold'>internal</emphasis> for now.
-They are not perfect now &mdash; without a predictable stage name like <literal>"LIGHT"</literal>,
-and with various differences between OpenGL and OpenGLES parameters,
-and because the desktop versions depend on some deprecated GLSL types (<literal>gl_Xxx</literal>).
+<para>Please treat these plugs as <emphasis role='bold'>internal</emphasis> for now.
 We may break the compatibility of these plugs!</para>
 
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_light_scale</emphasis>(
   inout float light_scale,
   const in vec3 normal_eye,
-  const in vec3 light_dir
-#ifndef GL_ES
-,
-  const in gl_LightSourceParameters light,
-  const in gl_LightProducts light_products,
-  const in gl_MaterialParameters material
-#endif
-)
+  const in vec3 light_dir)
 </screen>
 
 <para>Scale the light source contribution.
@@ -2920,13 +2908,7 @@ The initial value is a multiplication of material and light ambient colors.</par
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_material_light_diffuse</emphasis>(
   inout vec4 diffuse,
   const in vec4 vertex_eye,
-  const in vec3 normal_eye
-#ifndef GL_ES
-  ,
-  const in gl_LightSourceParameters light_source,
-  const in gl_MaterialParameters material
-#endif
-)
+  const in vec3 normal_eye)
 </screen>
 
 <para>Diffuse color may be changed here.
@@ -2955,32 +2937,18 @@ the actual exponent for light equations.
 This plug works with the actual exponent.
 </para>
 
-<screen role="plug_declaration">void <emphasis role="bold">PLUG_add_light_contribution_front</emphasis>(
+<screen role="plug_declaration">void <emphasis role="bold">PLUG_add_light_contribution</emphasis>(
   inout vec4 color,
   const in vec4 vertex_eye,
   const in vec3 normal_eye,
-#ifdef GL_ES
-  const in gl_MaterialParameters material
-#else
-  const in float material_shininess
-#endif
-)
+  in float material_shininess,
+  in vec4 color_per_vertex)
 </screen>
 
 <para>Add color coming from lighting this material.
 This is used internally to add the light sources, with each light source
-adding another <literal>add_light_contribution_xxx</literal> plug.
-There is also the <literal>add_light_contribution_back</literal>,
-for light contribution on the back side of the faces.</para>
-
-<para>On OpenGLES (used on mobile devices), this is a little different:</para>
-
-<itemizedlist>
-  <listitem><para>The plug is called just <literal>PLUG_add_light_contribution</literal>
-    (without any <literal>_front</literal> or <literal>_back</literal> suffix).</para></listitem>
-  <listitem><para>Instead of the <literal>gl_MaterialParameters material</literal>,
-    there is <literal>float material_shininess</literal> parameter.</para></listitem>
-</itemizedlist>
+adding another <literal>add_light_contribution</literal> plug.
+</para>
 
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_lighting_apply</emphasis>(
   inout vec4 fragment_color,
@@ -2991,10 +2959,8 @@ for light contribution on the back side of the faces.</para>
 <para>At this point, the lighting is calculated. Light contributions are summed,
 along with material emissive and global scene ambient colors,
 result is clamped to 1.0, and the alpha value is set correctly.
-You can change the fragment color now, if you want to do something <emphasis>before</emphasis>
+You can change the color now, if you want to do something <emphasis>before</emphasis>
 texturing is applied.</para>
-
-<para>This particular plug is not available on OpenGLES (mobile) for now.</para>
 
 </section>
 
