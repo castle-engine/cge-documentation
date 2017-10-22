@@ -2816,6 +2816,10 @@ is false, we're looking at the other side than where standard <literal>gl_Normal
 was pointing. For example, for bump mapping, it's most sensible to negate
 only the Z component of the normal vector in tangent space.</para>
 
+<para>Note that this "plug" exists only when using <emphasis>Phong shading</emphasis>,
+not Gouraud shading.
+Specify <literal>shading="PHONG"</literal> for the given shape to force it.</para>
+
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_texture_color</emphasis>(
   inout vec4 texture_color,
   [const in samplerXxx texture,]
