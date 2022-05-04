@@ -22,13 +22,13 @@ ALL_OUTPUT := dejavusans-bold.xml dejavuserif-italic.xml dejavusans.xml
 
 all: $(ALL_OUTPUT)
 
-dejavusans-bold.xml: /usr/share/fonts/truetype/ttf-dejavu/DejaVuSans-Bold.ttf
+dejavusans-bold.xml: /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf
 	fop-ttfreader $< $@
 
-dejavuserif-italic.xml: /usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif-Italic.ttf
+dejavuserif-italic.xml: /usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf
 	fop-ttfreader $< $@
 
-dejavusans.xml: /usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf
+dejavusans.xml: /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf
 	fop-ttfreader $< $@
 
 clean:

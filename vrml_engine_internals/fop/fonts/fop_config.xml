@@ -40,17 +40,17 @@
       -->
 
       <font metrics-url="fop/fonts/dejavusans-bold.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans-Bold.ttf">
+        embed-url="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf">
         <font-triplet name="DejaVuSans" style="normal" weight="bold"/>
       </font>
 
       <font metrics-url="fop/fonts/dejavuserif-italic.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif-Italic.ttf">
+        embed-url="/usr/share/fonts/truetype/dejavu/DejaVuSerif-Italic.ttf">
         <font-triplet name="DejaVuSerif" style="italic" weight="normal"/>
       </font>
 
       <font metrics-url="fop/fonts/dejavusans.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf">
+        embed-url="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf">
         <font-triplet name="DejaVuSans" style="normal" weight="normal"/>
       </font>
 
