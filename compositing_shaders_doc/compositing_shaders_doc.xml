@@ -63,6 +63,7 @@
   </author>
   <copyright>
     <year>2011</year>
+    <year>2022</year>
     <holder>Michalis Kamburelis</holder>
   </copyright>
   <legalnotice><para>You can redistribute and/or modify
@@ -2817,8 +2818,7 @@ was pointing. For example, for bump mapping, it's most sensible to negate
 only the Z component of the normal vector in tangent space.</para>
 
 <para>Note that this "plug" exists only when using <emphasis>Phong shading</emphasis>,
-not Gouraud shading.
-Specify <literal>shading="PHONG"</literal> for the given shape to force it.</para>
+not <emphasis>Gouraud shading</emphasis>.</para>
 
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_texture_color</emphasis>(
   inout vec4 texture_color,
@@ -2834,13 +2834,38 @@ X3D texture node: <literal>sampler2D</literal> for 2D textures,
 <literal>sampler3D</literal> for 3D textures, <literal>samplerCube</literal> for cube
 maps, and <literal>sampler2DShadow</literal> for <literal>GeneratedShadowMap</literal>.</para>
 
-<screen role="plug_declaration">void <emphasis role="bold">PLUG_texture_apply</emphasis>(
+<screen role="plug_declaration">void <emphasis role="bold">PLUG_main_texture_apply</emphasis>(
   inout vec4 fragment_color,
   const in vec3 normal_eye)
 </screen>
 
-<para>At this point, the textures are applied. You can change the fragment
-color now, for various effects.</para>
+<para>Called right after <emphasis>main texture</emphasis> was applied. The main texture is</para>
+
+<itemizedlist>
+  <listitem><para><literal>diffuseTexture</literal> in case of Phong <literal>Material</literal></para></listitem>
+
+  <listitem><para><literal>emissiveTexture</literal> in case of <literal>UnlitMaterial</literal></para></listitem>
+
+  <listitem><para><literal>baseTexture</literal> in case of <literal>PhysicalMaterial</literal></para></listitem>
+</itemizedlist>
+
+<para>This plug is called always, even if the main texture is not actually present.
+You can change the fragment color now, for various effects.</para>
+
+<para>There's a big difference between how Phong and Gouraud shading interact with this plug:</para>
+
+<itemizedlist>
+  <listitem><para>In <emphasis>Phong shading</emphasis>, this plug is called <emphasis>before</emphasis>
+    the lighting was applied. Because for Phong shading,
+    the texture is the input for the lighting equation parameter.
+  </para></listitem>
+
+  <listitem><para>In <emphasis>Gouraud shading</emphasis> this plug is called <emphasis>after</emphasis>
+    the lighting was applied. Because for Gouraud shading,
+    the texture is applied in the fragment shader,
+    and it is mixed with the color calculated from lights in the vertex shader.
+  </para></listitem>
+</itemizedlist>
 
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_fog_apply</emphasis>(
   inout vec4 fragment_color,
@@ -2848,9 +2873,7 @@ color now, for various effects.</para>
 </screen>
 
 <para>At this point, the X3D fog is applied. Again you can change here the
-fragment color, as you desire. This plug is called after
-the <literal>texture_apply</literal>, because you usually want to apply the fog
-to the final (textured) fragment color.</para>
+fragment color, as you desire. This is called after lighting, textures, fog are all applied.</para>
 
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_fragment_end</emphasis>(
   const in vec4 fragment_color)
@@ -2870,9 +2893,14 @@ at the same shader stage where the lighting is calculated.</para>
 
 <itemizedlist>
   <listitem><para>For <emphasis>Phong shading</emphasis>
-    they are available at the <emphasis>fragment stage</emphasis>.</para></listitem>
+    they are available at the <emphasis>fragment stage</emphasis>.</para>
+
+    <para>Phong shading is default
+    since <emphasis>Castle Game Engine</emphasis> 7.0-alpha-snapshot on 2022-04-01,
+    see <ulink url="https://castle-engine.io/wp/2022/04/01/design-lights-using-castle-game-engine-new-light-components-and-related-features-with-video/" />.
+    </para>
+  </listitem>
   <listitem><para>For <emphasis>Gouraud shading</emphasis>
-    (used by default)
     they are available at the <emphasis>vertex stage</emphasis>.</para></listitem>
 </itemizedlist>
 
@@ -2962,9 +2990,21 @@ adding another <literal>add_light_contribution</literal> plug.
 
 <para>At this point, the lighting is calculated. Light contributions are summed,
 along with material emissive and global scene ambient colors,
-result is clamped to 1.0, and the alpha value is set correctly.
-You can change the color now, if you want to do something <emphasis>before</emphasis>
-texturing is applied.</para>
+result is clamped to 1.0, and the alpha value is set correctly.</para>
+
+<para>There's a big difference between how Phong and Gouraud shading interact with this plug:</para>
+
+<itemizedlist>
+  <listitem><para>In <emphasis>Phong shading</emphasis>, this plug is called <emphasis>in fragment stage, after
+    both lighting and textures are applied</emphasis>. Because for Phong shading,
+    the lighting is calculated after textures.
+  </para></listitem>
+
+  <listitem><para>In <emphasis>Gouraud shading</emphasis> this plug is called <emphasis>in vertex stage,
+    after lighting but before texture application</emphasis>.
+    Because for Gouraud shading, the texture is applied later, in fragment shader.
+  </para></listitem>
+</itemizedlist>
 
 </section>
 
