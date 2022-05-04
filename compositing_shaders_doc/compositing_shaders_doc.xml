@@ -847,7 +847,7 @@ Shape {
       parts EffectPart {
         type "FRAGMENT"
         url "data:text/plain,
-        <phrase role="italic">void PLUG_after_lighting_and_textures(
+        <phrase role="italic">void PLUG_fragment_modify(
           inout vec4 fragment_color)
         {
           fragment_color.rgb *= 2.0;
@@ -866,16 +866,17 @@ The &glsl; code inside our extensions is marked with the italic font.
 they will be automatically called at the appropriate place with appropriate
 parameters from the final (automatically generated and used) shader.
 -->
-The special &glsl; function name <literal>PLUG_after_lighting_and_textures</literal>
-indicates that we use the <literal>after_lighting_and_textures</literal> plug.
-This particular plug is called after calculating the textures and lighting,
-and is the closest to intuitively <quote>just modifying the pixel color</quote>.
+The special &glsl; function name <literal>PLUG_fragment_modify</literal>
+indicates that we use the <literal>fragment_modify</literal> plug.
+This particular plug is called after calculating everything else for this pixel
+(textures, lighting, fog)
+and allows to intuitively <quote>modify the final pixel color</quote>.
 <literal>fragment_color</literal> is an &_inout; parameter, by modifying it
 we modify the color that will be displayed on the screen.</para>
 
 <para>A reference of all the plugs available in our implementation
 is at the end of this paper, see <xref linkend="appendix.plugs" />.
-For each plug, like this <literal>PLUG_after_lighting_and_textures</literal>,
+For each plug, like this <literal>PLUG_fragment_modify</literal>,
 we define a list of parameters
 <!-- (they have to be declared exactly the same in an effect), -->
 and when it is called.</para>
@@ -997,7 +998,7 @@ parts, just like with standard shader nodes.
 <para>
 In a single <literal>EffectPart</literal> node, many <literal>PLUG_</literal>
 functions may be declared. However, all plug functions must be declared in the appropriate
-effect type. For example, the <literal>after_lighting_and_textures</literal> plug cannot be used
+effect type. For example, the <literal>fragment_modify</literal> plug cannot be used
 within a <literal>VERTEX</literal> shader.
 If the effect requires some processing per-vertex and some per-fragment,
 it is necessary to use two <literal>EffectPart</literal> nodes, with different types.
@@ -2368,7 +2369,7 @@ We use it at this step.</para>
 <para>This step trivially allows the <literal>ComposedShader</literal>
 code to also contain plug declarations, like <literal>/&#xFEFF;* PLUG: xxx ... */</literal>.
 The same plug names as our default names may be used
-(like <literal>after_lighting_and_textures</literal> and so on),
+(like <literal>fragment_modify</literal> and so on),
 in which case the same user effects will be useful with the custom shader.
 This even allows the browser to add some internal effects
 (like shadow maps) to the custom shader template.</para>
@@ -2485,7 +2486,7 @@ to correctly catch all the ways how plugs may be used.</para>
 knowing the texture type (2D, 3D, cube map), texture mode (multiply,
 add and such) and other properties. It should follow all X3D texturing
 and multi-texturing requirements. The code should define a function
-named <literal>PLUG_after_lighting_and_textures</literal> that can be later connected
+named <literal>PLUG_main_texture_apply</literal> that can be later connected
 to the final shader. It should also declare plug named <literal>texture_color</literal>,
 that can be used by user effects for this texture.</para>
 
@@ -2868,28 +2869,31 @@ You can change the fragment color now, for various effects.</para>
 <para><emphasis>Deprecated</emphasis> name for <literal>PLUG_main_texture_apply</literal>.
 Do not use in new code.</para>
 
-<screen role="plug_declaration">void <emphasis role="bold">PLUG_after_lighting_and_textures</emphasis>(
-  inout vec4 fragment_color)
-</screen>
-
-<para>Called <emphasis>after lighting (including shadows) and textures are applied</emphasis>
-(regardless of whether Phong or Gouraud shading is used), but before fog is applied.
-This is probably the most useful plug to intuitively <emphasis>"change the fragment color"</emphasis>.</para>
-
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_fog_apply</emphasis>(
   inout vec4 fragment_color,
   const vec3 normal_eye_fragment)
 </screen>
 
 <para>At this point, the X3D fog is applied. Again you can change here the
-fragment color, as you desire. This is called after lighting, textures, fog are all applied.</para>
+fragment color, as you desire. This is called after lighting, textures, standard fog are all applied.
+You can use this to apply custom fog equation.</para>
+
+<screen role="plug_declaration">void <emphasis role="bold">PLUG_fragment_modify</emphasis>(
+  inout vec4 fragment_color)
+</screen>
+
+<para>Called <emphasis>after lighting (including shadows), textures, fog are applied</emphasis>
+(regardless of whether Phong or Gouraud shading is used).
+But <emphasis>before gamma correction (to change color from linear to monitor color-space)
+and tone mapping are done</emphasis>.
+This is probably the most useful plug to intuitively <emphasis>"change the fragment color"</emphasis>.</para>
 
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_fragment_end</emphasis>(
   const in vec4 fragment_color)
 </screen>
 
 <para>Do the final processing of the fragment. This is called after applying
-both textures and fog, and cannot modify the fragment color anymore.
+both textures and fog, and <emphasis>cannot modify the fragment color anymore</emphasis>.
 This is useful for operations like alpha-testing the fragment.</para>
 
 </section>
