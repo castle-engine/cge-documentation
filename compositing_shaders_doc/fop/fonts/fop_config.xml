@@ -40,22 +40,22 @@
       -->
 
       <font metrics-url="fop/fonts/dejavuserif.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif.ttf">
+        embed-url="/usr/share/fonts/truetype/dejavu/DejaVuSerif.ttf">
         <font-triplet name="DejaVuSerif" style="normal" weight="normal"/>
       </font>
 
       <font metrics-url="fop/fonts/dejavuserif-bold.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerif-Bold.ttf">
+        embed-url="/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf">
         <font-triplet name="DejaVuSerif" style="normal" weight="bold"/>
       </font>
 
       <font metrics-url="fop/fonts/dejavusans.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf">
+        embed-url="/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf">
         <font-triplet name="DejaVuSans" style="normal" weight="normal"/>
       </font>
 
       <font metrics-url="fop/fonts/dejavusans-bold.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans-Bold.ttf">
+        embed-url="/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf">
         <font-triplet name="DejaVuSans" style="normal" weight="bold"/>
       </font>
 
@@ -76,29 +76,27 @@
 
            So to be 100% sure that PDF looks and prints the same, we have
            to specify and embed all fonts.
-           - We take Times, Arial from MS Core Fonts
-             (ttf-mscorefonts-installer package in Debian), in TTF.
-           - We take Mono from Liberation (ttf-liberation).
-             Courier in MS Core Fonts looks worse (look e.g. on quote signs),
-             as well as FreeFont (ttf-freefont).
+
+           - We take Serif, Sans, Mono from Liberation
+             (fonts-liberation package in Debian), in TTF.
            - We take Symbol from LibreOffice OpenSymbol font (ttf-opensymbol
              package in Debian), also in TTF.
       -->
 
       <font metrics-url="fop/fonts/myserif.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationSerif-Regular.ttf">
         <font-triplet name="MySerif" style="normal" weight="normal"/>
       </font>
       <font metrics-url="fop/fonts/myserif-bold.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Bold.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationSerif-Bold.ttf">
         <font-triplet name="MySerif" style="normal" weight="bold"/>
       </font>
       <font metrics-url="fop/fonts/myserif-italic.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Italic.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationSerif-Italic.ttf">
         <font-triplet name="MySerif" style="italic" weight="normal"/>
       </font>
       <font metrics-url="fop/fonts/myserif-bold-italic.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Bold_Italic.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationSerif-BoldItalic.ttf">
         <font-triplet name="MySerif" style="italic" weight="bold"/>
       </font>
 
@@ -120,24 +118,24 @@
       </font>
 
       <font metrics-url="fop/fonts/mysans.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Arial.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf">
         <font-triplet name="MySans" style="normal" weight="normal"/>
       </font>
       <font metrics-url="fop/fonts/mysans-bold.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Arial_Bold.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf">
         <font-triplet name="MySans" style="normal" weight="bold"/>
       </font>
       <font metrics-url="fop/fonts/mysans-italic.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Arial_Italic.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationSans-Italic.ttf">
         <font-triplet name="MySans" style="italic" weight="normal"/>
       </font>
       <font metrics-url="fop/fonts/mysans-bold-italic.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/msttcorefonts/Arial_Bold_Italic.ttf">
+        embed-url="/usr/share/fonts/truetype/liberation/LiberationSans-BoldItalic.ttf">
         <font-triplet name="MySans" style="italic" weight="bold"/>
       </font>
 
       <font metrics-url="fop/fonts/mysymbol.xml" kerning="yes"
-        embed-url="/usr/share/fonts/truetype/openoffice/opens___.ttf">
+        embed-url="/usr/share/fonts/truetype/libreoffice/opens___.ttf">
         <font-triplet name="MySymbol" style="normal" weight="normal"/>
       </font>
 

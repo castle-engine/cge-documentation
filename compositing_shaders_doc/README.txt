@@ -8,3 +8,10 @@ Things to do at the end:
 - my checklist is in ../compositing_shaders/README.txt
 - we had to use "hard" pagebreaks, so recheck if they still make sense
 - recheck does large figures, esp. the large shinto shrine page, are still Ok.
+
+To remake:
+
+```
+sudo apt install opensp xmlto fop fonts-liberation fonts-dejavu fonts-opensymbol
+make
+```
