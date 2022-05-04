@@ -50,7 +50,6 @@ dist: clean distclean
 	mkdir /tmp/vrml_engine_doc_dist/
 	cp -R ./ /tmp/vrml_engine_doc_dist/vrml_engine_doc
 	rm -Rf /tmp/vrml_engine_doc_dist/vrml_engine_doc/shadow_maps_x3d/
-	dircleaner /tmp/vrml_engine_doc_dist/ clean -d '.svn'
 	find /tmp/vrml_engine_doc_dist/ -type d -and -exec chmod 755 '{}' ';'
 	find /tmp/vrml_engine_doc_dist/ -type f -and -exec chmod 644 '{}' ';'
 	cd /tmp/vrml_engine_doc_dist/; tar czvf vrml_engine_doc.tar.gz vrml_engine_doc/
@@ -58,15 +57,15 @@ dist: clean distclean
 
 # upload ---------------------------------------------------------------------
 
-SF_USERNAME=kambi
-SF_HOST=web.sourceforge.net
-SF_PATH=/home/project-web/castle-engine/htdocs/vrml_engine_doc/
+SSH_USERNAME=michalis
+SSH_HOST=castle-engine.io
+SSH_PATH=/home/michalis/cge-www/htdocs/compositing_shaders_doc/
 
-SF_CONNECT=$(SF_USERNAME),castle-engine@$(SF_HOST):$(SF_PATH)
+SCP_TARGET=$(SSH_USERNAME)@$(SSH_HOST):$(SSH_PATH)
 SCP_OPTIONS=
 
 # Prepare and upload all the stuff referenced under
-# [http://castle-engine.sourceforge.net/vrml_engine_doc.php].
+# https://castle-engine.io/engine_doc.php .
 # Calls "dist" first, as "dist" also does clean
 # (avoiding any unnecessary stuff in output/ later).
 .PHONY: upload
@@ -75,8 +74,8 @@ upload:
 	$(MAKE) dist html html-nochunks pdf
 	sed -e 's|<xsl:import href="html_piwik.xsl"/> <!-- enabled -->|<!-- <xsl:import href="html_piwik.xsl"/> -->|' --in-place xsl/html_chunks.xsl
 	tar czvf output.tar.gz output/
-	scp $(SCP_OPTIONS) output.tar.gz $(SF_CONNECT)
-	scp $(SCP_OPTIONS) vrml_engine_doc.tar.gz $(SF_CONNECT)
-	./sf_upload_finalize.sh $(SF_USERNAME) $(SF_PATH)
+	scp $(SCP_OPTIONS) output.tar.gz $(SCP_TARGET)
+	scp $(SCP_OPTIONS) vrml_engine_doc.tar.gz $(SCP_TARGET)
+	./upload_finalize.sh $(SSH_USERNAME) $(SSH_HOST) $(SSH_PATH)
 # Do not keep HTML version with Piwik enabled on local disk.
 	rm -Rf output/xsl/html/ output/xsl/html-nochunks/
