@@ -30,7 +30,7 @@
         </fo:block>
 
         <fo:block font-weight="normal" font-size="17.28pt" space-before="40pt">
-          Wrocław, 2011
+          Wrocław, 2011-2022
         </fo:block>
       </fo:block><fo:block xmlns:fo="http://www.w3.org/1999/XSL/Format" break-after="page"/>
 </xsl:template>

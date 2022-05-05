@@ -45,7 +45,7 @@
 </xsl:template>
 
 <xsl:template name="book.titlepage.before.verso"><img src="images/cellular_texturing_title.png" alt="Cellular texturing using our procedural texture"/><p>Ph.D. Thesis</p><p>Institute of Computer Science<br/>
-    University of Wrocław</p><p>Wrocław, 2011</p><hr/>
+    University of Wrocław</p><p>Wrocław, 2011-2022</p><hr/>
 </xsl:template>
 
 <xsl:template name="book.titlepage.verso">

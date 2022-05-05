@@ -9,10 +9,7 @@
 <!-- Keep Piwik code in a separate, optional file.
      Will be used only for HTML version that will be uploaded online.
 
-     For offline version, don't use Piwik, as it can eat too much bandwidth
-     on SF webspace... I managed to get "This project has been temporarily blocked
-     for exceeding its bandwidth threshold" on 2011-11-08, when heavily
-     browsing this. -->
+     For offline version, don't use Piwik, for privacy.. -->
 <!-- <xsl:import href="html_piwik.xsl"/> -->
 
 <xsl:param name="navig.graphics" select="1"/>
