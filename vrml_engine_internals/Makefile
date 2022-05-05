@@ -58,8 +58,8 @@ dist: clean distclean
 # upload ---------------------------------------------------------------------
 
 SSH_USERNAME=michalis
-SSH_HOST=castle-engine.io
-SSH_PATH=/home/michalis/cge-www/htdocs/compositing_shaders_doc/
+SSH_HOST=ssh.castle-engine.io
+SSH_PATH=/home/michalis/cge-www/htdocs/vrml_engine_doc/
 
 SCP_TARGET=$(SSH_USERNAME)@$(SSH_HOST):$(SSH_PATH)
 SCP_OPTIONS=

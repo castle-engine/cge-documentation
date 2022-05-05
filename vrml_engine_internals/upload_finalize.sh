@@ -6,7 +6,7 @@ SSH_HOST="$2"
 SSH_PATH="$3"
 
 ssh "${SSH_USERNAME}@${SSH_HOST}" <<EOF
-cd "$SF_PATH"
+cd "$SSH_PATH"
 rm -Rf output/
 tar xzvf output.tar.gz
 rm -f output.tar.gz
