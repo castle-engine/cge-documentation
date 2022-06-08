@@ -1,0 +1,10 @@
+# LaTeX and friends temp files
+compositing_shaders.aux
+compositing_shaders.bbl
+compositing_shaders.blg
+compositing_shaders.lbl
+compositing_shaders.brf
+compositing_shaders.log
+
+# main output
+compositing_shaders.pdf
