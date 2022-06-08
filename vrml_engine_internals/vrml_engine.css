@@ -1,6 +1,10 @@
 /* CSS style for HTML version of vrml_engine documentation. */
 
-body { font-family: sans-serif; }
+@import "cge-pasdoc.css";
+
+.content {
+  margin-left: 0 !important; /* override cge-pasdoc.css, that assumes left navigation column */
+}
 
 pre.screen {
   border: 1px solid #aaaaaa;

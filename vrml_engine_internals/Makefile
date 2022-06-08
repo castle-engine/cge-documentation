@@ -1,18 +1,13 @@
-# Before making docs, create examples/ symlink, like
-#   ln -s ../../demo-models/vrml_engine_doc_simple_examples/ example_models/
-# Depends on where you checked out
-#  https://github.com/castle-engine/demo-models
-
 BASE_DOCUMENT_NAME := vrml_engine
 
-html_post = mkdir -p $(1)admonitions/ ; \
+html_post = mkdir -p $(1)admonitions/ && \
   cp -f /usr/share/xml/docbook/stylesheet/nwalsh/images/*.png \
         /usr/share/xml/docbook/stylesheet/nwalsh/images/*.gif \
-        $(1)admonitions/ ; \
-  mkdir -p $(1)examples/ ; \
-  cp -f examples/*_mini.png $(1)examples/ ; \
-  cp -f vrml_engine.css $(1) ; \
-  mkdir -p $(1)images/ ; \
+        $(1)admonitions/ && \
+  mkdir -p $(1)examples/ && \
+  cp -f examples/*_mini.png $(1)examples/ && \
+  cp -f vrml_engine.css $(1) && \
+  mkdir -p $(1)images/ && \
   cp -f images/frustum_box_nasty_case.png \
         images/ghost_shadow.png \
 	images/ghost_lack_of_shadow.png \
@@ -23,7 +18,14 @@ html_post = mkdir -p $(1)admonitions/ ; \
 	images/button_view*.png \
 	images/sv_triangle_*.png \
         images/*_mini.png \
-        $(1)images/
+        $(1)images/ && \
+  cp -R html-parts/images/* $(1)images/ && \
+  cp -R html-parts/castle-engine-website-base \
+        html-parts/cge-pasdoc.js \
+	html-parts/cge-pasdoc.css \
+	$(1) && \
+  castle-engine simple-compile post_process_html.lpr && \
+  ./post_process_html
 
 HTML_CHUNKS_XSL := xsl/html_chunks.xsl
 HTML_NOCHUNKS_XSL := xsl/html_nochunks.xsl
@@ -43,6 +45,7 @@ include Makefile-docbook
 .PHONY: distclean
 distclean:
 	rm -f vrml_engine_doc.tar.gz output.tar.gz
+	rm -Rf castle-engine-output post_process_html post_process_html.exe
 
 .PHONY: dist
 dist: clean distclean
@@ -52,7 +55,7 @@ dist: clean distclean
 	rm -Rf /tmp/vrml_engine_doc_dist/vrml_engine_doc/shadow_maps_x3d/
 	find /tmp/vrml_engine_doc_dist/ -type d -and -exec chmod 755 '{}' ';'
 	find /tmp/vrml_engine_doc_dist/ -type f -and -exec chmod 644 '{}' ';'
-	cd /tmp/vrml_engine_doc_dist/; tar czvf vrml_engine_doc.tar.gz vrml_engine_doc/
+	cd /tmp/vrml_engine_doc_dist/ && tar czvf vrml_engine_doc.tar.gz vrml_engine_doc/
 	mv /tmp/vrml_engine_doc_dist/vrml_engine_doc.tar.gz .
 
 # upload ---------------------------------------------------------------------

@@ -7,10 +7,9 @@
 <xsl:param name="admon.graphics" select="1"/>
 <xsl:param name="admon.graphics.path">admonitions/</xsl:param>
 
-<!-- mobile-friendly -->
-<xsl:template name="user.head.content">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-</xsl:template>
+<xsl:template name="user.head.content">CASTLE-HEAD</xsl:template>
+<xsl:template name="user.header.navigation">CASTLE-BODY-BEGIN</xsl:template>
+<xsl:template name="user.footer.navigation">CASTLE-BODY-END</xsl:template>
 
 <xsl:param name="html.stylesheet">vrml_engine.css</xsl:param>
 
