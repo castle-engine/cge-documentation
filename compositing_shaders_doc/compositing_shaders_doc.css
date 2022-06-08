@@ -1,4 +1,3 @@
-body { font-family: sans-serif; }
 code.literal { background-color: #f0f0f0; }
 
 pre.screen {
@@ -83,4 +82,35 @@ div.legalnotice { font-size: small; }
 .figure-contents img {
   /* mobile-friendly (look correct on narrow screens) */
   max-width: 100%;
+}
+
+/* make body begin look better, similar to our manual prev/next headers */
+.navheader th {
+  text-align: center !important;
+}
+.navheader, .navfooter {
+  width: 100%;
+  border: thin solid #ffeaa9;
+  background: #fff4d2;
+  padding: 0.3em;
+}
+.navheader {
+  margin-bottom: 1em;
+}
+.navfooter {
+  margin-top: 1em;
+}
+.navheader hr,
+.navfooter hr {
+  display: none;
+}
+.navheader img,
+.navfooter img {
+  width: 3em;
+  height: 3em;
+}
+
+.book-titlepage {
+  margin-top: 1em;
+  margin-bottom: 1em;
 }

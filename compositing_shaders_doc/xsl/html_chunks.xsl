@@ -6,14 +6,18 @@
 
 <xsl:import href="html_common.xsl"/>
 
+<xsl:template name="user.header.navigation">CASTLE-BODY-BEGIN</xsl:template>
+<xsl:template name="user.footer.navigation">CASTLE-BODY-END</xsl:template>
+
 <!-- Keep Piwik code in a separate, optional file.
      Will be used only for HTML version that will be uploaded online.
 
      For offline version, don't use Piwik, for privacy.. -->
 <!-- <xsl:import href="html_piwik.xsl"/> -->
 
-<!-- For now, leave text navigation, looks simpler -->
-<xsl:param name="navig.graphics" select="0"/>
+<xsl:param name="navig.graphics" select="1"/>
+<xsl:param name="navig.graphics.path">admonitions/</xsl:param>
+<xsl:param name="navig.graphics.extension">.svg</xsl:param>
 
 <!-- This is useful, as this makes URLs to parts of chunked output
   more "stable" (i.e., if you keep the id of the chapter/section etc.,

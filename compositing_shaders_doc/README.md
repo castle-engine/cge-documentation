@@ -6,10 +6,27 @@ See https://castle-engine.io/compositing_shaders.php for an overview of the idea
 
 To remake:
 
-```
-sudo apt install opensp xmlto fop fonts-liberation fonts-dejavu fonts-opensymbol
-make
-```
+- Place `castle-engine` (from https://github.com/castle-engine/castle-engine ) alongside `cge-documentation` repository. Or update the `html-parts` symlink here, to be valid.
+
+- Maybe do
+
+    ```
+    cd $CASTLE_ENGINE_PATH/doc/pasdoc/html-parts
+    make clean
+    make
+    ```
+
+    to refresh `html-parts` files, based on current `cge-www` files.
+
+- Install DocBook XML to PDF tools and fonts: on Debian-like systems: `sudo apt install opensp xmlto fop fonts-liberation fonts-dejavu fonts-opensymbol`
+
+- You also need _Castle Game Engine_ build tool working (we use it for HTML post-processing tool written using CGE).
+
+- `make`
+
+- Output is in
+    - PDF: `output/xsl/vrml_engine.pdf`
+    - HTML: `output/xsl/html/`
 
 Things to do at the end:
 - my checklist is in ../compositing_shaders/README.md

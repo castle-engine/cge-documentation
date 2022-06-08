@@ -10,8 +10,7 @@ FOP_JAVA_MAX_HEAP_SIZE := 512M
 FOP_OPTIONS := -c fop/fonts/fop_config.xml
 
 html_post = mkdir -p $(1)admonitions/ && \
-  cp -f /usr/share/xml/docbook/stylesheet/nwalsh/images/*.png \
-        /usr/share/xml/docbook/stylesheet/nwalsh/images/*.gif \
+  cp -f /usr/share/xml/docbook/stylesheet/nwalsh/images/*.svg \
         $(1)admonitions/ && \
   mkdir -p $(1)images/callouts/ && \
   cp -f /usr/share/xml/docbook/stylesheet/nwalsh/images/callouts/*.png \
@@ -21,7 +20,14 @@ html_post = mkdir -p $(1)admonitions/ && \
   mkdir -p $(1)images/ && \
   cp -f images/html/*.png $(1)images/ && \
   mkdir -p $(1)formulas/ && \
-  cp -f formulas/*.png $(1)formulas/
+  cp -f formulas/*.png $(1)formulas/ && \
+  cp -R html-parts/images/* $(1)images/ && \
+  cp -R html-parts/castle-engine-website-base \
+        html-parts/cge-pasdoc.js \
+	html-parts/cge-pasdoc.css \
+	$(1) && \
+  castle-engine simple-compile post_process_html.lpr && \
+  ./post_process_html
 
 .PHONY: default
 default: validate-xmllint html pdf

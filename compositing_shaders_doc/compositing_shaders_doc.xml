@@ -66,14 +66,7 @@
     <year>2022</year>
     <holder>Michalis Kamburelis</holder>
   </copyright>
-  <legalnotice><para>You can redistribute and/or modify
-    this document under the terms of the
-    <emphasis>GNU General Public License</emphasis>
-    as published by the Free Software Foundation.
-    Either version 2 of the License, or (at your option) any later version.
-    The license text may be found on
-    <ulink url="http://www.gnu.org/licenses/gpl.html" />.</para>
-  </legalnotice>
+  <legalnotice><para>This documentation is <ulink url="https://github.com/castle-engine/cge-documentation/">open-source and we welcome pull requests to improve it.</ulink></para></legalnotice>
 </bookinfo>
 
 <preface id="abstract">

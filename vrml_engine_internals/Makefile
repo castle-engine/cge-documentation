@@ -1,8 +1,7 @@
 BASE_DOCUMENT_NAME := vrml_engine
 
 html_post = mkdir -p $(1)admonitions/ && \
-  cp -f /usr/share/xml/docbook/stylesheet/nwalsh/images/*.png \
-        /usr/share/xml/docbook/stylesheet/nwalsh/images/*.gif \
+  cp -f /usr/share/xml/docbook/stylesheet/nwalsh/images/*.svg \
         $(1)admonitions/ && \
   mkdir -p $(1)examples/ && \
   cp -f examples/*_mini.png $(1)examples/ && \

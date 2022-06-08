@@ -17,9 +17,7 @@
 
 <xsl:param name="navig.graphics" select="1"/>
 <xsl:param name="navig.graphics.path">admonitions/</xsl:param>
-<!-- PNG versions look bad (they are just a text rendered on an image...
-     not sensible at all) -->
-<!-- xsl:param name="navig.graphics.extension">.png</xsl:param> -->
+<xsl:param name="navig.graphics.extension">.svg</xsl:param>
 
 <!-- This is useful, as this makes URLs to parts of chunked output
   more "stable" (i.e., if you keep the id of the chapter/section etc.,
