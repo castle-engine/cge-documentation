@@ -6,14 +6,14 @@
 
 <xsl:import href="html_common.xsl"/>
 
-<xsl:template name="user.header.navigation">CASTLE-BODY-BEGIN</xsl:template>
-<xsl:template name="user.footer.navigation">CASTLE-BODY-END</xsl:template>
-
 <!-- Keep Piwik code in a separate, optional file.
      Will be used only for HTML version that will be uploaded online.
 
      For offline version, don't use Piwik, for privacy.. -->
-<!-- <xsl:import href="html_piwik.xsl"/> -->
+<xsl:import href="html_piwik.xsl"/> <!-- enabled -->
+
+<xsl:template name="user.header.navigation">CASTLE-BODY-BEGIN</xsl:template>
+<xsl:template name="user.footer.navigation">CASTLE-BODY-END</xsl:template>
 
 <xsl:param name="navig.graphics" select="1"/>
 <xsl:param name="navig.graphics.path">admonitions/</xsl:param>
