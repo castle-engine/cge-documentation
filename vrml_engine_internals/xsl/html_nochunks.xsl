@@ -6,4 +6,9 @@
 
 <xsl:import href="html_common.xsl"/>
 
+<!-- The html_chunks.xsl also includes this, but through a different XSL template,
+     to keep content on top. -->
+<xsl:template name="user.header.content">CASTLE-BODY-BEGIN</xsl:template>
+<xsl:template name="user.footer.content">CASTLE-BODY-END</xsl:template>
+
 </xsl:stylesheet>

@@ -6,6 +6,9 @@
 
 <xsl:import href="html_common.xsl"/>
 
+<xsl:template name="user.header.navigation">CASTLE-BODY-BEGIN</xsl:template>
+<xsl:template name="user.footer.navigation">CASTLE-BODY-END</xsl:template>
+
 <!-- Keep Piwik code in a separate, optional file.
      Will be used only for HTML version that will be uploaded online.
 

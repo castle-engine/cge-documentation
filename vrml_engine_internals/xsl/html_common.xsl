@@ -8,8 +8,6 @@
 <xsl:param name="admon.graphics.path">admonitions/</xsl:param>
 
 <xsl:template name="user.head.content">CASTLE-HEAD</xsl:template>
-<xsl:template name="user.header.navigation">CASTLE-BODY-BEGIN</xsl:template>
-<xsl:template name="user.footer.navigation">CASTLE-BODY-END</xsl:template>
 
 <xsl:param name="html.stylesheet">vrml_engine.css</xsl:param>
 

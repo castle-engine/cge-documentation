@@ -31,5 +31,7 @@ begin
   ReplaceBodyEnd := FileToString('html-parts/body-end.html');
 
   FilesCount := FindFiles('output/xsl/html/', '*.html', false, @ProcessFile, nil, []);
-  Writeln('Processed ', FilesCount, ' HTML files.');
+  Writeln('Processed ', FilesCount, ' HTML files (chunks).');
+  FilesCount := FindFiles('output/xsl/html-nochunks/', '*.html', false, @ProcessFile, nil, []);
+  Writeln('Processed ', FilesCount, ' HTML files (nochunks).');
 end.
