@@ -7,7 +7,13 @@
 <xsl:param name="admon.graphics" select="1"/>
 <xsl:param name="admon.graphics.path">admonitions/</xsl:param>
 
-<xsl:template name="user.head.content">CASTLE-HEAD</xsl:template>
+<xsl:template name="user.head.content">
+<meta charset="utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="Author" content="Michalis Kamburelis"/>
+CASTLE-HEAD
+</xsl:template>
 
 <xsl:param name="html.stylesheet">vrml_engine.css</xsl:param>
 

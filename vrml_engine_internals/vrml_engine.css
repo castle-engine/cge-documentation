@@ -86,3 +86,11 @@ div.figure {
 .navfooter th {
   border: 0;
 }
+
+.content img {
+  /* Make wide images look ok on mobile, testcase:
+     https://castle-engine.io/vrml_engine_doc/output/xsl/html/section.how_octree_works.html
+     viewed on phone (real phone or through Firefox debug tools).
+  */
+  max-width: 100% !important;
+}
