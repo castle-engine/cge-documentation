@@ -10,7 +10,7 @@
      Will be used only for HTML version that will be uploaded online.
 
      For offline version, don't use Piwik, for privacy.. -->
-<xsl:import href="html_piwik.xsl"/> <!-- enabled -->
+<!-- <xsl:import href="html_piwik.xsl"/> -->
 
 <xsl:template name="user.header.navigation">CASTLE-BODY-BEGIN</xsl:template>
 <xsl:template name="user.footer.navigation">CASTLE-BODY-END</xsl:template>
