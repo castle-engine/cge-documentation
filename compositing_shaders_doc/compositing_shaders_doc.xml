@@ -862,7 +862,7 @@ parameters from the final (automatically generated and used) shader.
 The special &glsl; function name <literal>PLUG_fragment_modify</literal>
 indicates that we use the <literal>fragment_modify</literal> plug.
 This particular plug is called after calculating everything else for this pixel
-(textures, lighting, fog)
+(textures, lighting)
 and allows to intuitively <quote>modify the final pixel color</quote>.
 <literal>fragment_color</literal> is an &_inout; parameter, by modifying it
 we modify the color that will be displayed on the screen.</para>
@@ -2862,24 +2862,28 @@ You can change the fragment color now, for various effects.</para>
 <para><emphasis>Deprecated</emphasis> name for <literal>PLUG_main_texture_apply</literal>.
 Do not use in new code.</para>
 
+<screen role="plug_declaration">void <emphasis role="bold">PLUG_fragment_modify</emphasis>(
+  inout vec4 fragment_color)
+</screen>
+
+<para>Called <emphasis>after lighting (including shadows) and textures are applied</emphasis>
+(regardless of whether Phong or Gouraud shading is used).
+But <emphasis>before gamma correction (to change color from linear to monitor color-space)
+and tone mapping are done</emphasis>.
+This is probably the most useful plug to intuitively <emphasis>"change the fragment color"</emphasis>.</para>
+
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_fog_apply</emphasis>(
   inout vec4 fragment_color,
   const vec3 normal_eye_fragment)
 </screen>
 
-<para>At this point, the X3D fog is applied. Again you can change here the
-fragment color, as you desire. This is called after lighting, textures, standard fog are all applied.
+<para>At this point, the fog is applied. Again you can change here the
+fragment color, as you desire. This is called after lighting, textures and standard fog are all applied.
 You can use this to apply custom fog equation.</para>
 
-<screen role="plug_declaration">void <emphasis role="bold">PLUG_fragment_modify</emphasis>(
-  inout vec4 fragment_color)
-</screen>
-
-<para>Called <emphasis>after lighting (including shadows), textures, fog are applied</emphasis>
-(regardless of whether Phong or Gouraud shading is used).
-But <emphasis>before gamma correction (to change color from linear to monitor color-space)
-and tone mapping are done</emphasis>.
-This is probably the most useful plug to intuitively <emphasis>"change the fragment color"</emphasis>.</para>
+<para>This happens <emphasis>after gamma correction (to change color from linear to monitor color-space)
+and tone mapping are done</emphasis> (because fog is done in final color space, to have fog color
+easily matching background and UI, see <ulink url="https://castle-engine.io/fog" />).</para>
 
 <screen role="plug_declaration">void <emphasis role="bold">PLUG_fragment_end</emphasis>(
   const in vec4 fragment_color)
