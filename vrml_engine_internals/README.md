@@ -32,7 +32,7 @@ While I keep it available for historical reasons, you should better:
 
     to refresh `html-parts` files, based on current `cge-www` files.
 
-- Install DocBook with XML tools: on Debian-like systems: `apt get docbook-xml docbook-xsl xmlto opensp fop`
+- Install DocBook with XML tools: on Debian-like systems: `apt install docbook-xml docbook-xsl xmlto opensp fop`
 
 - You also need _Castle Game Engine_ build tool working (we use it for HTML post-processing tool written using CGE).
 
