@@ -298,42 +298,6 @@ but not the other way around.
 That is, you can no longer use VRML 1.0 nodes in files declared as VRML 2.0 / X3D.
 </emphasis></para>
 
-<figure>
-  <title>Four spheres in mixed VRML 1.0 and 2.0 code</title>
-  <mediaobject>
-  <imageobject role="html">
-    <imagedata format="PNG"
-      fileref="examples/sum_1_2_screen_mini.png" />
-  </imageobject>
-  <imageobject role="fo">
-    <imagedata format="PNG"
-      fileref="examples/sum_1_2_screen.png"
-      width="3in" contentwidth="3in" />
-  </imageobject>
-  <imageobject role="dblatex">
-    <imagedata format="EPS"
-      fileref="examples/sum_1_2_screen.eps"
-      width="3in" contentwidth="3in" />
-  </imageobject>
-  </mediaobject>
-</figure>
-
-<para>This file uses VRML 2.0 sphere that is transformed using
-both  VRML 1.0 approach (<literal>Translation</literal> node that affects
-all subsequent nodes) and VRML 2.0 approach (<literal>Transform</literal>
-node that affects all it's children). And everything works:
-VRML 1.0 nodes are handled according to VRML 1.0 specification,
-VRML 2.0 according to VRML 2.0 specification. Transformations,
-no matter which VRML version was used to specify them, affect all shapes.
-The file's header line
-says that it's supposed to be VRML 2.0, and this means that when
-we have a node name that is possible in both VRML specifications
-(but must be handled differently in each version), for example
-<literal>Transform</literal> node, file header decides which version
-of this node (<literal>TNodeTransform_1</literal> or
-<literal>TNodeTransform_2</literal>) is created when parsing this file.
-</para>
-
 <para>This also means that you have many VRML 2.0 features available
 in VRML 1.0. VRML 2.0 nodes like <literal>Background</literal>,
 <literal>Fog</literal> and many others, that express features not available
