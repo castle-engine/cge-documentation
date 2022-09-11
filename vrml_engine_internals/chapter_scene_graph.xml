@@ -289,11 +289,14 @@ like <literal>IndexedFaceSet</literal>, this is much harder.</para>
 that when reading VRML 1.0, many VRML 2.0 constructs
 (that not conflict with anything in VRML 1.0)
 are allowed, and the other way around too. That's why you can actually
-mix VRML 1.0 and 2.0 code in my engine. Consider this strange file:</para>
+mix VRML 1.0 and 2.0 code in my engine.</para>
 
-<screen><xi:include href="example_models/sum_1_2.wrl"
-  xmlns:xi="http://www.w3.org/2001/XInclude"
-  parse="text"/></screen>
+<para><emphasis>Update in 2022: As VRML 1.0 format is now ancient
+and maintaining it has been some work, this "sum" feature has been a little "downgraded".
+It is still possible to use many VRML 2.0 / X3D nodes in VRML 1.0,
+but not the other way around.
+That is, you can no longer use VRML 1.0 nodes in files declared as VRML 2.0 / X3D.
+</emphasis></para>
 
 <figure>
   <title>Four spheres in mixed VRML 1.0 and 2.0 code</title>
