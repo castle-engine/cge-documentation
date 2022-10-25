@@ -17,10 +17,6 @@ CASTLE-HEAD
 
 <xsl:param name="html.stylesheet">compositing_shaders_doc.css</xsl:param>
 
-<!-- Make HTML validation Ok. -->
-<xsl:param name="chunker.output.doctype-public">-//W3C//DTD HTML 4.01 Transitional//EN</xsl:param>
-<xsl:param name="chunker.output.doctype-system">http://www.w3.org/TR/html4/loose.dtd</xsl:param>
-
 <!-- Surround <abbrev> (but only inside the bibliography list,
      not in xrefs to bibliography entries) in bold.
      This template comes from
