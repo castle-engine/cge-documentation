@@ -28,42 +28,42 @@
 <sect1 id="section.links_my">
 <title>Author's resources</title>
 
-<para><ulink url="http://castle-engine.sourceforge.net/">Our VRML / X3D engine
+<para><ulink url="https://castle-engine.io/">Our VRML / X3D engine
 homepage</ulink>, including:</para>
 
 <itemizedlist>
   <listitem><para><ulink
-    url="http://castle-engine.sourceforge.net/engine_doc.php">
+    url="https://castle-engine.io/engine_doc.php">
     Engine documentation</ulink> &mdash; the document that you're reading
     right now</para></listitem>
 
   <listitem><para><ulink
-    url="http://castle-engine.sourceforge.net/view3dscene.php">view3dscene</ulink>
+    url="https://castle-engine.io/view3dscene.php">view3dscene</ulink>
     &mdash; VRML (1.0, 2.0), X3D browser, and a viewer for other 3D formats
     (3DS, OBJ, Collada, MD3, others)</para></listitem>
 
   <listitem><para><ulink
-    url="http://castle-engine.sourceforge.net/rayhunter.php">rayhunter</ulink>
+    url="https://castle-engine.io/rayhunter.php">rayhunter</ulink>
     &mdash; command-line ray-tracer, and it's
-    <ulink url="http://castle-engine.sourceforge.net/raytr_gallery.php">
+    <ulink url="https://castle-engine.io/raytr_gallery.php">
     gallery</ulink></para></listitem>
 
   <listitem><para><ulink
-    url="http://castle-engine.sourceforge.net/engine.php">
+    url="https://castle-engine.io/engine.php">
     overview and sources of my engine</ulink> and their <ulink
-    url="http://castle-engine.sourceforge.net/reference.php">
+    url="https://castle-engine.io/reference.php">
     reference</ulink></para></listitem>
 
   <listitem><para><ulink
-    url="http://castle-engine.sourceforge.net/x3d_implementation_status.php">
+    url="https://castle-engine.io/x3d_implementation_status.php">
     VRML / X3D implementation status</ulink></para></listitem>
 
   <listitem><para><ulink
-    url="http://castle-engine.sourceforge.net/demo_models.php">
+    url="https://castle-engine.io/demo_models.php">
     VRML / X3D test suite</ulink></para></listitem>
 
   <listitem><para><ulink
-    url="http://castle-engine.sourceforge.net/x3d_extensions.php">
+    url="https://castle-engine.io/x3d_extensions.php">
     Specification of my extensions to VRML / X3D</ulink></para></listitem>
 </itemizedlist>
 

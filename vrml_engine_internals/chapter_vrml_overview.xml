@@ -194,7 +194,7 @@ Example field types are:</para>
       the <firstterm>Unix epoch</firstterm> (<emphasis>00:00:00 UTC on 1 January 1970</emphasis>).
       Although for single-player games, where time is not necessarily tied
       to the real-world time, sometimes other interpretations are useful,
-      see my <ulink url="http://castle-engine.sourceforge.net/x3d_time_origin_considered_uncomfortable.php"><quote>VRML / X3D
+      see my <ulink url="https://castle-engine.io/x3d_time_origin_considered_uncomfortable.php"><quote>VRML / X3D
       time origin considered uncomfortable</quote> article</ulink>.
       </para>
       </listitem>
@@ -1621,7 +1621,7 @@ Note that viewpoint/camera nodes
 are also affected by transformation.</para>
 
 <para>Finally, note that my VRML viewer
-<ulink url="http://castle-engine.sourceforge.net/view3dscene.php">
+<ulink url="https://castle-engine.io/view3dscene.php">
 view3dscene</ulink> has a useful function to print VRML viewpoint/camera
 nodes ready to be pasted to VRML file, see menu item <quote>Console</quote>
 -> <quote>Print current camera node</quote>.</para>
@@ -1844,7 +1844,7 @@ Transform {
 
 <para>Our engine handles prototypes and external prototypes perfectly
 (since around September 2007). We have some VRML/X3D extensions
-(see <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php">
+(see <ulink url="https://castle-engine.io/x3d_extensions.php">
 Castle Game Engine extensions list</ulink>),
 and they can be declared as external prototypes
 with URN like
@@ -1903,7 +1903,7 @@ about VRML 2.0 applied also to X3D.</para>
       from any encoding to any other, and no information is lost.
       Many tools exist to convert from one encoding to the other
       (our own engine can be used to convert between XML and classic encoding,
-      see <ulink url="http://castle-engine.sourceforge.net/view3dscene.php#section_converting"/>).</para>
+      see <ulink url="https://castle-engine.io/view3dscene.php#section_converting"/>).</para>
     </glossdef>
   </glossentry>
 
@@ -2267,7 +2267,7 @@ But we have two usable script protocols:</para>
   <listitem><para><literal>compiled:</literal> protocol
     allows you to assign a compiled-in (that is, written in ObjectPascal
     and compiled in the program) handler to the script.
-    See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_script_compiled"/>
+    See <ulink url="https://castle-engine.io/x3d_extensions.php#section_ext_script_compiled"/>
     for documentation.</para></listitem>
 
   <listitem><para><literal>castlescript:</literal> protocol
@@ -2277,7 +2277,7 @@ But we have two usable script protocols:</para>
     Together with nodes like <literal>KeySensor</literal> this allows
     you to write full games/toys in pure VRML/X3D (without the need
     to compile anything).
-    See <ulink url="http://castle-engine.sourceforge.net/castle_script.php"/>
+    See <ulink url="https://castle-engine.io/castle_script.php"/>
     for full documentation and many examples.</para></listitem>
 </orderedlist>
 
@@ -2308,7 +2308,7 @@ implemented</emphasis>, but are documented elsewhere:</para>
     <glossterm><emphasis>NURBS</emphasis></glossterm>
     <glossdef><para>NURBS curves and surfaces. Along with interpolators
       to move other stuff along curves and surfaces.
-      See <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_nurbs.php" />.
+      See <ulink url="https://castle-engine.io/x3d_implementation_nurbs.php" />.
       </para></glossdef>
   </glossentry>
 
@@ -2316,14 +2316,14 @@ implemented</emphasis>, but are documented elsewhere:</para>
     <glossterm><emphasis>Environmental textures</emphasis></glossterm>
     <glossdef><para>Textures to simulate mirrors, auto-generated or loaded
       from files.
-      See <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_cubemaptexturing.php" />.
+      See <ulink url="https://castle-engine.io/x3d_implementation_cubemaptexturing.php" />.
       </para></glossdef>
   </glossentry>
 
   <glossentry>
     <glossterm><emphasis>Shaders</emphasis></glossterm>
     <glossdef><para>Full access to GPU shaders (<emphasis>OpenGL Shading Language</emphasis>).
-      See <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_shaders.php" />.
+      See <ulink url="https://castle-engine.io/x3d_implementation_shaders.php" />.
       </para></glossdef>
   </glossentry>
 
@@ -2332,13 +2332,13 @@ implemented</emphasis>, but are documented elsewhere:</para>
     <glossdef><para>Sensors to detect clicking and dragging with a mouse.
       Dragging sensors are particularly fun to allow user to visually edit
       the 3D world.
-      See <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_pointingdevicesensor.php" />.
+      See <ulink url="https://castle-engine.io/x3d_implementation_pointingdevicesensor.php" />.
       </para></glossdef>
   </glossentry>
 
   <glossentry>
     <glossterm><emphasis>And much more...</emphasis></glossterm>
-    <glossdef><para>See <ulink url="http://castle-engine.sourceforge.net/vrml_x3d.php" />
+    <glossdef><para>See <ulink url="https://castle-engine.io/vrml_x3d.php" />
       for a complete and up-to-date list of all the VRML / X3D features
       supported in our engine.
       Including the standard VRML / X3D features and our extensions.</para></glossdef>

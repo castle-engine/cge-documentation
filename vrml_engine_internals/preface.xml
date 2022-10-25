@@ -52,7 +52,7 @@ VRML has many advantages over other 3D languages:</para>
 
   <listitem><para>The language is easy to extend.
     You can easily add your own nodes and fields
-    (and I did, see <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php">
+    (and I did, see <ulink url="https://castle-engine.io/x3d_extensions.php">
     the list of my VRML extensions</ulink>).
     </para></listitem>
   <!--
@@ -76,7 +76,7 @@ VRML has many advantages over other 3D languages:</para>
     silently converting them to VRML/X3D graph.</para></listitem>
 
   <listitem><para>Allows to make a general-purpose VRML browser.
-    See <ulink url="http://castle-engine.sourceforge.net/view3dscene.php">
+    See <ulink url="https://castle-engine.io/view3dscene.php">
     view3dscene</ulink>.</para></listitem>
 
   <listitem><para>Allows to make more specialized programs,
@@ -101,7 +101,7 @@ VRML has many advantages over other 3D languages:</para>
     with all objects.</para>
 
     <para>Example game that uses my engine this way is
-    <ulink url="http://castle-engine.sourceforge.net/castle.php">
+    <ulink url="https://castle-engine.io/castle.php">
     <quote>The Castle</quote></ulink>.
     </para>
   </listitem>

@@ -96,7 +96,7 @@ see <literal>examples/vrml/simplest_vrml_browser_with_shadow_volumes.lpr</litera
 
 <para>To actually define what lights are used for shadow volumes,
 set <literal>shadowVolumes</literal> and <literal>shadowVolumesMain</literal>
-to true on some VRML/X3D light node. See <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_shadows" />
+to true on some VRML/X3D light node. See <ulink url="https://castle-engine.io/x3d_extensions.php#section_ext_shadows" />
 for details. Alternatively, you can control the main light source
 by overriding <literal>TCastleSceneManager.MainLightForShadows</literal>.</para>
 

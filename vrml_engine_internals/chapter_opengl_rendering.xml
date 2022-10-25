@@ -155,7 +155,7 @@ VRML 2.0 / X3D requirements with fixed-function rendering:</para>
 <para>Shader pipeline overcomes above problems. We program spot falloff
 ourselves in GLSL, honoring <literal>beamWidth</literal> correctly.
 We also do per-pixel lighting calculation (Phong shading).
-See <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_lighting.php" />.</para>
+See <ulink url="https://castle-engine.io/x3d_implementation_lighting.php" />.</para>
 
 <para>You can also use classic ray-tracer of our engine to see the correct
 lighting.</para>
@@ -184,7 +184,7 @@ then you can use <literal>TGLRendererLights</literal> directly.
 <para>When you render 3D models using our engine classes,
 like <literal>TCastleScene</literal>, everything related to lights
 is automatically taken care of.
-All lights (including the headlight, see <ulink url="http://castle-engine.sourceforge.net/x3d_extensions.php#section_ext_headlight" />)
+All lights (including the headlight, see <ulink url="https://castle-engine.io/x3d_extensions.php#section_ext_headlight" />)
 can be described and animated inside the VRML/X3D model. Programmers
 can also control lights by code.
 Some useful things are <literal>TCastleSceneCore.HeadlightOn</literal>
@@ -204,7 +204,7 @@ for everything. Using <literal>TCastleAbstractViewport.UseGlobalLights = true</l
 does this for you.</para>
 
 <para>I use this technique in my games. For example see <ulink
-  url="http://castle-engine.sourceforge.net/castle.php">
+  url="https://castle-engine.io/castle.php">
 <quote>The Castle</quote></ulink> levels.</para>
 
 </sect2>

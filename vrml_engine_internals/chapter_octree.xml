@@ -224,7 +224,7 @@ around the near box.</para>
 </para>
 
 <para>You can view octree like this using
-<ulink url="http://castle-engine.sourceforge.net/view3dscene.php">
+<ulink url="https://castle-engine.io/view3dscene.php">
 view3dscene</ulink>. Just turn on the menu option <quote>View</quote>
 -> <quote>Show whole octree</quote>. There are also menu commands to
 investigate octree nodes only at the particular depth.</para>

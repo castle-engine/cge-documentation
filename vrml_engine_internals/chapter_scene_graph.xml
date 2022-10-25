@@ -18,10 +18,10 @@ or solutions &mdash; this would be too low-level stuff, uninteresting
 from a general point of view. If you're an ObjectPascal programmer
 and you want to actually use my engine then you may find it helpful
 to study
-<ulink url="http://castle-engine.sourceforge.net/sources.php">
+<ulink url="https://castle-engine.io/sources.php">
 source code</ulink> (especially example programs in <filename>examples</filename>
 subdirectories) and
-<ulink url="http://castle-engine.sourceforge.net/reference.php">
+<ulink url="https://castle-engine.io/reference.php">
 units reference</ulink> while reading this document.
 If you only want to read this document, everything that you need
 is some basic idea about object-oriented programming.</para>
@@ -518,7 +518,7 @@ add them as a children of other nodes, you can set their
 fields as you like, and so on. Also several methods for
 enumerating and searching the nodes graph are provided
 (like <literal>EnumerateNodes</literal> and <literal>FindNode</literal>).
-See <ulink url="http://castle-engine.sourceforge.net/reference.php">units
+See <ulink url="https://castle-engine.io/reference.php">units
 reference</ulink> for details.</para>
 
 <para>I made a decent converter from 3DS, Wavefront OBJ and other file formats
@@ -704,7 +704,7 @@ Leftmost column has no over-triangulation, next columns
 have more and more over-triangulation.
 We use our own extensions to control the triangulation,
 see
-<ulink url="http://castle-engine.sourceforge.net/x3d_implementation_geometry3d_extensions.php"/>
+<ulink url="https://castle-engine.io/x3d_implementation_geometry3d_extensions.php"/>
 for details.</para>
 
 <para>Spot lights shine on every object.
@@ -800,12 +800,12 @@ cones and cylinders) doesn't matter here at all.</para>
     global variables.</para></listitem>
 
   <listitem><para>VRML / X3D authors can use the
-    <ulink url="http://castle-engine.sourceforge.net/x3d_implementation_geometry3d_extensions.php">
+    <ulink url="https://castle-engine.io/x3d_implementation_geometry3d_extensions.php">
     custom triangulation fields</ulink> in VRML node to control this.</para></listitem>
 
   <listitem><para>Finally, my programs
-    <ulink url="http://castle-engine.sourceforge.net/view3dscene.php">view3dscene</ulink> and
-    <ulink url="http://castle-engine.sourceforge.net/rayhunter.php">rayhunter</ulink> allow
+    <ulink url="https://castle-engine.io/view3dscene.php">view3dscene</ulink> and
+    <ulink url="https://castle-engine.io/rayhunter.php">rayhunter</ulink> allow
     you to control this by command-line options</para>
 
 <screen>--detail-quadric-slices &lt;integer&gt;
@@ -879,7 +879,7 @@ it to the <literal>AllowedChildrenNodes</literal> list.</para>
 <para>This way you can define specific VRML nodes for a specific
 programs, without the need to modify anything within the base units.
 I used this technique in the
-<ulink url="http://castle-engine.sourceforge.net/malfunction.php">
+<ulink url="https://castle-engine.io/malfunction.php">
 malfunction game</ulink> to define special-purpose VRML nodes like
 <literal>MalfunctionLevelInfo</literal> and
 <literal>MalfunctionNotMovingEnemy</literal>.
