@@ -155,7 +155,7 @@ VRML 2.0 / X3D requirements with fixed-function rendering:</para>
 <para>Shader pipeline overcomes above problems. We program spot falloff
 ourselves in GLSL, honoring <literal>beamWidth</literal> correctly.
 We also do per-pixel lighting calculation (Phong shading).
-See <ulink url="https://castle-engine.io/x3d_implementation_lighting.php" />.</para>
+See <ulink url="https://castle-engine.io/x3d_implementation_lighting.php">lighting</ulink>.</para>
 
 <para>You can also use classic ray-tracer of our engine to see the correct
 lighting.</para>
