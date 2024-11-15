@@ -23,11 +23,10 @@ html_post = mkdir -p $(1)admonitions/ && \
   cp -f formulas/*.png $(1)formulas/ && \
   cp -R html-parts/images/* $(1)images/ && \
   cp -R html-parts/castle-engine-website-base \
-        html-parts/cge-pasdoc.js \
-	html-parts/cge-pasdoc.css \
-	$(1) && \
-  castle-engine simple-compile post_process_html.lpr && \
-  ./post_process_html
+      	html-parts/cge-pasdoc.css \
+        $(1) && \
+        castle-engine simple-compile post_process_html.lpr && \
+        ./post_process_html
 
 .PHONY: default
 default: validate-xmllint html pdf
